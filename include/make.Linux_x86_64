@@ -1,0 +1,23 @@
+#---------------------- for Linux  ------------------------
+#  system-specific makefile macros.
+# -Wall shows lots of comple-time warnings
+CPPFLAGS = -DOS=LINUX -DFORTRAN=F90
+CORE_FLAGS= -O3 -DBLAS2
+CORE_FLAGS= -O2
+#CORE_FLAGS= -O3 
+FFLAGS=-fdefault-integer-8 -fdefault-real-8
+FFLAGS=
+FC= gfortran -g -fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
+FC=gfortran -Wall -Wno-unused-variable -Wno-unused-dummy-argument
+LN=gfortran
+LIBS= -lblas
+LIBS=
+
+#---- where to find the pgplot and MPI libraries ---
+MPILIB=mpi_nul.o
+BLASLIB= -L/usr/local/unsupported/lib -lf77blas -latlas
+BLASLIB=
+PLOTLIB= -L${HOME}/pgplot -lpgplot -lX11
+
+
+
