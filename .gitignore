@@ -1,3 +1,20 @@
+# object code and Fortran module files
 *.o
 *.mod
 
+# The compiled binaries
+danfe
+danmesh
+danmung
+danplot
+danfront
+danfrontg
+sierpinski
+# some compiel dcode - one day these will be removed or tidied up
+qp
+qp_ps
+pl2ps_2win
+
+
+# the working copy of teh platform specific makefile options
+make.*
