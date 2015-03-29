@@ -1,8 +1,10 @@
+= Examples for teh DANFE Finite Element engine
+
 There are 6 examples here
 
 
-ex1: a Simple 2d cantilever.
-   This shows th basic operation of danfe on a simple structure
+_ex1_ : a Simple 2d cantilever.
+   This shows the basic operation of danfe on a simple structure
    The is a therotical solution to the this case : tip deflection is given by this formula:
 
     The mesh we used has 20 by 6 finite elements: each an 8 node quadrilateral.
@@ -14,7 +16,7 @@ ex2: 3d Beam
 
 ex3: Material non-lineariry: 2d Foundation
 
-ex4: example of multipel materias and eleement type?
+ex4: example of multiple materias and eleement types?
 
 ex5 : Adaptive Shape optimisation of a beam
    Here a rectangular canilever mesh is created and a point load applied at the tip.
