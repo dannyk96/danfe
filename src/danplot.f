@@ -784,7 +784,8 @@ c.... should we handle *QUICKPLOT ??
         IKEYWORD = IKEYWORD + 1
         CALL GET_KEYWORD (U1,U0,KEYWORD)
         if (iverb>=3)          !- or use colourisation
-     &  WRITE (   *,'(I3,A,A)') IKEYWORD, ' : ',KEYWORD
+     &   CALL PRINT_KEYWORD(IKEYWORD,KEYWORD,.FALSE.)
+!     !  WRITE (   *,'(I3,A,A)') IKEYWORD, ' : ',KEYWORD
         if (iverb>=2) then          !- or use colourisation
           WRITE (LINE,'(I3,A,A)') IKEYWORD, ' : ',KEYWORD
           CALL POST_POP_UP (LINE)
@@ -826,11 +827,11 @@ c--------------------------- titles, etc. ------------------------------
  9123   IF(I.NE.11) BACKSPACE (U1)   !-- point back to the next *KEYWORD
         N_TITLES = I-1
         WRITE(*,'(A)') (char(27)//'[1;33m'//
-     &                 TITLES(I)//char(27)//'[;37m',I=1,N_TITLES)
+     &                 TITLES(I)//char(27)//'[0m',I=1,N_TITLES)
       ELSEIF (KEYWORD.EQ.'*LOAD_STEP_TITLE') THEN  
         READ (U1,'(A)') TITLE_LS
         IF (TITLE_LS.EQ.' ') TITLE_LS = ' --- No title was given --- '     
-        WRITE(*,'(A)')  char(27)//'[1;33m'//TITLE_LS//char(27)//'[;37m'
+        WRITE(*,'(A)')  char(27)//'[1;33m'//TITLE_LS//char(27)//'[0m'
       ELSEIF (KEYWORD.EQ.'*LOAD_CASE_NUMBER') THEN  
         READ (U1,*) LC_number         !- not actualy used by Danplot
       ELSEIF (KEYWORD.EQ.'*LOAD_STEP_NUMBER') THEN  

@@ -547,7 +547,7 @@ c     If under Danplot, write to the screen in a pop-up
         WRITE (*,'(A,I3,1X,A,2X,A,A)') 
      &    CHAR(27)//'[1;33m  ',IKEYWORD
      &   ,CHAR(27)//'[1;32m  ',KEYWORD(1:ISTR_END(KEYWORD))
-     &   ,CHAR(27)//'[1;37m.'
+     &   ,CHAR(27)//'[0m.'
       else
       WRITE (*,'(I3,1X,3A)') IKEYWORD,
      &    '[',KEYWORD(2:ISTR_END(KEYWORD)),']'
