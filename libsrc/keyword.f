@@ -263,7 +263,7 @@ C     22-8-94 Patched Salford BUG where IOSTAT=104 at (subsequent) EOFs
 C
       IMPLICIT NONE
       CHARACTER LINE*80, file*80
-      INTEGER IO,IOSTAT, IFR,ITO, I
+      INTEGER IO,IOSTAT, IFR,ITO, I, ios
       LOGICAL FILE_OPEN
 
       IF (IOSTAT.EQ.0) THEN
@@ -280,7 +280,9 @@ C
       ELSE
 c----------------- check other possible read-errors --------------------
         BACKSPACE (IO)           !(should never get an error here)
-        READ (IO,'(A)') LINE     !(or here either)
+        READ (IO,'(A)',IOSTAT=ios) LINE     !(or here either)
+        if (ios.ne.0) print*,'ios=',ios, "(IN_TEST)"
+        if (ios.ne.0) return 2
 
         IF (LINE(1:1).eq.'*') THEN !------- A new Keyword -----------
           BACKSPACE (IO)           !- point back to the '*'
