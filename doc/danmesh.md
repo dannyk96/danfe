@@ -36,8 +36,8 @@ features requested by users.
                              ========
 
    1   : OVERVIEW
-      1.1   Overall philosophy 
-      1.2   Introduction
+         1.1   Overall philosophy
+         1.2   Introduction
 
    2   : GUIDE TO THE SECTIONS OF THE LIBRARY
       2.1:  General
@@ -68,9 +68,9 @@ index.
 
 ---------------------------------------------------------------------------
 
-=== Chapter 1 : The DANMESH mesh generation system
+** Chapter 1 : The DANMESH mesh generation system
 
- 1.1 Overview
+*** 1.1 Overview
 
 DANMESH is a finite element mesh generating system. The package exists 
 as a portable Fortran library together with a driving main program. 
@@ -88,19 +88,19 @@ for ÿa ÿparticular mesh may be chosen. ÿFor example , for ÿa ÿcyclidical
 mesh, wether to create nodes along arcs from the beginning, or form as a 
 rectangular block then transform ÿinto a cylinder later. 
 
- 1.2 The concept of keyword driven datafiles
+*** 1.2 The concept of keyword driven datafiles
 ... ÿÿPhilosophy ÿof  ÿdata ÿfiles ÿpartitionned ÿinto ÿdata-modules ÿby 
 *keywords 
 
 
- 1.3 Special charcters
+*** 1.3 Special charcters
 
 Although the format of the input data is free-form, several symbols have 
 a special meaning if placed in column 1. In particluar, every section of 
 data is marked by a Keyword that starts with a '*' character. Other 
 symbols mark comment lines, include files and output redirection.
 
- 1.3.1 Keywords
+**** 1.3.1 Keywords
 
 All keywords begin have an asterix as their first character to identify 
 them. 
