@@ -1,10 +1,3 @@
-L---T  -T1T-T-T-T-T2T---T--- @10i-+----4T---+---T5----+-T--6----T----7-RT-+--  -
-
-
-
-
-
-
 ---------------------------------------------------------------------------
 
 
@@ -26,28 +19,9 @@
 
 ---------------------------------------------------------------------------
 
-
-
-
-
-
-
-
 Revsion 0.0      24-3-94
 Revsion 0.1       9-7-94
 Revsion 0.2       9-8-94
-
-
-
-
-
-
-
-
-
-
-
-
 
 The latest release of DANMESH and this documentation is available on-
 line by anonymous FTP from the following URL:
@@ -58,19 +32,12 @@ Any queries may be addressed to the author at the above address. The
 author welcomes any constructive critisism and is keen to add any 
 features requested by users.
 
-
-
-
-
-
                              CONTENTS
                              ========
 
- 
-
    1   : OVERVIEW
-      1.1   Overall philosophy 
-      1.2   Introduction
+         1.1   Overall philosophy
+         1.2   Introduction
 
    2   : GUIDE TO THE SECTIONS OF THE LIBRARY
       2.1:  General
@@ -99,24 +66,11 @@ features requested by users.
 alphabetic order, and contain full X-refs, so maybe we don't need an 
 index.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---------------------------------------------------------------------------
 
-Chapter 1 : The DANMESH mesh generation system
+** Chapter 1 : The DANMESH mesh generation system
 
- 1.1 Overview
+*** 1.1 Overview
 
 DANMESH is a finite element mesh generating system. The package exists 
 as a portable Fortran library together with a driving main program. 
@@ -129,24 +83,24 @@ There are modules for defining the nodes and elements, for moving and
 deleting existing nodes and elements, subdiving and changing elements 
 and for saving and loading a mesh in a variety of formats.
 
-Several ÿmethods may be used to create a mesh and so the most ÿefficient 
-for ÿa ÿparticular mesh may be chosen. ÿFor example , for ÿa ÿcyclidical 
+Several Ã¿methods may be used to create a mesh and so the most Ã¿efficient 
+for Ã¿a Ã¿particular mesh may be chosen. Ã¿For example , for Ã¿a Ã¿cyclidical 
 mesh, wether to create nodes along arcs from the beginning, or form as a 
-rectangular block then transform ÿinto a cylinder later. 
+rectangular block then transform Ã¿into a cylinder later. 
 
- 1.2 The concept of keyword driven datafiles
-... ÿÿPhilosophy ÿof  ÿdata ÿfiles ÿpartitionned ÿinto ÿdata-modules ÿby 
+*** 1.2 The concept of keyword driven datafiles
+... Ã¿Ã¿Philosophy Ã¿of  Ã¿data Ã¿files Ã¿partitionned Ã¿into Ã¿data-modules Ã¿by 
 *keywords 
 
 
- 1.3 Special charcters
+*** 1.3 Special charcters
 
 Although the format of the input data is free-form, several symbols have 
 a special meaning if placed in column 1. In particluar, every section of 
 data is marked by a Keyword that starts with a '*' character. Other 
 symbols mark comment lines, include files and output redirection.
 
- 1.3.1 Keywords
+**** 1.3.1 Keywords
 
 All keywords begin have an asterix as their first character to identify 
 them. 
@@ -164,17 +118,17 @@ the parser.
  
 1.3.3 File redirection and 'Include' files 
 
-Secondary ÿdata files may be 'Include'-d into the main file by ÿmeans of 
+Secondary Ã¿data files may be 'Include'-d into the main file by Ã¿means of 
 the '<' character followed by a filename. This allows inclusion of whole 
-sets ÿof ÿmodules (for example a pre-defined section), ÿor ÿjust ÿa ÿfew 
-numbers. ÿThe '<' ÿtoken may appear anywhere even within the middle of a 
-module, ÿand also maybe be nested within 'Include' ÿfiles to any ÿlevel. 
+sets Ã¿of Ã¿modules (for example a pre-defined section), Ã¿or Ã¿just Ã¿a Ã¿few 
+numbers. Ã¿The '<' Ã¿token may appear anywhere even within the middle of a 
+module, Ã¿and also maybe be nested within 'Include' Ã¿files to any Ã¿level. 
 Modules such as *IMPORT_NFF are almost always followed by redirection to 
 read from the fixed format file. 
-   By ÿdefault output from modules such as *WRITE_DANPLOT go to ÿa ÿfile 
+   By Ã¿default output from modules such as *WRITE_DANPLOT go to Ã¿a Ã¿file 
 with the same name as the primary input file but with the suffix '.OUT'. 
-The ÿ'>' ÿcharacter may be used to change the destination of ÿsubsequent 
-output. ÿThis is followed by the filename to use. ÿA single '>' ÿwith no 
+The Ã¿'>' Ã¿character may be used to change the destination of Ã¿subsequent 
+output. Ã¿This is followed by the filename to use. Ã¿A single '>' Ã¿with no 
 filename will revert output to the previous output file. 
 
  (( Should *WRITE_OFF *always*  write to a file with a 'GEO' suffix ? 
@@ -186,9 +140,9 @@ filename will revert output to the previous output file.
 
 Chapter 2 : The format of the DANMESH package
 
-The ÿlibrary of modules is divided into 7 sections, ÿwhich are described 
-in this chapter. ÿChapter 3 contains a full description of every module, 
-arranged in alphabetical order. ÿThe description includes the syntax, ÿa 
+The Ã¿library of modules is divided into 7 sections, Ã¿which are described 
+in this chapter. Ã¿Chapter 3 contains a full description of every module, 
+arranged in alphabetical order. Ã¿The description includes the syntax, Ã¿a 
 description, examples of use, any caveats, and cross-references to other 
 related modules. 
 
@@ -271,8 +225,8 @@ Modules
 
 SECTION 4 :  ELEMENT PROPERTY GROUPS
 
-In ÿa ÿmesh ÿit is typical to have the elements ÿof ÿdifferent ÿproperty 
-types, ÿÿeg. ÿConcrete piles with a mesh of sand overlying clay, ÿÿPlate 
+In Ã¿a Ã¿mesh Ã¿it is typical to have the elements Ã¿of Ã¿different Ã¿property 
+types, Ã¿Ã¿eg. Ã¿Concrete piles with a mesh of sand overlying clay, Ã¿Ã¿Plate 
 bending elements of different thicknesses, or layers of material are the 
 same but are added to the mesh in succesive load steps. 
   These may be defined automaticaly (for example by *LAYERED_SLOPE), 
@@ -299,17 +253,17 @@ Modules
 
 SECTION 5 : GEOMETRY MORPHING ROUTINES
 
-It ÿis ÿoften convenient to form parts of the mesh as a ÿsimple ÿregular 
-block ÿand then 'morph' ÿthis mesh into its final form by, ÿfor ÿexample 
-wrapping it around into a cylinder. ÿAlso pre-formed standard meshes may 
-be ÿscaled (*SCALE_MESH) ÿand translated (*SHIFT_MESH) ÿto ÿthe ÿdesired 
+It Ã¿is Ã¿often convenient to form parts of the mesh as a Ã¿simple Ã¿regular 
+block Ã¿and then 'morph' Ã¿this mesh into its final form by, Ã¿for Ã¿example 
+wrapping it around into a cylinder. Ã¿Also pre-formed standard meshes may 
+be Ã¿scaled (*SCALE_MESH) Ã¿and translated (*SHIFT_MESH) Ã¿to Ã¿the Ã¿desired 
 configuration. 
    Some of these modules perform quite specialised tasks, such as 
 *WRAP_TWIST_Y. This rotates succesive x-z planes around the y-axis so as 
 to give a 'spiral' mesh, eg. for a screw-thread or helix-type mesh.
 
    After moving nodes about, some nodes may end up in the same location, 
-the ÿmodule *JOIN_COINCIDENT_NODES will give these nodes the ÿsame ÿnode 
+the Ã¿module *JOIN_COINCIDENT_NODES will give these nodes the Ã¿same Ã¿node 
 number, then renumber the remaining nodes after deleting the 'extra' un-
 needed node numbers 
 
@@ -373,18 +327,18 @@ providing a simple way to get a 'good' bandwidth in simple FE programs.
 The routine *SORT_ELEMENT_FROM_POINT performs a similar task for the 
 element numbering (eg for frontal solvers) by considering the centroid 
 of each element.
-  Some ÿmodules ÿcan give elements so thin that ÿoppsoite ÿsides ÿbecome 
-adjacent, ÿfor example using *LAYERED_SLOPE with a seam that peters out. 
-This ÿcan ÿcause ÿproblems ÿin ÿFE ÿsolvers. ÿÿThe ÿmodule *DELETE_ZERO_ 
-AREA_ELEMENTS ÿwill ÿremove these and renumber the renmaining ÿelements. 
-This ÿwould ÿnormaly ÿbe followed ÿby ÿ*JOIN_COINCIDENT_NODES ÿto ÿ'glue 
+  Some Ã¿modules Ã¿can give elements so thin that Ã¿oppsoite Ã¿sides Ã¿become 
+adjacent, Ã¿for example using *LAYERED_SLOPE with a seam that peters out. 
+This Ã¿can Ã¿cause Ã¿problems Ã¿in Ã¿FE Ã¿solvers. Ã¿Ã¿The Ã¿module *DELETE_ZERO_ 
+AREA_ELEMENTS Ã¿will Ã¿remove these and renumber the renmaining Ã¿elements. 
+This Ã¿would Ã¿normaly Ã¿be followed Ã¿by Ã¿*JOIN_COINCIDENT_NODES Ã¿to Ã¿'glue 
 together' the elements on either side of the deleted elements. 
 
 
 SECTION 8: MISCELANEOUS AND OBSOLETE MODULES
 
-This ÿsection contains an Appendix of Modules, ÿwhose tasks are specific 
-to ÿparticular cases, ÿor whose action can be better performed be use of 
+This Ã¿section contains an Appendix of Modules, Ã¿whose tasks are specific 
+to Ã¿particular cases, Ã¿or whose action can be better performed be use of 
 other modules. Modules in this section will probably be removed from the 
 next release of the package. 
 
@@ -523,9 +477,9 @@ Data:
     <none>
 
 Description:
-    This ÿsets the program to work in two dimensions. ÿIt should be used
+    This Ã¿sets the program to work in two dimensions. Ã¿It should be used
 before any other mesh-generating keywords. This keyword is not necessary 
-if ÿthe ÿmesh is explicitly two dimensional or three ÿdimensional, ÿÿfor 
+if Ã¿the Ã¿mesh is explicitly two dimensional or three Ã¿dimensional, Ã¿Ã¿for 
 example *IMPORT_3DEDIT 
 
 See also:
@@ -604,8 +558,8 @@ Data:
 directions respectively.
 
 Description:
-    This ÿmodule ÿcreates a simple regular mesh of simplex ÿelements ÿ(4 
-node ÿquadrilaterals ÿin 2D, ÿ8 ÿnode bricks in 3D). ÿÿThe ÿelements ÿare 
+    This Ã¿module Ã¿creates a simple regular mesh of simplex Ã¿elements Ã¿(4 
+node Ã¿quadrilaterals Ã¿in 2D, Ã¿8 Ã¿node bricks in 3D). Ã¿Ã¿The Ã¿elements Ã¿are 
 numbered in nxe first, then nye (then nze). This module may be used as a 
 starting point for mesh-generation. 
 
@@ -645,24 +599,24 @@ Data:
 'stage-line'
 
 Description:
-    Ths ÿmodule allows a direct way of producing meshes where ÿthe ÿsoil 
-lies in bands of continously varying thickness. ÿThe mesh produced is in 
-the ÿform ÿof 4-noded quadrilaterals with each layer given ÿa ÿdifferent 
+    Ths Ã¿module allows a direct way of producing meshes where Ã¿the Ã¿soil 
+lies in bands of continously varying thickness. Ã¿The mesh produced is in 
+the Ã¿form Ã¿of 4-noded quadrilaterals with each layer given Ã¿a Ã¿different 
 material property number. (the lowest layer is material type 1) One line 
-of ÿdata is needed for each 'stage-line'. ÿThese are the vertical ÿlines 
-between each element, ÿhence for nxe element in the x-direction, ÿÿnxe+1 
+of Ã¿data is needed for each 'stage-line'. Ã¿These are the vertical Ã¿lines 
+between each element, Ã¿hence for nxe element in the x-direction, Ã¿Ã¿nxe+1 
 lines of data are required. 
 
 Advanced Usage:
-    Since ÿthe ÿmesh ÿproduced is in the form ÿof ÿ4-node ÿquadrilateral 
-elements, ÿÿwith only one element per layer then we would normally ÿthis 
-module ÿwith ÿ*DANBLOCKS ÿto both increase the number ÿof ÿelements ÿand 
-change ÿthe ÿelement type to (say) ÿ8-noded quadrilaterals. ÿÿSimerlarly 
+    Since Ã¿the Ã¿mesh Ã¿produced is in the form Ã¿of Ã¿4-node Ã¿quadrilateral 
+elements, Ã¿Ã¿with only one element per layer then we would normally Ã¿this 
+module Ã¿with Ã¿*DANBLOCKS Ã¿to both increase the number Ã¿of Ã¿elements Ã¿and 
+change Ã¿the Ã¿element type to (say) Ã¿8-noded quadrilaterals. Ã¿Ã¿Simerlarly 
 *DANBLOCKS may be used transform the mesh into 3D. 
-    If ÿone ÿof the 'seams' ÿpeters out, ÿthen the intersection ÿof ÿthe 
-layers ÿabove ÿand ÿbelow will coincide in the ÿdata. ÿÿThe ÿ'zero-area' 
-elements ÿproduced ÿin ÿthis collapsed layer may then ÿbe ÿdeleted ÿwith 
-*DELETE_ZERO_AREA_ELEMETS ÿÿand ÿthen ÿÿthe ÿÿÿsides ÿÿÿrejoined ÿÿÿwith 
+    If Ã¿one Ã¿of the 'seams' Ã¿peters out, Ã¿then the intersection Ã¿of Ã¿the 
+layers Ã¿above Ã¿and Ã¿below will coincide in the Ã¿data. Ã¿Ã¿The Ã¿'zero-area' 
+elements Ã¿produced Ã¿in Ã¿this collapsed layer may then Ã¿be Ã¿deleted Ã¿with 
+*DELETE_ZERO_AREA_ELEMETS Ã¿Ã¿and Ã¿then Ã¿Ã¿the Ã¿Ã¿Ã¿sides Ã¿Ã¿Ã¿rejoined Ã¿Ã¿Ã¿with 
 *JOIN_COINCIDENT_NODES 
 
 
@@ -701,7 +655,7 @@ See also:
 
     *SLOPE_MESH
 
-A direct method for creating regular meshes with ÿoptional ÿsloping face 
+A direct method for creating regular meshes with Ã¿optional Ã¿sloping face 
 cut-out. 
 
 Data:
@@ -727,16 +681,16 @@ directions respectively.
       width(:) are the z-coordinates though the thickness of the model
 
 Description:
-    This ÿmodule allows the direct creatation of 'block'-style meshes of 
+    This Ã¿module allows the direct creatation of 'block'-style meshes of 
 elements. In 2 dimensions, these are 8-node quadrilaterals (8nq's), in 3 
-dimensions, ÿthese may be 8,14 or 20 node brick elements for example all 
+dimensions, Ã¿these may be 8,14 or 20 node brick elements for example all 
 meshes in Chapter 6 of the Manchester FE book [1]=[Smith and Griffiths]. 
-In ÿits simplest form, ÿnxs is set to be equal to nxe, ÿnys is set to be 
-equal to nye and bottom(:) ÿis given the same values as top. ÿThis ÿwill 
-produce a  regular 'block' ÿ(eg book60.dat). ÿIf top are given different 
+In Ã¿its simplest form, Ã¿nxs is set to be equal to nxe, Ã¿nys is set to be 
+equal to nye and bottom(:) Ã¿is given the same values as top. Ã¿This Ã¿will 
+produce a  regular 'block' Ã¿(eg book60.dat). Ã¿If top are given different 
 values to bottom, then the 'vertical' mesh lines will slope, for example 
-the slope stabilty mesh of 'book61.dat'. ÿIf ndim is set to 3 and so nze 
-and ÿwidth(:) ÿÿsupplied, ÿthen the 3D equivalents of these ÿmeshes ÿare 
+the slope stabilty mesh of 'book61.dat'. Ã¿If ndim is set to 3 and so nze 
+and Ã¿width(:) Ã¿Ã¿supplied, Ã¿then the 3D equivalents of these Ã¿meshes Ã¿are 
 produced with nze elements into the plane of the 2D cross-section. 
 
 Advanced Use:
@@ -982,11 +936,11 @@ Data:
     <none>
 
 Description:
-    This module pauses until the <CR> ÿkey is pressed, ÿthen clears ÿthe 
-screen ÿand ÿdraws ÿthe current mesh. ÿOn a PC with a VGA ÿscreen, ÿÿthe 
-backgraound ÿis blue, ÿwith the nodes in red and the elements in ÿwhite. 
+    This module pauses until the <CR> Ã¿key is pressed, Ã¿then clears Ã¿the 
+screen Ã¿and Ã¿draws Ã¿the current mesh. Ã¿On a PC with a VGA Ã¿screen, Ã¿Ã¿the 
+backgraound Ã¿is blue, Ã¿with the nodes in red and the elements in Ã¿white. 
 The view is held until the next press of <CR>. 
-    For ÿmore advanced plotting options including full three-dimensional 
+    For Ã¿more advanced plotting options including full three-dimensional 
 shading, the DANPLOT package should be used. 
 
 Example usage:
@@ -1068,7 +1022,7 @@ Output a file of polygons suitable be raytracing.
 Data:
 
 Description:
-    This ÿexports the mesh as a set of polygons in RAYSHADE ÿformat, ÿÿa 
+    This Ã¿exports the mesh as a set of polygons in RAYSHADE Ã¿format, Ã¿Ã¿a 
 public-domain raytracing package. .. 
 
 Advanced usage:
@@ -1316,10 +1270,10 @@ material layer such a coal-seam within the mesh peters out. Such
 elements do not really exist and can cause problems in analysis since 
 they have zero area and hence zero stiffness  causing numerical 
 problems.
-    All ÿthe elements of the mesh are examined. ÿFor the centre of ÿeach 
-element, ÿÿthe Jacobian matrix is produced. ÿIf the determinant of ÿthis 
+    All Ã¿the elements of the mesh are examined. Ã¿For the centre of Ã¿each 
+element, Ã¿Ã¿the Jacobian matrix is produced. Ã¿If the determinant of Ã¿this 
 matrix is zero (using a small tolerance), then the element is considered 
-degenerate ÿÿand ÿis ÿremoved. ÿÿThe ÿnodes ÿare ÿnot ÿremoved ÿand ÿÿso 
+degenerate Ã¿Ã¿and Ã¿is Ã¿removed. Ã¿Ã¿The Ã¿nodes Ã¿are Ã¿not Ã¿removed Ã¿and Ã¿Ã¿so 
 *DELETE_ZERO_AREA_ELEMENTS is normally followed by *DELETE_ORPHAN_NODES. 
     When we are removing an infinitely thin layer from the centre of a 
 mesh then we normal which to connect the elements abobe and below this 
@@ -1383,7 +1337,7 @@ warped so that seperate edges are brought together. In order for the FE
 program to know that the two are connected, it is convenient to 
 give them the same node number. This also reduces the number of nodal 
 coordinates that need to be stored.
-    A ÿside ÿeffect ÿof this module is that the nodes ÿnumbers ÿare ÿre-
+    A Ã¿side Ã¿effect Ã¿of this module is that the nodes Ã¿numbers Ã¿are Ã¿re-
 sequenced to close up the 'gaps'. 
 
 
@@ -1416,11 +1370,11 @@ Data:
    xp,yp,zp is the coordinate in space of the sorting point.
 
 Description:
-    Given ÿa ÿpoint ÿin space, ÿthis sorts the nodes in order ÿof ÿtheir 
-distance ÿfrom ÿthis ÿpoint, ÿsuch that the node nearest to ÿthis ÿpoint 
+    Given Ã¿a Ã¿point Ã¿in space, Ã¿this sorts the nodes in order Ã¿of Ã¿their 
+distance Ã¿from Ã¿this Ã¿point, Ã¿such that the node nearest to Ã¿this Ã¿point 
 becomes node number '1'. Although, this routine is not really necessary, 
-some older FE programs use banded matrix solvers where ÿthe freedoms are 
-numbered in the same order as the nodes. without sorting, ÿthis can lead 
+some older FE programs use banded matrix solvers where Ã¿the freedoms are 
+numbered in the same order as the nodes. without sorting, Ã¿this can lead 
 to unacceptably large bandwidths. 
           
 This sorts all the nodes 
@@ -1453,11 +1407,11 @@ Data:
    xp,yp,zp is the coordinate in space of the sorting point.
 
 Description:
-    Given ÿa ÿpoint in space, ÿthis sorts the elements in order ÿof ÿthe 
-distances ÿof ÿtheir ÿcentres from this point, ÿsuch ÿthat ÿthe ÿeleemnt 
-nearest ÿto ÿthis point is becomes element number '1'. ÿAlthough, ÿÿthis 
-routine ÿis ÿnot really necessary, ÿÿsome older FE programs ÿuse frontal
-matrix solvers. where ÿthe maximum instataneous front-width, is a 
+    Given Ã¿a Ã¿point in space, Ã¿this sorts the elements in order Ã¿of Ã¿the 
+distances Ã¿of Ã¿their Ã¿centres from this point, Ã¿such Ã¿that Ã¿the Ã¿eleemnt 
+nearest Ã¿to Ã¿this point is becomes element number '1'. Ã¿Although, Ã¿Ã¿this 
+routine Ã¿is Ã¿not really necessary, Ã¿Ã¿some older FE programs Ã¿use frontal
+matrix solvers. where Ã¿the maximum instataneous front-width, is a 
 function of the biggest difference in element number at a node.
 
 Example usage:
@@ -1543,8 +1497,8 @@ Data:
     <none>
 
 Description:
-    This ÿcreates ÿa mesh of triangular elemnts from one composed ÿof ÿa 
-grid ÿof ÿparent ÿquadrilaterals.
+    This Ã¿creates Ã¿a mesh of triangular elemnts from one composed Ã¿of Ã¿a 
+grid Ã¿of Ã¿parent Ã¿quadrilaterals.
 For each element, a centoidal node is created. For 3-noded triangular 
 element are created out of each quadrilateral such the third node of 
 each triangle is this new central node.
@@ -1572,8 +1526,8 @@ Data:
     <none>
 
 Description:
-    This ÿcreates ÿa mesh of triangular elemnts from one composed ÿof ÿa 
-grid ÿof ÿparent ÿquadrilaterals.
+    This Ã¿creates Ã¿a mesh of triangular elemnts from one composed Ã¿of Ã¿a 
+grid Ã¿of Ã¿parent Ã¿quadrilaterals.
 Two 3-noded triangular 
 element are created out of each quadrilateral such the first edge of 
 each triangle is along the diagonal of the parent.
@@ -1916,8 +1870,8 @@ Description:
 value of the y-coordinate at that point. This produces a spiraly twisted 
 column from a straight one. If the column is not centered on the y-axis 
 then this produces a 'corkscrew' or 'spiral-staircase' type mesh.
-    This ÿis an example of a special purpose module. Its ÿsource code is 
-gven here as an example of how to structure ÿa user written ÿmodule ÿfor 
+    This Ã¿is an example of a special purpose module. Its Ã¿source code is 
+gven here as an example of how to structure Ã¿a user written Ã¿module Ã¿for 
 transforming the geometry.
 
 Example usage:
