@@ -94,6 +94,8 @@ danfe: danfe.o $(DANLIB) $(MPILIB)
 	$(LN) -o $@ $^ $(BLASLIB)
 danmesh: danmesh.o $(DANLIB) $(MPILIB)
 	$(LN) -o $@ $^ $(BLASLIB)
+danslip: danslip.o $(DANLIB)
+	$(LN) -o $@ $^ 
 
 danfront: danfront.o afront.o  $(INT_GEN)
 	$(LN) -o $@ $^  
@@ -119,6 +121,8 @@ pl2ps_2win: pl2ps_2win.o
 danfe.o: src/danfe.f
 	$(FC) -c -I include $<
 danmesh.o: src/danmesh.f
+	$(FC) -c $<
+danslip.o: src/danslip.f
 	$(FC) -c $<
 danplot.o: src/danplot.f
 	$(FC) -c $<
