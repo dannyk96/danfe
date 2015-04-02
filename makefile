@@ -145,7 +145,7 @@ afrontg.o: libsrc/afront.F90
 	$(FC) -c $(F90FLAGS) -DPGPLOT -o $@ $<
 
 #---- all teh library code in libsrc
-int_gen.o: libsrc/int_gen.F
+int_gen.o: libsrc/int_gen.F90
 	$(FC) -c $(CPPFLAGS) $<
 keyword.o: libsrc/keyword.f
 	$(FC) -c $<
