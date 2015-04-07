@@ -1,15 +1,24 @@
 #---------------------- for Linux  ------------------------
 #  system-specific makefile macros.
 # -Wall shows lots of comple-time warnings
-CPPFLAGS = -DOS=LINUX -DFORTRAN=F90
+#CPPFLAGS = -DOS=LINUX -DFORTRAN=F90
+CPPFLAGS =
 CORE_FLAGS= -O3 -DBLAS2
 CORE_FLAGS= -O2
 #CORE_FLAGS= -O3 
-FFLAGS=-fdefault-integer-8 -fdefault-real-8
+
 FFLAGS=
-FC= gfortran -g -fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
-FC=gfortran -Wall -Wno-unused-variable -Wno-unused-dummy-argument
+# for runtime debugging
+FFLAGS+=-g
+#  for auto double precision
+FFLAGS=-fdefault-integer-8 -fdefault-real-8
+# for  warnign of source code bugs
+FFLAGS+=-fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
+
+FC=gfortran $(FFLAGS)
+FC_CPP=gfortran  -cpp $(FFLAGS)
 LN=gfortran
+
 LIBS= -lblas
 LIBS=
 

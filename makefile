@@ -130,8 +130,8 @@ danfront.o: src/danfront.f90 afront.o
 	$(FC) -c $(F90FLAGS) $<
 qp.o: src/qp.f
 	$(FC) -c $<
-qp_ps.o: src/qp_ps.F
-	$(FC) -c $<
+qp_ps.o: src/qp_ps.f
+	$(FC_CPP) -c $<
 pl2ps_2win.o: src/pl2ps_2win.f
 	$(FC) -c $<
 danmung.o: src/danmung.f
@@ -140,9 +140,9 @@ danmung.o: src/danmung.f
 #----- Sources: Danfront's extras ----
 # (note f90 module dependancies here)
 afront.o: libsrc/afront.F90
-	$(FC) -c $(F90FLAGS) $<
+	$(FC_CPP) -c $(F90FLAGS) $<
 afrontg.o: libsrc/afront.F90
-	$(FC) -c $(F90FLAGS) -DPGPLOT -o $@ $<
+	$(FC_CPP) -c $(F90FLAGS) -DPGPLOT -o $@ $<
 
 #---- all teh library code in libsrc
 int_gen.o: libsrc/int_gen.F90
