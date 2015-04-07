@@ -16,5 +16,5 @@ qp_ps
 pl2ps_2win
 
 
-# the working copy of teh platform specific makefile options
-make.*
+# the working copy of the platform specific makefile options
+./make.*
