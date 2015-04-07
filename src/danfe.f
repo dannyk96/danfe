@@ -29,9 +29,10 @@ c      - 2ø DANFE_MAINs have PE/=0 but read their own files
 
       parameter (maxprocs=512)
       common /MPP/iproc,nproc,status,proc_ma
-      INTEGER IPROC,NPROC, status(20), proc_map(0:maxprocs)
+      INTEGER IPROC,NPROC, status(20)
 
-      character command_line*255
+!     integer proc_map(0:maxprocs)       ! not yet impliemnted
+!     character command_line*255         ! not yet impliemnted (n/a?)
 
 c-- 4-11-99 conecpt of a processor-map --
 c
@@ -376,7 +377,8 @@ C---------------------------------------------------------------------
       INTEGER  U0                 !- 'root' data file
      &        ,U1                 !- 'current' data file
      &        ,U2                 !-  (.RES Misc output file - unused)
-     &        ,U3,u3d,u3s,u3e     !-  Output file(s)
+     &        ,U3                 !-  Output file(s) : main .out  (keyword based)
+!    &        ,u3d,u3s,u3e        !-  Output files: disps, stress,strains
      &        ,IOPS(30)           !- job-control options
      &        ,IDBG(10)           !- codes for 'debug' outputs
      &   ,Iters_cgs(50)           !- PCG iteration counts
@@ -394,12 +396,13 @@ c    &        ,file_out*128       !-- an output file
 !---------------------------------------------------------------------
 ! variables for parsing the command line
       CHARACTER :: filenames*1024=' ',    !- stack of input filenames
-     &                  FILENAME*60 =' ', !- input datfile name
-     &                  basename*60       !- base for output filenames
+     &                  FILENAME*60 =' '  !- input datfile name
+!    &                  basename*60       !- base for output filenames
       integer :: iverb=2           !  verbosity  so can increment or decrement from here.
      &          ,igraph=0          !- 0=no graphics, 1= ..
       character :: arg*80, arg1*1, arg2*1
-      integer :: nargs, danfe_argc
+      integer :: nargs   
+!     integer :: danfe_argc           ! depricated
       logical :: debug = .false.,     !- cf. iverb (maybe cpp this?)
      &           colorise=.true.       !- toggle if use ANSI colours
 
@@ -408,8 +411,6 @@ c    &        ,file_out*128       !-- an output file
      &        ,FOUND              !-- valid keyword flag
 
       REAL TIME(20)               !-- Program run-timings
-c      INTEGER  ARGC                !-- No. of command-line arguments
-c      EXTERNAL ARGC
       CHARACTER DATE_STAMP*20     !-- current date function
       EXTERNAL  DATE_STAMP
 
@@ -560,7 +561,7 @@ c   6: report how many files we used
        nargs= iargc()     !- for IRIX etc.
 
 !--------------- parse the command line ------------------
-      !nargs= danfe_argc()
+!     !nargs= danfe_argc()
       print*,'#args=',nargs
       iskip=0
       if (nargs==0) then
@@ -674,16 +675,16 @@ c       stop         !- really GOTO 888 (cf MPI)
 ! get the 'base name' to append outputfile extensions to.
 ! I guess we only do this if this is the *first* datafile ?
 !     call to_lower(FILE)        !- lower case is easier to handle(?)
-      FILE_ROOT=FILE(1:INDEX(FILE,'.d')-1)
+      FILE_ROOT=FILE(1:INDEX(FILE,'.d')-1)  ! fixme as .d extension is not obligatory
 
 c next is better as getting the 'basename'
 c best for outputfiles to go in the cwd
 c  but use teh source directory location for #include files
 !     OPEN (U2,FILE=FILE_ROOT(1:istr_end(file_root))//'.tab')  !-- Log (opt?)
       OPEN (U3,FILE=FILE_ROOT(1:istr_end(file_root))//'.out')  !-- Danplot
-      u3d=u3       !- output stream for DISPS (current)
-      u3s=u3       !   "       "        Stresses
-      u3e=u3       !   "       "        Strains
+!     u3d=u3       !- output stream for DISPS (current)
+!     u3s=u3       !   "       "        Stresses
+!     u3e=u3       !   "       "        Strains
 
 c.. hmm write this to all output files as we create them?
         WRITE(U3,'(A,78(''-'')/, A/A/A/, A,78(''-'')/ )')
@@ -2639,7 +2640,7 @@ c     INTEGER STACKSIZE
 c     PARAMETER (STACKSIZE=999 000 000)
 c     INTEGER*1 STACK
 c     COMMON /SPAWN_STACK/STACK
-      EXTERNAL DANFE_MAIN
+!     EXTERNAL DANFE_MAIN
 
 c     CALL DANFE_MAIN ()
 c     CALL SPAWN@ (DANFE_MAIN, STACK,STACKSIZE, HANDLE)

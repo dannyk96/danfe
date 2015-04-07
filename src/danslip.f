@@ -137,15 +137,16 @@ C
 
       REAL           GC (IGC,*)        ! Nodal coords
      &           ,DISPS (3,*)          ! Nodal Displacements
-      INTEGER NUMS(INUMS,*), IO, P(*)
+      INTEGER NUMS(INUMS,*), IO
+      integer :: p(*)                  ! not actually used
       CHARACTER KEYWORD*(*)
      +            ,TITLES*90 !
      +            ,FILE_PCX*20    !- PCX save filename
       LOGICAL       FOUND              !- if this KEYWORD was handled here
      &             ,EXISTS             !- the PCX file already exists
 
-      INTEGER*2   IFAIL_2      !- for PCX saving
-      INTEGER*4   BUFFER       !-
+!     INTEGER*2   IFAIL_2      !- for PCX saving
+!     INTEGER*4   BUFFER       !- for PCX saving 
 
       REAL D(6,7),DD(2)        ! * Model Shape *
      &           ,B(4)         !  window boudaries (not really used)
