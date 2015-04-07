@@ -10,6 +10,8 @@ danplot
 danfront
 danfrontg
 sierpinski
+# For msdos environments
+*.exe
 # some compiel dcode - one day these will be removed or tidied up
 qp
 qp_ps
