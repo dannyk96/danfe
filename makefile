@@ -182,6 +182,9 @@ draw_ps.o: libsrc/draw_ps.f
 	$(FC) -c  $<
 draw_dxf.o: libsrc/draw_dxf.f
 	$(FC) -c  $<
+# next wont compile with gforttran as subrouitnes end in the @ symbol
+draw_salford.o: libsrc/draw_salford.f
+	$(FC) -c  $<
 real4.o: libsrc/real4.f
 	$(FC) -c  $<
 
