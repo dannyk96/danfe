@@ -124,3 +124,9 @@ rem %FC_CPP% libsrc\danlib.f /BINARY danlib.obj
 :: rem  %FC% src\danfront.f90 /MOD_PATH libsrc
 %FC% src\danfe.f  /IN libsrc  /LINK danfe.exe    /LIBRARY %DANLIB% %MPILIB%  int_gen.obj 
 :$changed 08/04/15
+::
+:: clean-up
+::
+del *.obj 
+dir *.mod
+del *.mod
