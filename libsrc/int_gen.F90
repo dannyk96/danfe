@@ -37,7 +37,11 @@
 !
       character envvar*(*), string*(*)
 
+#ifdef __FTN95
+      string=" "
+#else
       CALL get_environment_variable(envvar, string)
+#endif
       end
 
 
