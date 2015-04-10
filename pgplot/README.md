@@ -4,6 +4,10 @@
 Danplot neeeds to be built using a low-level graphics libreary. Danplot was originally developed using the garphucs routines founnd in teh Salfrod FTN95 compiler on DOS and then later Windows.
 Around 1999 Danplot was ported to Unix / Linux and the graphics were converted to call routines from the PGPLOT library. The only graphic sdriver used was the /XWIN one. POstscript continued to nbe writen direct from the Danplot Fortran itself.
 
+
+One reference I used was http://www.star.le.ac.uk/~cgp/pgplot_Fortran95_WinXP.html
+This includes a downlaod of an updated GIF driver
+
 #### Future
 
 It is hoped to port Danplot to a future graphics subsystem. This might be Qt ot raw X11 tbc.
