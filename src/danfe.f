@@ -31,8 +31,8 @@ c      - 2ø DANFE_MAINs have PE/=0 but read their own files
       common /MPP/iproc,nproc,status,proc_ma
       INTEGER IPROC,NPROC, status(20)
 
-!     integer proc_map(0:maxprocs)       ! not yet impliemnted
-!     character command_line*255         ! not yet impliemnted (n/a?)
+      integer proc_map(0:maxprocs)       ! not yet impliemnted
+      character command_line*255         ! not yet impliemnted (n/a?)
 
 c-- 4-11-99 conecpt of a processor-map --
 c

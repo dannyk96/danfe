@@ -30,23 +30,22 @@ IS3264BIT := $(shell getconf LONG_BIT)
 #OS      := $(shell uname)
 #ARCH    := $(shell uname -m)
 # be careful - not all unixes have both -s and -m options
-ARCH    := $(shell uname -sm | sed 's/ /_/g')
+#ARCH    := $(shell uname -sm | sed 's/ /_/g')
+ARCH=default
 #PLATFORM = $(ARCH)
-
 #ifeq ($(OS), Linux)
 #  PLATFORM = $(OS)_$(ARCH)
 #else
 #  PLATFORM = $(OS)
 #endif
 
-INT_GEN=int_gen.o
-
-TOPDIR=$(CWD)
-INCDIR=$(TOPDIR)/include
-BASE=$(TOPDIR)
+#TOPDIR=$(CWD)
+#INCDIR=$(TOPDIR)/include
+#BASE=$(TOPDIR)
 
 
 #-- choose whether we want the OpenMP parallelsed matrix routines --
+# TODO use ifdef to better effect hence a single version of matrix.F
 MATRIX=matrix
 #MATRIX=matrix_openmp
 
@@ -54,11 +53,14 @@ MATRIX=matrix
 #include make.$(PLATFORM)
 # note option to add a further qualifier - eg ifc v. g95
 include make.$(ARCH)
+# TODO I might prefer to build as ARCH=inc as default but can overrride
+
 
 # the files that make up the Finite element library
 DANLIB= keyword.o k_mesh.o k_meshio.o k_bc.o \
 	elements.o general.o small.o shape.o gauss.o
 # add machine/compliler specific interface
+INT_GEN=int_gen.o
 DANLIB+=$(INT_GEN)
 # add matrix library - sometime I want the OpenMP version.
 DANLIB+=$(MATRIX).o
@@ -181,6 +183,9 @@ draw_pgplot.o: libsrc/draw_pgplot.f
 draw_ps.o: libsrc/draw_ps.f
 	$(FC) -c  $<
 draw_dxf.o: libsrc/draw_dxf.f
+	$(FC) -c  $<
+# next wont compile with gforttran as subrouitnes end in the @ symbol
+draw_salford.o: libsrc/draw_salford.f
 	$(FC) -c  $<
 real4.o: libsrc/real4.f
 	$(FC) -c  $<

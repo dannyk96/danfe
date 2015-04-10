@@ -2114,6 +2114,7 @@ end module plotlib
       CHARACTER BITMAP_NAME*60         !- filename for an image
       integer ibx,iby                  !- bitmap size.
       character pattyp*10              !- 'point','line','bitmap'
+      integer patcode
 
 !---- 1: overall mesh control ----
 !- read 'standard' mesh density (eg. 0.1m) and max density (eg. x6)
