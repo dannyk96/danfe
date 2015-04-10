@@ -22,10 +22,17 @@
       character  :: arg*(*)
       arg = ""
       call getarg (N,arg)     ! need to compile with -Vaxlib
+! Fortran2003 adds 
+!   CALL GET_COMMAND_ARGUMENT(number, value, length, status) 
+!     - This is a subroutine returning the string value of the Nth argument (argument 0 being the command-name). 
+!    The length (optional) returns the length of the value returned, and status (also optional) returns 0 normally, or non-zero if there is an error such as a non-existing argument).
+
       end
 !-----------------------------------------------------------------------
       function danfe_argc() result(nargs)
       nargs=iargc()
+! Fortran2003 adds COMMAND_ARGUMENT_COUNT()
+!    - This is an integer function returning the number of argument strings on the command-line (excluding the initial command-name if there is one).
       end
 
 !-----------------------------------------------------------------------
