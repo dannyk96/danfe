@@ -1,6 +1,7 @@
 # object code and Fortran module files
 *.o
 *.mod
+*.obj
 
 # The compiled binaries
 danfe
