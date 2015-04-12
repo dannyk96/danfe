@@ -1,32 +1,36 @@
 #---------------------- for Linux  ------------------------
-#  system-specific makefile macros.
-# -Wall shows lots of comple-time warnings
-#CPPFLAGS = -DOS=LINUX -DFORTRAN=F90
-CPPFLAGS =
-CORE_FLAGS= -O3 -DBLAS2
-CORE_FLAGS= -O2
-#CORE_FLAGS= -O3 
+#
+# Make.<ARCH> file for a generic Linux on x86_84 systems
+#
+# This will also work on cygwin under MS-Windows
+#  (just change to point to where pgplot is installed etc.)
+#
 
-FFLAGS=
-# for runtime debugging
-FFLAGS+=-g
+# We use a 3rd party BLAS libarary is available
+#CORE_FLAGS= -O3 -DBLAS2
+#BLASLIB= -lblas -L/usr/local/unsupported/lib -lf77blas -latlas
+
+#
 #  for auto double precision
-FFLAGS=-fdefault-integer-8 -fdefault-real-8
-# for  warnign of source code bugs
+#
+#FFLAGS=-fdefault-integer-8 -fdefault-real-8
+
+#
+# for  warnings of source code bugs
+#
 FFLAGS+=-fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
 
-FC=gfortran $(FFLAGS)
-FC_CPP=gfortran  -cpp $(FFLAGS)
-LN=gfortran
+#
+#  MPI libraries: default os to use my dummy driver
+#
+#MPILIB=-lmpi
 
-LIBS= -lblas
-LIBS=
-
-#---- where to find the pgplot and MPI libraries ---
-MPILIB=mpi_nul.o
-BLASLIB= -L/usr/local/unsupported/lib -lf77blas -latlas
-BLASLIB=
-PLOTLIB= -L${HOME}/pgplot -lpgplot -lX11
+#
+# PGPLOT library location
+#  note on Ubuntu you cah hjsut do apt-get install pgplot5
+#
+PLOTLIB+= -L${HOME}/pgplot
+PLOTLIB+= -lpgplot -lX11
 
 
 
