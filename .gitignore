@@ -13,11 +13,12 @@ danfrontg
 sierpinski
 # For msdos environments
 *.exe
-# some compiel dcode - one day these will be removed or tidied up
-qp
+# some compile dcode - one day these will be removed or tidied up
+qp_pgplot
+qp_opengl
 qp_ps
 pl2ps_2win
 
 
 # the working copy of the platform specific makefile options
-./make.*
+#/make.*
