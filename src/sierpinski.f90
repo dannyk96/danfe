@@ -34,7 +34,7 @@ contains
   subroutine init ()
 !----- 0: initialise -----
 !.. leave this until we actauly want to create an FE mesh ?
-  treesize=0.01* maxdaughters**maxdepth     !- try 10% of max theoretical?
+! treesize=nint(0.01* maxdaughters**maxdepth)     !- try 10% of max theoretical?
   treesize=50000
   if (allocated(tree)) deallocate(tree)
   allocate (tree(treesize))
@@ -354,7 +354,8 @@ end subroutine method4
 
    d=sqrt((x2-x1)**2+(y2-y1)**2)
 !  npts = 1+ 6* d *real(2**maxdepth) / maxval (bb(2,1:2))
-   npts = 1+ 26* d *real(2**maxdepth) / maxval (bb(2,1:2))
+!TODO what is '26' doing explictly here??
+   npts = int(1+ 26* d *real(2**maxdepth) / maxval (bb(2,1:2)))
    do j=0,npts
      xp = x1 + j/real(npts)*(x2-x1)
      yp = y1 + j/real(npts)*(y2-y1)

@@ -101,7 +101,7 @@ c      integer  ICOL_2    !- hack
 c---------- copy real coords to integer*2 x,y lists --------------------
 c  *** invert ALL the y-values ???
 
-      Iresy = dv_yp     !- ***just a hack for no .. beware SVGA
+      Iresy = nint(dv_yp)     !- ***just a hack for no .. beware SVGA
 c     IF (IDV.eq.10) iresy = 600 !768    !- hack to max. resolution for now
 
 ! debug
@@ -144,8 +144,8 @@ c      20 = LH, 21=centre,  22=RH justification !
       ELSEIF (IOP.ge.20.and.iop.le.29) THEN 
         x4(1:n)= x(1:n) ; y4(1:n)=y(1:n)
         ixoff=0
-        if (iop.eq.21) ixoff = istr_end(text)*X(2)/2     ! centre  25-3-98
-        if (iop.eq.22) ixoff = istr_end(text)*X(2)       ! RH just
+        if (iop.eq.21) ixoff = nint(istr_end(text)*X(2)/2.)     ! centre  25-3-98
+        if (iop.eq.22) ixoff = nint(istr_end(text)*X(2))       ! RH just
         XI=x(1)-ixoff           ! set text anchor point
 c       CALL DRAW_TEXT@ (TEXT,XI_2(1),YI_2(1),ICOL_2)
         CALL PGSCI (icol)
@@ -443,7 +443,7 @@ c1     continue                      !- (a F90 endless DO..ENDDO)
         IF (CKEY.eq.'A') THEN   !- got LH mouse
           GOTO 22
         ELSEIF (CKEY.eq.'Z') THEN   !- got RH mouse (cf. zoom box)
-          GOTO 22
+          GOTO 33 
         ELSEIF (KEY.ne.0) THEN                !- keyboard was pressed -!
           codes(1) = -key      !- so return the (-ve) opcode (mung outside)
           RETURN

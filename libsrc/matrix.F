@@ -1064,12 +1064,13 @@ c     integer:: iworkspace=n
      &       ,D (0:IWORKSPACE)       !- [Precond]*R  (==R if no precon)
 c#endif
       LOGICAL CONVERGED, report_flops
-      INTEGER IDOF,I,K,IEL,IC,NEL,IPRECON,N_BS,IBS_START
+      INTEGER :: IDOF,I,K,IEL,IC,NEL,IPRECON,N_BS,IBS_START=0
      &      ,MAX_ITERS,IPRE_1, ISTORE,ISTART     !- locals
       REAL TOL,BIG,BIGGEST, ALPHA,BETA, UP,UP2,DOWN, BIG_SPRING
 
       character string*79, solver*7
-      real flops, flops_mv, flops_vv,flops_setup, flop_rate, flop_ratet,
+      real :: flops, flops_mv, flops_vv,flops_setup, 
+     & flop_rate=0., flop_ratet=0.,
      & tol_sofar, t0,t0a,t1a,t1,t_old
       integer ilevel,ireport,iters_old
       real ddot   ! blas dot-product routine
@@ -1163,7 +1164,7 @@ c------------------------ loop the iterations --------------------------
 c     TOL = 10.**(-4)              !- adjust as necessary
       TOL = 10.**(-6)              !- adjust as necessary
       MAX_ITERS = N                !- Theoretical maximum needed  :-)
-      MAX_ITERS = MAX_ITERS * 1.5  !- try this ?
+      MAX_ITERS = nint(MAX_ITERS * 1.5)  !- try this ?
 
       call get_secs (t0)           !- time the process, and..
       t_old=t0
@@ -1306,6 +1307,7 @@ c     report_flops = ipr.ge.4.and..true.
           iters_old=iters
         else
           flop_rate = 0.
+          flop_ratet = 0.
         endif
       if (ireport.eq.1)     !- column headers --
      &write(*,'(a)')
