@@ -56,12 +56,17 @@ FFLAGS+=-fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
 # Default is to use gfortran
 #
 FC=gfortran $(FFLAGS)
-FC_CPP=gfortran  -cpp $(FFLAGS)
+FC_CPP=gfortran $(FFLAGS) -cpp
 LN=gfortran
 #
 #  MPI libraries: default os to use my dummy driver
 #
 MPILIB=mpi_nul.o
+#
+#  Graphics libarary
+#   cf  sudo apt-get install pgplot5
+#
+PLOTLIB= -L${HOME}/pgplot  -lpgplot -lX11
 
 
 
