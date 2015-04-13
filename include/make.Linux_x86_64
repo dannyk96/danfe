@@ -16,11 +16,6 @@
 #FFLAGS=-fdefault-integer-8 -fdefault-real-8
 
 #
-# for  warnings of source code bugs
-#
-FFLAGS+=-fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
-
-#
 #  MPI libraries: default os to use my dummy driver
 #
 #MPILIB=-lmpi
@@ -29,8 +24,7 @@ FFLAGS+=-fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
 # PGPLOT library location
 #  note on Ubuntu you cah hjsut do apt-get install pgplot5
 #
-PLOTLIB+= -L${HOME}/pgplot
-PLOTLIB+= -lpgplot -lX11
+#PLOTLIB= -L${HOME}/pgplot  -lpgplot -lX11
 
 
 
