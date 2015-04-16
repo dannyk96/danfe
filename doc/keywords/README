@@ -1,0 +1,30 @@
+ The master for the man pages for all the keywords in danfe input files 
+is held in a flat file. 
+This is parsed fy a Fortran program to generate:
+   1. a set of HTML files
+   2. a cross-referencng links in the HTML
+   3. a master index.html 
+
+
+Future directions
+-----------------
+1. We could consider porting publish.f90 to Perl - then we can make better use of has tables etc.
+
+2. Since we have to Danfe source we could make use of it.
+2.1   e.g. extract the source and colorise it in HTML
+2.2   or cross-reference to spot for any changes etc. 
+
+3. We need to complete the documentation !
+
+4. Split the source into several files?
+
+5. support for in-line formatting (bold, red) - e.g. HTML, Tex etc ?
+
+6. offer different index.html flavours - for example sorted by #lines etc.
+
+7. Consider other areas of documentation like material_properties
+
+8. Consider using Twiki markup  eg. _italic words_.
+   so either just write as twiki pages - or maybe mung into such.
+   but man pages ?
+
