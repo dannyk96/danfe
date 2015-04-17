@@ -121,7 +121,7 @@ pl2ps_2win: pl2ps_2win.o
 
 #--- sources for the applications ----
 danfe.o: src/danfe.f
-	$(FC) -c -I include $<
+	$(FC) -c -I libsrc $<
 danmesh.o: src/danmesh.f
 	$(FC) -c $<
 danslip.o: src/danslip.f
