@@ -33,10 +33,10 @@ c----------------------- get the paper size -------------------------------
       IF (TYPE.EQ.'   ') LANDSCAPE = .true.
 
 c............ set the 'default' paper to A4 ..................
-      res(1) =    ctp* (210 -10 -10)
-      res(2) =    ctp* (297 -10 -10) !- ie. 5mm all round
-      res(4) =    ctp* ( 15 )
-      res(5) =    ctp* ( 10 )
+      res(1) =    nint(ctp* (210 -10 -10))
+      res(2) =    nint(ctp* (297 -10 -10)) !- ie. 5mm all round
+      res(4) =    nint(ctp* ( 15 ))
+      res(5) =    nint(ctp* ( 10 ))
 
       IF (TYPE(1:2).EQ.'MY') THEN   !- no-op 'cos we have sizes already!
 c..... maybe allow units in mm or inches ?
@@ -48,20 +48,20 @@ c        res(4) = .4 *72
 c        res(5) = .4 *72
 
       ELSEIF (TYPE(1:2).EQ.'A3') THEN
-        res(1) =    ctp* (297 -5 -5)
-        res(2) =    ctp* (420 -5 -5) !- ie. 5mm all round
-        res(4) =    ctp* ( 5 )
-        res(5) =    ctp* ( 5 )
+        res(1) =    nint(ctp* (297 -5 -5))
+        res(2) =    nint(ctp* (420 -5 -5)) !- ie. 5mm all round
+        res(4) =    nint(ctp* ( 5 ))
+        res(5) =    nint(ctp* ( 5 ))
 
       ELSEIF (TYPE(1:3).EQ.'PHD') THEN      !- Landscape with 15mm borders
 c..... as L,R,T,B = 15.,15.,40., 25. (10mm hanging title)
 c..... but beware of the shift of .4" that is done here :-(
 
         LANDSCAPE = .true.
-        res(1) =    ctp* (210  -40 -15)
-        res(2) =    ctp* (297  -15 -15)
-        res(4) =    ctp* ( 15 )
-        res(5) =    ctp* ( 10 )
+        res(1) =    nint(ctp* (210  -40 -15))
+        res(2) =    nint(ctp* (297  -15 -15))
+        res(4) =    nint(ctp* ( 15 ))
+        res(5) =    nint(ctp* ( 10 ))
       ELSE
         PRINT*,TYPE,' is an unknown PAPER size.. "A4" assumed'
       ENDIF

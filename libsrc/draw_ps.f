@@ -101,10 +101,10 @@ c.. token #4,5,.. = ? clipping, ?nologo
       endif
 
 
-      res(1) = res(1)-ctp*(bl+br)         ! image width
-      res(2) = res(2)-ctp*(bt+bb)         ! image height
-      res(4) = ctp*bl                     ! bottom left corner
-      res(5) = ctp*bb                     !   of the image
+      res(1) = res(1)-int(ctp*(bl+br))         ! image width
+      res(2) = res(2)-int(ctp*(bt+bb))         ! image height
+      res(4) = int(ctp*bl)                     ! bottom left corner
+      res(5) = int(ctp*bb)                     !   of the image
 
 !--------------- sub-picture position --------------------
 !  obselete but perhaps interesting as an example
@@ -113,34 +113,34 @@ c     1 =top half, 2=bot half, 3=LHS,4=RHS
 c     5= top-left quarter, etc. (cf Abaqus/Post)
 c     hence  morph  res(), and bl,br,bt,bb
       IF (POS.EQ.'t'.or.pos.eq.'top') then     !- 2 on a page vertically
-        res(2)=res(2)/2.
+        res(2)=res(2)/2 
         res(5)=res(5)+res(2)
       ELSEIF (POS.EQ.'b'.or.pos.eq.'bot') then
-        res(2)=res(2)/2.
+        res(2)=res(2)/2 
 
       ELSEIF (POS.EQ.'l') then      ! 2 on a page horizontally
-        res(1)=res(1)/2.
+        res(1)=res(1)/2 
         res(4)=res(4)+res(1)
       ELSEIF (POS.EQ.'r') then
-        res(1)=res(1)/2.
+        res(1)=res(1)/2 
 
       ELSEIF (POS.EQ.'3t') then      !- vertical thirds
-        res(2)=res(2)/3.
+        res(2)=res(2)/3 
         res(5)=res(5)+2*res(2)
       ELSEIF (POS.EQ.'3c') then
-        res(2)=res(2)/3.
+        res(2)=res(2)/3 
         res(5)=res(5)+res(2)
       ELSEIF (POS.EQ.'3b') then
-        res(2)=res(2)/3.
+        res(2)=res(2)/3 
 
       ELSEIF (POS.EQ.'3l') then      !- horiz. thirds
-        res(1)=res(1)/3.
+        res(1)=res(1)/3 
         res(4)=res(4)+2*res(1)
       ELSEIF (POS.EQ.'3m') then
-        res(1)=res(1)/3.
+        res(1)=res(1)/3 
         res(4)=res(4)+res(1)
       ELSEIF (POS.EQ.'3r') then
-        res(1)=res(1)/3.
+        res(1)=res(1)/3 
 
       ENDIF
 
@@ -262,8 +262,8 @@ c.. avoid lowercase/uppercase problems?
         ENDIF
       ENDDO
       print*,'** paper size not found!'
-      ixpap=72 *3.       !- default =3 inch square ?
-      iypap=72 *3.
+      ixpap=72 *3       !- default =3 inch square ?
+      iypap=72 *3
       RETURN
       END
 
@@ -438,14 +438,14 @@ C     This writes the frame and Danplot logo to the PS output file
 C      (assuming A4 portrait)
 C       .. we can use RES() to position more accurately
 C
-!  shoudl honor a flag to skip any logo, datestamp, etc.
+!  should honor a flag to skip any logo, datestamp, etc.
       CHARACTER  TITLE*40, FILE2*40, VERSION*(*)
      &        ,DATE_STAMP*20, BS
       EXTERNAL DATE_STAMP
       INTEGER RES(6)
       REAL X(5),Y(5)
       external istr_end
-      BS='\\'
+      BS='\'
 
       FILE2 = TITLE
       DO I=1,istr_end(FILE2)     !- reverse backslashes for postscript output

@@ -111,7 +111,7 @@ rem %FC_CPP% libsrc\danlib.f /BINARY danlib.obj
 %FC% src\sierpinski.f90 /LINK siepinski.exe 
 %FC_CPP% src\qp_ps.f  /LINK qp_ps.exe
 %FC% src\pl2ps_2win.f  /LINK pl2ps_2win.exe
-%FC% src\qp.f         /LINK qp.exe       /LIBRARY int_gen.obj  
+%FC% src\qp_pgplot.f  /LINK qp_pgplot.exe       /LIBRARY int_gen.obj  
 ::
 :: The 4 core applications of DANFE
 ::

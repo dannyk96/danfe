@@ -851,7 +851,7 @@ c     items is returned (maybe 'nul' if no 'hit')
 c
       parameter (nbut=3)
       integer q(4),q1(4),p(4,nbut), opc(nbut),codes(*)
-      character  text(nbut)*70, opt(nbut)*1
+      character  text(nbut)*90, opt(nbut)*1
       COMMON /MENU_STRINGS/MENU_STRINGS
       CHARACTER MENU_STRINGS(2)*90
       data ((p(j,i),j=1,4),text(i),opt(i),opc(i),i=1,nbut)  
@@ -993,7 +993,7 @@ C
       SAVE
       PARAMETER (NBUT=1)
       INTEGER Q(4),Q1(4),P(4,NBUT) ,   OPC(NBUT), codes(*)
-      CHARACTER  TEXT(NBUT)*70, OPT(NBUT)*1
+      CHARACTER  TEXT(NBUT)*90, OPT(NBUT)*1
       COMMON /MENU_STRINGS/MENU_STRINGS
       CHARACTER MENU_STRINGS(2)*90
 
@@ -1687,13 +1687,13 @@ C
       integer igx(40), igy(40), igm(40)
       
       integer igc(40)
-      logical igb(4)
+      logical igb(40)
       logical built 
       integer buffer
       data built /.false./
       data ((p(j,i),j=1,4),text(i),opt(i),opc(i),i=1,16)  
      +  /
-     +   10, 10,120,16,    '-- SVGA modes --'   ,' ',    0
+     +   10, 10,120,16,    '- SVGA modes -'   ,' ',    0
 
      +  ,10, 50,120, 0,    'n/a'                ,'F',46001
      +  ,10, 70,120, 0,    'n/a'                ,'F',46002
@@ -2655,9 +2655,9 @@ c       WRITE (TEXT(2),'(A)')    LABEL    !- hmm only got 12 characters
           P (3,10) =  PAL(3,ival)     !- add a scale-bar ?
           IBC(11)  = IVAL             !- do in HLS too?
         ELSE
-          P (3, 8) = 0.
-          P (3, 9) = 0.
-          P (3,10) = 0.
+          P (3, 8) = 0
+          P (3, 9) = 0
+          P (3,10) = 0
           IBC(11)  = 0
         ENDIF
         DO I=0,255

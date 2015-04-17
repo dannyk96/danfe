@@ -8,7 +8,8 @@ CORE_FLAGS= -O2
 FFLAGS=-fdefault-integer-8 -fdefault-real-8
 FFLAGS=
 FC= gfortran -c -g -fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
-F90=gfortran
+FC_CPP =$(FC) -cpp
+#F90=gfortran
 LN=gfortran
 LIBS= -lblas
 LIBS=
@@ -17,5 +18,6 @@ LIBS=
 MPILIB=mpi_nul.o
 BLASLIB= -L/usr/local/unsupported/lib -lf77blas -latlas
 BLASLIB=
+PGPLOT_DIR=../../pgplot
 PLOTLIB= -L${PGPLOT_DIR} -lpgplot -lX11
 
