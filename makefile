@@ -43,6 +43,8 @@ BLASLIB=
 # Standard flags for building
 #
 FFLAGS=
+#     I want to allow 132 columns even in fixed format source (not 72)
+FFLAGS=-ffixed-line-length-132
 #
 # for runtime debugging
 #
