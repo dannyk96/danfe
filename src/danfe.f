@@ -196,9 +196,9 @@ c    &       MNN  =60 000     !-- Max. # of nodes
 c    &      ,MEL  =25 000     !-- Max. # of elements
      &       MNN  =2 000 000     !-- Max. # of nodes
      &      ,MEL  = 80 000     !-- Max. # of elements
-     &      ,IKV  = 9 000 000    ! for hop3c.d
+c    &      ,IKV  = 9 000 000    ! for hop3c.d
 c    &      ,IKV  =18 000 000   !--  PCG for Lamaload
-c    &      ,IKV  =82 000 000   !-- SPARIN for Lamaload
+     &      ,IKV  =82 000 000   !-- SPARIN for Lamaload
 c    &      ,IKV  =218 000 000   !-- BANRED for Lamaload (after sorting nodes)
 c    &      ,IKV  =248 000 000   !-- BANRED for Lamaload (after sorting nodes)
 c    &      ,IKV  =165 000 000    !-- SPARIN for BNFL B38
@@ -499,7 +499,7 @@ C                            (disps too), need option to same/diff .OUT files
       DATA  Q_NUMBER (1)/1/,IQ_TOT/1/      !- just one sub-step of..
      &    , Q_PERCENT(1)/100./             !- 100% of the load
      &    , Q_DTIME(1)  /1./               !- applied in 1 second.
-      DATA BIG_SPRING / 1.E30/             !- arbitary 'Big spring'
+      DATA BIG_SPRING / 1.E20/             !- arbitary 'Big spring'
       DATA TIME/20*0./                     !- null the timings
 
 c----------------------- 0: Initialisation ----------------------------
@@ -1058,6 +1058,10 @@ c   - Hence in PLASTICITY section too
        ENDIF
 
 c========= b/ Init. the disp (ie. nodal)  tables ==========
+!TODO allocate them here too?
+!  note this is in the *NULL_ARRAYS section which might appear more than once?
+!  cf *RESET_STATE below.
+!
         CALL NULL2D (DISPS_TOT, MDF ,NODOF,NN)   !- total disps
         CALL NULL2D (FORCES_N,MDF ,NODOF,NN)     !- applied forces
         CALL NULL2D (FORCES_TOT,MDF ,NODOF,NN)   !- total applied forces
@@ -1205,6 +1209,8 @@ c.. so can malloc
      &   ,IKV, IR, KDIAG,IKDIAG, IRK
      &   ,GROUPS,IGROUPS   ,IOPS(3),IOPS(11),iverb)
 c.. so we can malloc now :-)
+!       write(*,'(a,10i6)') 'after get_kv_stats',kdiag(1:10)
+
 
         IF (IR.eq.0)       CALL MYERROR (3,' Empty stiffness matrix')
         IF (IR.GT.IKV)     CALL MYERROR (3, 'KV Array too small')
@@ -1259,9 +1265,11 @@ C-----------------------------------------------------------------------
 c-------- PCG's Preconditioner --------
 c.. cf treating this as the same as a FACTOR_KV for Sparin.
 c.. also we can (should) store IPRECON within KDIAG too.
+!TODO should  pass BIG_SPRING as an arg
        IF (IOPS(3).eq.1.or.IOPS(3).eq.6) THEN         !- if CG (sq/tri)
+!         iops(12) could be encapsulated in the pcg% struct?
           IF (IOPS(12).eq.1) THEN
-            CALL FORM_PRECON_DIAG (KV,IKV,KDIAG,IKDIAG, N)
+            CALL FORM_PRECON_DIAG (KV,IKV,KDIAG,IKDIAG, N, BIG_SPRING)
           ENDIF
         ENDIF
 c.. also note here the ability to print out some KV statistics
@@ -1272,6 +1280,9 @@ c 11-3-01 how come it still works if I am doing Eigen analysis , say with NxN st
      &    print*,'<> Factorising the Stiffness Matrix...'
           CALL FACTOR_KV (KV,IR,KDIAG,N,iops(3), idbg(1))
         ENDIF
+!TODO : I think FACTOR_KV should also calc and return the BIG_SPRING value
+!     which is equal to the largest number (say 1.e6) * a big number (saty 1.e15)
+!     This big spring is then only used again in backsub_kv as a multiplier on the applied loads.
 
         CALL GET_SECS (TIME(6))
         IF (IDBG(2).GE.2) WRITE(*,'(A,F9.2,A)')
@@ -1445,7 +1456,7 @@ C    we have DISPS_TOT as usual, (+ FORCES_TOT just for reference)
 C      velocities and accels need their own arrays
 C      DISPS is probaly not used.
 
-      DO I=1,N                  !- just for the PCG solver ?
+      DO I=0,N                  !- just for the PCG solver ?
         DISPS(I) = 0.
       ENDDO
 
@@ -1512,7 +1523,7 @@ c     ENDDO
 
 C================== set up iteration loop ===============================
 c.. explicit methods will have no iteration.
-      DO I=1,N
+      DO I=0,N
         DISPS_OLD(I) = 0.        ! for checking convergence
       ENDDO                      ! -or do within CHECON?
 c.. maybe best to do this *within* the plasticity subroutine
@@ -1550,6 +1561,7 @@ C-------------------- form the vector of applied loads -----------------
         CALL MYERROR (2,' Unknown method : Force/Displacemnt loading')
       ENDIF
 
+!  note: I could defer the *=BIG_SPRING into the BACSUB_KV() itself ?
       DO J=1,NODOF
         DO I=1,NN
           IFREE = NF(J,I)
@@ -1557,13 +1569,16 @@ C-------------------- form the vector of applied loads -----------------
      &      LOADS(IFREE) + FORCES_N(J,I) *STEP*FAC   !-- applied loads
         ENDDO
       ENDDO
+      loads(0) = 0           ! fixup in case we tried to apply a force / disp at a fixity
+
       TOTFORCE=0.
       DO IFREE=1,N
         TOTFORCE = TOTFORCE + LOADS(IFREE)
       ENDDO
       ipr=idbg(1)
-      if (iverb.ge.5)
-     &WRITE(*,'(A,E20.6)') 'Total applied load=',TOTFORCE
+!TODO  hmm dont want to do this for every plastic iteration
+!     if (iverb.ge.2)
+!    &WRITE(*,'(A,E20.6)') 'Total applied load=',TOTFORCE
 
 C------- if BIOT then add the KP*PP loads.
 c.. cf. APPLY_GRAVITY
@@ -1688,6 +1703,11 @@ c       F_MSS_MAX= 0.            !- just in case F_MSS gets undefined :-(
      &  ,ngp_failed, F_MSS_MAX, IDBG(1),iops(14) )
 c... what about an initial stress algorithm ?
       ENDIF
+     
+!     do i=1,nn
+!       write(*,'(i7,3g9.3,3i1,3g12.3)') i, forces_n(1:nodof,i), 
+!    & min(1,nf(:,i)), bdylds_n(1:nodof,i)
+!     enddo
 C---------- end of GP and elem loops .. can do some monitoring --------
 
         IF (CONVERGED) THEN          !- == 'EXIT'
@@ -1706,7 +1726,9 @@ C----------------------------------------------------------------------
 
  1111 CONTINUE   !- jump out of iteration loop
 
-      DO J=1,NODOF    !-- total displacements (just for print-out)
+!-- total displacements (just for print-out)
+!TODO note that disps() is still available (==disps_inc) so can reactions if we want.
+      DO J=1,NODOF    
         DO I=1,NN
           DISPS_TOT(J,I) = DISPS_TOT(J,I) + DISPS_INC(J,I)
         ENDDO
@@ -2382,6 +2404,10 @@ c------------- internal variables ---------------
 
 c---------------- Sum the load and disps at 'loaded nodes' -------------
 c    call calc_meanF_totD (S_D,S_F, FORCES_N,DISP_INC,BDYLDS_N,NN,NODOF)
+!FIXME  this total force should *not* be applied loads but should be the reactions
+!   ie for disp. control we must multiple disps_inc() by KV()
+!       CALL CG_MATVEC_EBE (KV, P, U, N, KDIAG, 1,pcg%NEL)  !U =KV * P
+
       S_D = 0.      !- Disp
       S_F = 0.      !- Force
       IC = 0
