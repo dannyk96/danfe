@@ -18,6 +18,7 @@ qp_pgplot
 qp_opengl
 qp_ps
 pl2ps_2win
+/a.out
 
 
 # the working copy of the platform specific makefile options
