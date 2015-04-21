@@ -442,7 +442,7 @@ c     If above Max. then either skip or fill in in the highest colour
 c------- If no lines cross we can just fill the whole polygon ------
 c... errm but only if COL_MIN is between 0 and N_CONTS surely.
       IF (ICOL_RANGE.LE.0) THEN
-        ICOL = COL_MIN + 1                      !(why add 1?)
+        ICOL = int(COL_MIN + 1)                      !(why add 1?)
 c       IF (ICOL.LT.0  .OR. ICOL. GT. N_CONTS) RETURN ! hack 28-12-96
         IF (type.NE.'fill') RETURN              !- nothing to draw
 C       CALL DRAW_POLY    (SC,ISC,NPTS,ICOL,2)  !- a header to DR_PRIM
@@ -463,7 +463,7 @@ c- the mean element value should *not* be just the mean of 8 numbers
         DO I=1,NPTS
           CC = CC + COLS(I)
         ENDDO
-        ICOL = CC/NPTS
+        ICOL = nint(CC/NPTS)
 
 c       CALL DRAW_POLY (SC,ISC,NPTS,ICOL,2)  !- a header to DR_PRIM
         CALL EXTRACT_POLY (SC,ISC,NPTS, X,Y)
@@ -1636,9 +1636,9 @@ c... so provide 5 colours   white, -, col, -, black  ??
        PAL (2,ij+2) = PAL_Menupane (2,imenu_back)
        PAL (3,ij+2) = PAL_Menupane (3,imenu_back)
 
-       PAL (1,ij+4) = 40.   *1.5
-       PAL (2,ij+4) = 40.   *1.5
-       PAL (3,ij+4) = 80.   *1.5
+       PAL (1,ij+4) = nint(40.   *1.5)   !- what is this for?
+       PAL (2,ij+4) = nint(40.   *1.5)
+       PAL (3,ij+4) = nint(80.   *1.5)
 
 c--------------------- standard 'material' colours ---------------------
       ELSEIF (IOP.EQ.11) THEN
@@ -1779,7 +1779,7 @@ c       .. interp in hls is probally nicer !
 c     .. can I adjust ncol here  (not necesserily the same as #contours)
 c   .. or just put *after* contours?
 c       ibcont2=ncol
-        NMAT= (255-20-10) / real (Ncol)    !- skip base cols and menu cols.
+        NMAT= nint((255-20-10) / real (Ncol))    !- skip base cols and menu cols.
         NMAT = min (nmat,19)     !- so dont overrun the contour col table
         jm = ibcont !+ibcont2 !- so after the 'mat. colours' (and the contours)
         do i=1,NMAT
@@ -2135,8 +2135,8 @@ C
       x(2) = H_text
       CALL DR_PRIM (TITLE,x,y,1,15,21)       !-- the title --
 
-      res(2) = res(2) - H_box     !- drawing area reduces
-      res(5) = res(5) + H_box     !- y-offset increases
+      res(2) = res(2) - nint(H_box)     !- drawing area reduces
+      res(5) = res(5) + nint(H_box)     !- y-offset increases
 
       RETURN
       END
