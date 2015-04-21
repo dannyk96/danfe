@@ -664,7 +664,7 @@ c   6: report how many files we used
 c       stop         !- really GOTO 888 (cf MPI)
       endif
 
-      WRITE(*,'(a,a)') '<> Data file name=',FILE
+      WRITE(*,'(a,a)') '   - Data file name=',FILE
 
       OPEN (U0,FILE=FILE,STATUS='OLD',iostat=ios)
       if (ios.ne.0) then
@@ -920,8 +920,8 @@ C---------------------- Material Properties (E,v,c,phi...) -------------
         CALL R_PRPTAB (U1,IDBG(1), PRPTAB,IPRPTAB, NTYPES,NMATS)
       ELSEIF (KEYWORD.EQ.'*MAT_PROPS') THEN
 c.. good to write them out again for
-        CALL R_PROPS_TOKEN  (U1, PRPTAB,IPRPTAB,MMATS, NMATS, idbg(1))
-        CALL WR_PROPS_TOKEN (U3, PRPTAB,IPRPTAB,MMATS, NMATS, idbg(1))
+        CALL R_PROPS_TOKEN  (U1, PRPTAB,IPRPTAB,MMATS, NMATS, iverb)
+        CALL WR_PROPS_TOKEN (U3, PRPTAB,IPRPTAB,MMATS, NMATS, iverb)
 
 C----------- patch to alter the Material parameters
 c.. better as a MAT_PROP then can do EBE (eg via *MP_BY_TOKEN)
@@ -997,7 +997,7 @@ c
 ! 11-3-01 added next. I think that doing it here is best, altnernative is to
 !      do at teh top of teh program, or at least if and when NN changes.
         NODE_ORDER(1) = 0           !- flag as having No optimsied BW.
-        IF (iverb >=4)
+        IF (iverb >=3)
      &  write (*,'(A,12i3)') 'DRPTVAC=',(drptvac(i),i=1,7)
         IF (iverb >=4)
      &  print*,'nodof_=',nodof_, 'nodof=', nodof
@@ -1028,7 +1028,7 @@ c        o will have 3x3 stress direction vectors if large-strain (cf Mok)
         STORE_GP =    NEL *  NGP* (IH)      ! stress, pl. strain (pp?)
         IF (iverb>=2) THEN
           WRITE (*,'(A,I3,A,i8,a,f10.3,a)')
-     &  'Storage at Gauss points =', IH+IH,' *', NEL*NGP_MAX,' GP''s  ='
+     &  '   - Storage at Gauss points =', IH+IH,' *', NEL*NGP_MAX,' GP''s  ='
      &   ,STORE_GP*8. /1024./1024.,' Mb'
         ENDIF
 
@@ -1039,7 +1039,7 @@ c                                              ! app forces, tot force, NF(int)
 c.. note PCGs own 'local' storage too (4 vectors ?: Xnew,P,U,D)
         IF (iverb>=2) THEN
           WRITE (*,'(A,I3,A,i8,a,f10.3,a)')
-     &     'Storage at Nodal points =', 6*NODOF,' *', NN,' Nodes ='
+     &     '   - Storage at Nodal points =', 6*NODOF,' *', NN,' Nodes ='
      &    ,8*STORE_NN /1024./1024.,' Mb'
         ENDIF
 
@@ -1173,7 +1173,8 @@ c.. will need to hold it until later for Eval extraction
       do i=1,n
         tot_mass= tot_mass+MB(i)
       enddo 
-      write(*,'(a,g25.6)') '<> Total mass=',tot_mass
+      if (iverb.ge.2)
+     &write(*,'(a,g25.6)') '   - Total mass=',tot_mass
 
 C-------------- Form and reduce the global stiffness matrix ------------
 c.. and big-springs too .. or defer B-S's unitl SPARIN stage
@@ -1249,7 +1250,7 @@ c   BIOT will need DTIM and THETA too. (also note the use of NODOF)
 
         CALL GET_SECS (TIME(4))
         IF (IDBG(2).GE.2) WRITE (*,'(a,f9.2,a)')
-     &    '<> KV formation  =',time(4) -time(3),' secs'
+     &    '   - KV formation  =',time(4) -time(3),' secs'
 
 c------- Displacement loading ------
         IF (IOPS(8).EQ.2)      !- if Disp loading
@@ -1277,7 +1278,7 @@ c.. eg. condition number, max/min pivots, array allocation for PCG, etc.
 c 11-3-01 how come it still works if I am doing Eigen analysis , say with NxN storage?
         IF (IOPS(20).eq.1) THEN  !- so can swicth off for eigenanalysis
           if (iverb>=2)
-     &    print*,'<> Factorising the Stiffness Matrix...'
+     &    print*,'   - Factorising the Stiffness Matrix...'
           CALL FACTOR_KV (KV,IR,KDIAG,N,iops(3), idbg(1))
         ENDIF
 !TODO : I think FACTOR_KV should also calc and return the BIG_SPRING value
@@ -1286,7 +1287,7 @@ c 11-3-01 how come it still works if I am doing Eigen analysis , say with NxN st
 
         CALL GET_SECS (TIME(6))
         IF (IDBG(2).GE.2) WRITE(*,'(A,F9.2,A)')
-     &    '<> Matrix factor =', TIME(6) -TIME(5),' secs'
+     &    '   - Matrix factor =', TIME(6) -TIME(5),' secs'
 
 c=======================================================================
 C            APPLIED LOADINGS and INITIAL STRESSES
@@ -1628,7 +1629,7 @@ c     iters_cgs(min(iters_tot,50)) = iters_cg    !- for all
 
       CALL GET_SECS(TIME(8))
 c      IF (IDBG(2).GE.2) WRITE(*,'(A,F9.2,A)')
-c     &    '<> Matrix solve =', TIME(8) -TIME(7),' secs'
+c     &    '   - Matrix solve =', TIME(8) -TIME(7),' secs'
 c      ENDDO
 C=======================================================================
 
@@ -1865,7 +1866,7 @@ c------------ solve the equations --------
      &              ,DISPS,LOADS,iters_cg, idbg(1) )  !_ nevershow this?
       CALL GET_SECS(TIME(8))
       IF (IDBG(2).GE.2) WRITE(*,'(A,F9.2,A)')
-     &    '<> Bacsub time =', TIME(8) -TIME(7),' secs'
+     &    '   -Bacsub time =', TIME(8) -TIME(7),' secs'
 
 c---------- accumulate the displacements.. by node -------------------
       IF (KEYWORD.EQ.'*ANALYSE_POTENTIALS') icol = 1   !- in column #1
@@ -2026,7 +2027,7 @@ c..         here as we will re-read KV from file
             enddo
 
             ifree=2
-            print*,'<> debug: imode=',imode,'rlambda=',rlambda,
+            print*,'   - debug: imode=',imode,'rlambda=',rlambda,
      &  ' kv(ifree)=',kv(ifree), ' (cf. BIG_SPRING)'
 
             BIG_SPRING=kv(ifree)*1.e10
@@ -2304,7 +2305,7 @@ c 777 CONTINUE
         CALL WRITE_RUNTIMES (TIME,idbg(2))
 c       IF (IDBG(1).GE.1) CALL PRINT_FREE_MEMORY ()
       ENDIF
-      WRITE(*,'(A)') '<> DANFE analysis completed'
+      WRITE(*,'(A)') '   - DANFE analysis completed'
       END                         ! end of the main subroutine DANFE.
 C-----------------------------------------------------------------------
 C같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같
@@ -2336,7 +2337,7 @@ c     WRITE(*,'(79(''-''))')
       ENDIF
       IF (IPR.GE.1)
      & WRITE(*,'(A, f5.2, a,a,f13.2,a)')
-     & '<> Total Run Time =', t2,unit,' =', t1,'s'
+     & '   - Total Run Time =', t2,unit,' =', t1,'s'
 
       IF (IPR.GE.2) then    !- extra timing info
         WRITE(*,'(T5,3(A,F10.2,A))')
