@@ -627,7 +627,7 @@ C     IPR >=2 for a print of the progress as I/N
 C
       REAL A(*)
       INTEGER KDIAG(*), NZEROS
-      real x,x1
+      real ::x=0.,x1
       real flops
       save flops
 
@@ -2227,8 +2227,9 @@ c-----------------------------------------------------------------------
 
       INTEGER M, IW, N2, N, K, MAXR, IRR, IR, KR, J, JM, IUGL, J2,
      + L, JL, MAXL, I, IA
-      REAL G, B, S, C, C2, S2, CS, U, U1, A(IA,*), D(*), E(*)
+      REAL B, S, C, C2, S2, CS, U, U1, A(IA,*), D(*), E(*)
       real flops
+      real :: g=0.    !- to avoid uninitialised gfortran warnings
 
 c.. calc total flops needed ..
       flops = 0
@@ -2888,9 +2889,12 @@ C-------------------------------------------------------------------------
 c
       integer i,j,k,l,m,n,ii,l1,l2,nm,mml,ierr
 c      double precision d(n),e(n),z(iz,n)
-c      double precision c,c2,c3,dl1,el1,f,g,h,p,r,s,s2,tst1,tst2  !,pythag
+c      double precision c,c2,c3,dl1,el1,f,g,h,p,r,s,tst1,tst2  !,pythag
       real d(n),e(n),z(iz,n)
-      real c,c2,c3,dl1,el1,f,g,h,p,r,s,s2,tst1,tst2  !,pythag
+      real c,c2,dl1,el1,f,g,h,p,r,s,tst1,tst2  !,pythag
+      ! to avoid compile warning about uninitialised and type convertion
+      real:: zero=0. , one=1.  , two=2.
+      real:: s2=0., c3=0.
 
 c ** 9-6-94 modified by Dan Kidger to pass 'iz' : the size of 'z'
 c
@@ -2987,8 +2991,8 @@ c     .......... form shift ..........
          l1 = l + 1
          l2 = l1 + 1
          g = d(l)
-         p = (d(l1) - g) / (2.0d0 * e(l))
-          r = sqrt(p**2+1.0d0)
+         p = (d(l1) - g) / (two * e(l))
+          r = sqrt(p**2+one)
 c         r = pythag(p,1.0d0)
          d(l) = e(l) / (p + sign(r,p))
          d(l1) = e(l) * (p + sign(r,p))
