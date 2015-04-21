@@ -1001,7 +1001,7 @@ c.. the wrong matrix to play with.
       IR2      = KDIAG (6)           !- start loc of the G()'s
       IPRE_1   = KDIAG (3)           !- base-pointer to the preconditioner in KV()
 c                                       (ie after the current end of KV)
-      write(*,'(10i6)') kdiag(1:20+24)
+!     write(*,'(10i6)') kdiag(1:20+24)
 c------------------ null the diagonal ----------------
       DO I=1,N                       !- (hold N in KDIAG too?)
         KV (IPRE_1+ I) = 0.
@@ -1097,11 +1097,11 @@ c     KDIAG(10)=..            !- store PRECON length too?
 !     This solves the equations by using the Conjugate Gradient Method
 !                      KV x = B
 !     19/04/15 rewritten from SOLVE_CG()  to be much cleaner
-!     
+!
       IMPLICIT NONE
 !
 !    passed arguments
-!     
+!
       INTEGER,intent(in)  :: KDIAG (*)         !- store of 'G' vectors + extra info.
       INTEGER,INTENT(IN)  :: IKV,IR,N,IPR !- size of KV/size of vectors/ (output #iters)
       INTEGER,INTENT(OUT) :: ITERS
@@ -1164,7 +1164,7 @@ c     KDIAG(10)=..            !- store PRECON length too?
 !     Initialastion
 !
       call apply_prceon(KV,b,N,D,pcg%iprecon,pcg%ipre_1)
-      d(0) = zero   
+      d(0) = zero
       p = d
 !     r(1:n) = loads(1:n)
       x=zero
@@ -1183,7 +1183,7 @@ c     TOL = 10.**(-4)              !- adjust as necessary
       ireport= 0
 
 !     how many floating point operations per CG iteration
-      CALL GET_PCG_FLOPS 
+      CALL GET_PCG_FLOPS
      &   (KDIAG,N,pcg%NEL,flops,flops_mv, flops_vv, flops_setup)   !- for timing
       if (ipr.ge.4) write(*,'(a,a,f12.3,a,f12.3,a)')
      & 'CG solver', ':',n/1.e3, ' Kequations,', flops/1.e6,' mflops/itn'
@@ -1216,7 +1216,7 @@ c    & ' setup=(',flops_setup/1000000.,')'
      &CALL MYERROR (2,'down=0. : Degenerate loads in Conj Grad Solver')
 
       alpha= up/down
-      xnew  = x + alpha * p 
+      xnew  = x + alpha * p
       b     = b - alpha * u
 
       call apply_prceon(KV,b,N,D,pcg%iprecon,pcg%ipre_1)
@@ -1428,7 +1428,7 @@ c----- apply the BIG_SPRINGS ------
         K = KDIAG (IBS_START+I)
         U(K) = U(K) + BIG_SPRING * X(K)
       ENDDO
-      write(*,'(a,10G12.3)')'after bs:x,u=',x(0:N),U(0:N)
+!     write(*,'(a,10G12.3)')'after bs:x,u=',x(0:N),U(0:N)
 
 c---------- MPI: exchange U() across boundaries ------------
 c   send: the values of U() on the boundary
@@ -1443,20 +1443,20 @@ c calls our nodes, hence block the += our values.
 c (cf one-sided communication)
 
 c-----------------------------------------------
-      write(*,'(a,(10G12.3))')'b=',b(0:N)
+!     write(*,'(a,(10G12.3))')'b=',b(0:N)
       DO I=1,N
         R(I) = B(I)  -U(I)               !- put 'loads' B into R=residual
       ENDDO                              ! (B is not used again)
-      write(*,'(a,(10G12.3))')'r=',r(0:N)
+!     write(*,'(a,(10G12.3))')'r=',r(0:N)
 
       call apply_prceon(KV,R,N,D,iprecon,ipre_1)
-      write(*,'(a,(10G12.3))')'d,r=',d(0:N),r(0:N)
+!     write(*,'(a,(10G12.3))')'d,r=',d(0:N),r(0:N)
 c----------- need 2 copies: (one gets bigger, the other smaller ?)
 c.. compute UP=R.D here too?
       DO I=1,N
         P(I) = D(I)
       ENDDO
-      write(*,'(a,(10G12.3))')'p,d=',p(0:N),d(0:N)
+!     write(*,'(a,(10G12.3))')'p,d=',p(0:N),d(0:N)
 
 c------------------------ loop the iterations --------------------------
 c     TOL = 10.**(-4)              !- adjust as necessary
@@ -1476,7 +1476,7 @@ c     TOL = 10.**(-4)              !- adjust as necessary
 c       print*,'iters=',iters
       call get_secs(t0a)            !- time before matrix:vector
       CALL CG_MATVEC_EBE (KV, P, U, N, KDIAG, 1,NEL)  !U =KV * P
-      write(*,'(a,(10G12.3))')'p,u=',p(0:N),U(0:N)
+!     write(*,'(a,(10G12.3))')'p,u=',p(0:N),U(0:N)
 
 c.. recieve the parts of U from other processors and sum them
 
@@ -1485,7 +1485,7 @@ c----- apply the BIG_SPRINGS ------
         K = KDIAG (IBS_START+I)
         U(K) = U(K) + BIG_SPRING * P(K)
       ENDDO
-      write(*,'(a,(10G12.3))')'u,p=',u(0:N),p(0:N)
+!     write(*,'(a,(10G12.3))')'u,p=',u(0:N),p(0:N)
 
       call get_secs(t1a)            !- time after matrix:vector
 
@@ -1531,7 +1531,7 @@ cdir$ unroll 2
         XNEW(I) = X(I) + ALPHA * P(I)        !  X = X + à P
         R(I)    = R(I) - ALPHA * U(I)        !  R = R - à U
       ENDDO
-      write(*,'(a,(10G12.3))')'xnew,r=',xnew(0:N),r(0:N)
+!     write(*,'(a,(10G12.3))')'xnew,r=',xnew(0:N),r(0:N)
 #endif
 
 c------------------------- apply preconditioner ------------------------
