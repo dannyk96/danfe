@@ -217,7 +217,6 @@ c      If no matches at all store a new KM
         CALL FORM_SPARCE_KV (KM,IKM,IDOF,G,KDIAG, KV)
         IPOS = 1
       ELSEIF (ISTORE.EQ.1.or.ISTORE.eq.6) THEN  !------ PCG -------
-
         IF (IPOS.EQ.0) THEN                 !- store a new one
           IR  = KDIAG(3)                    !- KV_end
           IPOS = IR                         !.. remember start-point for below
@@ -273,18 +272,19 @@ c
       REAL KV(IKV), FORCES_N(MDF,NN)
       INTEGER NF(INF,NN), KDIAG(IKDIAG)
 
-      IC = 1
+      IC = 0
       DO I=1,NN
         DO J=1,NODOF
           K = NF(J,I)
           IF (K.NE.0.AND.ABS(FORCES_N(J,I)).GT.1.E-8) THEN
-          IC = IC + 1   !- count of loaded nodes
+          IC = IC + 1   !- count of loaded freedoms
 
       IF (ISTORE.EQ.0) THEN              !-- SPARIN method
         KV (KDIAG(K)) = BIG_SPRING
       ELSEIF (ISTORE.EQ.1.or.istore.eq.6) THEN          !-- CG by EBE
 c.. new method stores a table of freedoms into KDIAg (plus a set of
 c.. BIG_SPRINGS ?
+
         KDIAG (11) = IC
         IF (IC.eq.1) THEN                !-- for the first one:
           KDIAG (13)= KDIAG (3) +1          !- get storage point in KV
@@ -378,7 +378,8 @@ c       DO I=1,1000
 c       ENDDO
       ELSEIF (ISTORE.EQ.1.or.istore.eq.6) THEN          !-- CG by EBE
 c       print*,'debug: calling SOLVE_CG'
-        CALL SOLVE_CG (KV,IKV,IR,LOADS,DISPS,N,KDIAG, ITERS_CG,IPR)  !orig
+c       CALL SOLVE_CG (KV,IKV,IR,LOADS,DISPS,N,KDIAG, ITERS_CG,IPR)  !orig
+        CALL solve_conjgrad(KV,IKV,IR,LOADS,DISPS,N,KDIAG, ITERS_CG,IPR)
 c  =47 iters,disp=.22225
 c       CALL SOLVE_CG2(KV,IKV,IR,LOADS,DISPS,N,KDIAG, ITERS_CG,IPR)  !Lucquin
 c  =89 iters,disp=.
@@ -840,6 +841,88 @@ c
 c   Dan Kidger 1993    (SOLVE_CG Algorithm from Griffiths & Smith book)
 C-----------------------------------------------------------------------
 
+      subroutine print_pcg_structs(kv,ikv,ir, n,kdiag, ipr)
+!
+!   This routine dumps the contents of the KDIAG structure
+!   This for debug
+!    Dan Kidger 16-4-15
+!
+!    Notes: here we build a F90 struct.
+!     This is a template for teh next revision where we will use this struct
+!     in place of kdiag(3) etc. which is very ugly and error prone
+!
+
+      IMPLICIT NONE
+      integer :: i,j, iel, ic, idof, ibase
+      INTEGER IKV,IR,N,IPR !- size of KV/size of vectors/ (output #iters)
+      REAL        KV (IKV)       !- all the matrices + procond.
+      real   :: big_spring
+      INTEGER  KDIAG (*)         !- store of 'G' vectors + extra info.
+
+      TYPE:: pcg_struct
+        integer :: cookie    ! = 12345 ??
+        integer :: end       ! current end point in KDIAG
+        integer :: endkv     ! current end point in KV
+        integer :: istore    ! 1=full, 2=upper tri storage
+        integer :: nel       !  # of KM (G's) that we have 
+        integer :: istart    ! start location of teh G()s in KDIAG
+        integer :: iprecon   !  >0 if a preconditioner
+        integer :: ipre_1    ! pointer to the preconditioner in KV()
+        integer :: n_bs      ! # of big_springs (for presc. disps.)
+        integer :: ibs_start ! start of the list of big spring freedoms
+        integer :: bigspring ! where the big spring value is in KV()
+      end type 
+      type(pcg_struct) :: pcg
+        
+! note that some of these are teh real start, others ar eteh base so +1,,+2 etc for content
+      pcg%cookie  = KDIAG(1)      ! cookie
+      pcg%end      =KDIAG(2)      ! current end point in KDIAG
+      pcg%endkv    =KDIAG(3)      ! current end point in KV
+      pcg%ISTORE  = KDIAG(4)      !- 1=full, 2=upper tri storage
+      pcg%NEL     = KDIAG(5)      !- # of KM (G's) that we have
+      pcg%ISTART  = KDIAG(6)      !- start loc of the G()'s - working pointer
+      pcg%IPRECON = KDIAG(8)      ! >0 if a preconditioner
+      pcg%IPRE_1   = KDIAG(9)      ! pointer to the start of the  preconditioner in KV()
+      pcg%N_BS     = KDIAG(11)     ! # of big_springs (for presc. disps.)
+      pcg%IBS_START = KDIAG(12)   !- start of the list of big spring freedoms
+      pcg%bigspring = KDIAG(13)   !- position of the big_spring value in KV
+
+      BIG_SPRING = KV (pcg%bigspring) !- value of the BIG_SPRING
+
+      print*,'Structure of the KDIAG list:' 
+      print*,'cookie                     =',pcg%cookie
+      print*,'current end point of KDIAG =',pcg%end
+      print*,'current end point of KV    =',pcg%endkv,  'ir=',ir
+      print*,'storage type (1=sq,2=tri)  =',pcg%istore
+      print*,'No of elems stored in KDIAG=',pcg%nel
+      print*,'start loc of Gs in KDIAG   =',pcg%istart,
+     &   ' val=(idof)=',kdiag(pcg%istart)
+
+      print*,'preconditioner (1=diiag)   =',pcg%iprecon
+      print*,'ptr to the precon in KV    =',pcg%ipre_1
+      if (pcg%iprecon==1) then
+        print*,'preconditioner (diagonal    ='
+        write (*,'(12g12.3)') (kv(pcg%ipre_1+i),i=1,n) 
+      endif
+    
+      print*,'No. of big springs         =',pcg%n_bs
+      print*,'ptr to the bigspring in KV =',pcg%bigspring
+     &      ,' val=', kv(pcg%bigspring)
+      print*,'ptr to bs freedomsin KDIAG =',pcg%ibs_start
+     &      ,' vals=',(kdiag(pcg%ibs_start+i),i=1,pcg%n_bs)
+
+      print*,' '
+      print*,'g vectors'
+      ic=pcg%istart
+      do iel=1,pcg%nel
+        IDOF  = KDIAG(IC)
+        IBASE = KDIAG(IC+1)
+         write(*,'(i6,i3,i6, 60i4)') 
+     &     iel,idof, ibase,(kdiag(ic+1+j),j=1,idof)
+        IC = IC + IDOF + 2        !- KDIAG pointer
+      enddo
+      end subroutine print_pcg_structs
+
 C-----------------------------------------------------------------------
       SUBROUTINE FORM_PCG_KV (KV,IKV, KM,IKM,IDOF,IC, itype)
 C
@@ -896,25 +979,29 @@ C
       END
 
 C-----------------------------------------------------------------------
-      SUBROUTINE FORM_PRECON_DIAG (KV,IKV,KDIAG,IKDIAG, N)
-C
-C     This finds the diagonal of the Global stiffness matrix
-C     and stores the reciprical of this in KV after the KM's
-C     for use as a Proconditioner.
-C       .. works for both full KM and upper-tri versions.
-c       .. Note the big-springs are stored *after* this
-C          (should it be before so the Precon uses the big_springs itself?)
-
-      REAL KV (IKV)
-      INTEGER KDIAG(IKDIAG),N
+      SUBROUTINE FORM_PRECON_DIAG (KV,IKV,KDIAG,IKDIAG, N,BIG_SPRING)
+!
+!     This finds the diagonal of the Global stiffness matrix
+!     and stores the reciprical of this in KV after the KM's
+!     for use as a Proconditioner.
+!       .. works for both full KM and upper-tri versions.
+!       .. Note the big-springs are stored *after* this  - really?
+!          (should it be before so the Precon uses the big_springs itself?)
+!
+      REAL    :: KV (IKV)
+      INTEGER :: KDIAG(IKDIAG),N
+      real    :: kv_max
+      real    :: big_spring
+      integer :: nzeros
 
 c.. hmm nice to have a 'magic' cookie for PCG so we abort if we are given
 c.. the wrong matrix to play with.
       ITYPE    = KDIAG (4)           !- 1 if full KM, 2 if upper tri
       NEL_USED = KDIAG (5)           !- # of G's that we have
       IR2      = KDIAG (6)           !- start loc of the G()'s
-      IPRE_1   = KDIAG (3)         !- base-pointer to the preconditioner in KV()
+      IPRE_1   = KDIAG (3)           !- base-pointer to the preconditioner in KV()
 c                                       (ie after the current end of KV)
+!     write(*,'(10i6)') kdiag(1:20+24)
 c------------------ null the diagonal ----------------
       DO I=1,N                       !- (hold N in KDIAG too?)
         KV (IPRE_1+ I) = 0.
@@ -944,6 +1031,8 @@ c .. so do we need a bit-bucket = PRECON(0) ?
      &      KV (IPRE_1+I) = KV (IPRE_1+I) +  KV (IR1-1 +ipos)
             ipos = ipos + (IDOF+1-J)      !- so +60, +59, +58,...
           ENDDO
+        ELSE
+        call myerror(3,'KV storage format is not 1 (NxN) or 2 (diag)')
         ENDIF
         IR2 = IR2 + IDOF + 2            !- update KDIAG pointer to next elem
       ENDDO
@@ -963,21 +1052,221 @@ c     loop freedoms, pick-up value, then add into KV_precon
 c   enddo
 c enddo
 
+!     write(*,'(a,(10g12.3))') 'before BS', (KV(IPRE_1+J),j=1,n)
+!
+!     Add in the big_spring values
+!
+      n_bs      = kdiag(11)         ! No. of Big Springs
+      ibs_start = kdiag(12)         ! where these freedoms are stored
+      do i=1,n_bs
+        j = kdiag(ibs_start+i)               ! freedom number
+        KV(IPRE_1+J) = BIG_SPRING
+      enddo 
+!     write(*,'(a,(10g12.3))') 'after BS', (KV(IPRE_1+J),j=1,n)
 
-c--------- invert the diagonal --------
-c.. if we find a zero then MYERROR (3,'Zero diagonal term found in KV')
+!--------- invert the diagonal --------
+      nzeros=0
+      kv_max=0.
       DO I=1,N
         val = KV(IPRE_1+I)
-        if (val.eq.0) call myerror(3,'Zero diagonal found (PRECON)')
-        KV (IPRE_1+ I) = 1. / val
+        kv_max=max(kv_max,val)
+        if (val.eq.0) then
+           nzeros = nzeros+1
+        else
+           KV (IPRE_1+ I) = 1. / val
+        endif
       ENDDO
+      print*,'  * Largest value found on diagonal of KV =', kv_max
+      if (nzeros>0) then
+         print*,'*** ', nzeros,'/',n,
+     & ' zero elements found on the diagonal'
+         call myerror(3,'Zero diagonal terms found in KV (PRECON)')
+      endif
 
 c----- update KDIAG info to match -----
       KDIAG(8) = 1            !- we now have a diagonal preconditioner
       KDIAG(9) = IPRE_1       !- & here is where it starts
-      KDIAG(2) = IPRE_1+N     !- new end-point of KV()  <KDIAG is unaffected>
+c     KDIAG(2) = IPRE_1+N     !- new end-point of KDIAG
+      KDIAG(3) = KDIAG(3)+1   !- new end-point of KV()  <KDIAG is unaffected>
 c     KDIAG(10)=..            !- store PRECON length too?
       END
+
+!----------------------------------------------------------------------
+      SUBROUTINE solve_conjgrad ( KV,IKV,IR, B,X,N, KDIAG, ITERS, IPR)
+!
+!     This solves the equations by using the Conjugate Gradient Method
+!                      KV x = B
+!     19/04/15 rewritten from SOLVE_CG()  to be much cleaner
+!
+      IMPLICIT NONE
+!
+!    passed arguments
+!
+      INTEGER,intent(in)  :: KDIAG (*)         !- store of 'G' vectors + extra info.
+      INTEGER,INTENT(IN)  :: IKV,IR,N,IPR !- size of KV/size of vectors/ (output #iters)
+      INTEGER,INTENT(OUT) :: ITERS
+      REAL,INTENT(IN)     :: KV (IKV)       !- all the matrices + procond.
+      REAL,INTENT(INOUT)  :: B (0:N)       !- the input forces   GET MODIFIED
+      REAL,INTENT(INOUT)  :: X (0:N)       !- the output disps (=inital guess on input)
+!
+!  Workspace
+!
+      real    ::  XNEW(0:n),P(0:n),U(0:n),D(0:n) !- use automatic arrays
+!     REAL    :: R(0:n)    ! unused: we now use B (=loads()) as this workspace
+      real    :: up,up2,down, alpha,beta
+      REAL    :: BIG_SPRING
+
+      integer :: i,j,k, iel, ic, idof, ibase
+      real    :: zero=0.
+
+! converrgence checking
+      real    :: tol,big,biggest
+      integer :: ilevel,ireport, iters_old, max_iters
+      LOGICAL CONVERGED, report_flops
+
+
+! timers
+      real :: flops, flops_mv, flops_vv,flops_setup,
+     & flop_rate=0., flop_ratet=0.,
+     & tol_sofar, t0,t0a,t1a,t1,t_old
+
+
+      TYPE:: pcg_struct
+        integer :: cookie    ! = 12345 ??
+        integer :: end       ! current end point in KDIAG
+        integer :: endkv     ! current end point in KV
+        integer :: istore    ! 1=full, 2=upper tri storage
+        integer :: nel       !  # of KM (G's) that we have
+        integer :: istart    ! start location of teh G()s in KDIAG
+        integer :: iprecon   !  >0 if a preconditioner
+        integer :: ipre_1    ! pointer to the preconditioner in KV()
+        integer :: n_bs      ! # of big_springs (for presc. disps.)
+        integer :: ibs_start ! start of the list of big spring freedoms
+        integer :: bigspring ! where the big spring value is in KV()
+      end type
+      type(pcg_struct) :: pcg
+
+! note that some of these are the real start, others are the base so +1,,+2 etc for content
+      pcg%cookie  = KDIAG(1)      ! cookie
+      pcg%end      =KDIAG(2)      ! current end point in KDIAG
+      pcg%endkv    =KDIAG(3)      ! current end point in KV
+      pcg%ISTORE  = KDIAG(4)      !- 1=full, 2=upper tri storage
+      pcg%NEL     = KDIAG(5)      !- # of KM (G's) that we have
+      pcg%ISTART  = KDIAG(6)      !- start loc of the G()'s - working pointer
+      pcg%IPRECON = KDIAG(8)      ! >0 if a preconditioner
+      pcg%IPRE_1   = KDIAG(9)      ! pointer to the start of the  preconditioner in KV()
+      pcg%N_BS     = KDIAG(11)     ! # of big_springs (for presc. disps.)
+      pcg%IBS_START = KDIAG(12)   !- start of the list of big spring freedoms
+      pcg%bigspring = KDIAG(13)   !- position of the big_spring value in KV
+
+      BIG_SPRING = KV (pcg%bigspring) !- value of the BIG_SPRING
+!
+!     Initialastion
+!
+      call apply_prceon(KV,b,N,D,pcg%iprecon,pcg%ipre_1)
+      d(0) = zero
+      p = d
+!     r(1:n) = loads(1:n)
+      x=zero
+
+c     TOL = 10.**(-4)              !- adjust as necessary
+      TOL = 10.**(-6)              !- adjust as necessary
+      MAX_ITERS = N                !- Theoretical maximum needed  :-)
+      MAX_ITERS = nint(MAX_ITERS * 1.5)  !- try this ?
+
+      call get_secs (t0)           !- time the process, and..
+      t_old=t0
+      iters_old=0
+
+      TOL_SOFAR = 0.1              !- watch current closeness
+      ilevel = 0                   !- and how many so far
+      ireport= 0
+
+!     how many floating point operations per CG iteration
+      CALL GET_PCG_FLOPS
+     &   (KDIAG,N,pcg%NEL,flops,flops_mv, flops_vv, flops_setup)   !- for timing
+      if (ipr.ge.4) write(*,'(a,a,f12.3,a,f12.3,a)')
+     & 'CG solver', ':',n/1.e3, ' Kequations,', flops/1.e6,' mflops/itn'
+c    & ' setup=(',flops_setup/1000000.,')'
+
+!
+!------------------------ loop the iterations --------------------------
+!
+      DO ITERS = 1 ,MAX_ITERS
+!       print*,'iters=',iters, ' /',max_iters
+
+      call get_secs(t0a)            !- time before matrix:vector
+      u  =zero
+      CALL CG_MATVEC_EBE (KV, P, U, N, KDIAG, 1,pcg%NEL)  !U =KV * P
+!----- apply the BIG_SPRINGS ------
+      DO I=1,pcg%N_BS                   !(=0 if no Big springs)
+        K = KDIAG (pcg%IBS_START+I)
+        U(K) = U(K) + BIG_SPRING * P(K)
+      ENDDO
+!     print*,'b=',b
+!     print*,'d=',d
+!     print*,'p=',p
+!     print*,'u=',u
+!     print*,'x=',x
+!     print*,'up,down,up2,alpha,beta=', up,down,up2,alpha,beta
+
+      up   = dot_product(b,d)
+      down = dot_product(p,u)
+      IF (ABS(DOWN).LT.1.E-30)
+     &CALL MYERROR (2,'down=0. : Degenerate loads in Conj Grad Solver')
+
+      alpha= up/down
+      xnew  = x + alpha * p
+      b     = b - alpha * u
+
+      call apply_prceon(KV,b,N,D,pcg%iprecon,pcg%ipre_1)
+      up2    = dot_product(b,d)
+      beta   = up2/up
+      p      = d + beta * p
+      CALL CHECON3 (XNEW(1) ,X(1),N,BIG,BIGGEST)
+      x = xnew
+      CONVERGED = (BIGGEST.LT.TOL)         !- convergence
+
+!
+!     report Mflops and when we pass each convergence level.
+!
+      if (ipr.ge.4.and. biggest.lt.tol_sofar) then   ! report flop rate
+        ireport=ireport+1
+        ilevel = ilevel +1
+        TOL_SOFAR = tol_sofar/10.    !- next one to check
+        call get_secs (t1)           !- time the process
+        if (t1.gt.t0) then
+          flop_rate = (iters-iters_old)*flops / (t1-t_old) !- this step
+          flop_ratet = iters*flops / (t1-t0)  !- overall
+          t_old=t1
+          iters_old=iters
+        else
+          flop_rate = 0.
+          flop_ratet = 0.
+        endif
+      if (ireport.eq.1)     !- column headers --
+     &write(*,'(a)')
+     &'iters, log_big,%n, flops (MatVec, VecVec, mean, overall)'
+      write (*,'(i6,f8.2,f5.1,a,2f9.1,2f9.1,f9.3)')
+     &  iters, log10(biggest), iters/real(n)*100,'%',
+     & flops_mv/max(1.e-12,(t1a-t0a))/1.e6,
+     & flops_vv/max(1.e-12,(t1-t1a))/1.e6,
+     & flop_rate/1.e6, flop_ratet/1.e6
+     & ,t1-t0    !- timestamp
+      endif
+
+
+      if (ipr>=4)
+     &write(*,'(i5,8g13.3)') iters, up,down,up2,alpha,beta, 
+     &    big,biggest
+        B(0) = 0.          !-  make sure this is zero ? why?
+        IF (.not.converged) CYCLE
+        x = xnew           ! copy final answer from workspace
+        return
+      ENDDO                              !- loop iterations
+      CALL MYERROR (3,'Conjugant Gradient Method failed to converge')
+
+      END SUBROUTINE solve_conjgrad
 
 C-----------------------------------------------------------------------
       SUBROUTINE SOLVE_CG ( KV,IKV,IR, B,X,N, KDIAG, ITERS, IPR)
@@ -1070,14 +1359,15 @@ c#endif
 
       character string*79, solver*7
       real :: flops, flops_mv, flops_vv,flops_setup, 
-     & flop_rate=0., flop_ratet=0.,
-     & tol_sofar, t0,t0a,t1a,t1,t_old
+     &        flop_rate=0., flop_ratet=0.,
+     &        tol_sofar, t0,t0a,t1a,t1,t_old
       integer ilevel,ireport,iters_old
-      real ddot   ! blas dot-product routine
 
-c       print*,'debug: entered SOLVE_CG'
-c       pause
-c       call flush(6)
+!      print*,'debug: entered SOLVE_CG'
+! if debug
+      print*,'solve_cg,ipr=',ipr
+      if (ipr.ge.2)
+     &call print_pcg_structs(kv,ikv,ir, n,kdiag, ipr)
 
       P(0) = 0.          !-  make sure these are zero too ?
       U(0) = 0.          !  ( only need to do P(0) before mat_mul
@@ -1106,8 +1396,9 @@ c-------------------- Abstract the storage info ------------------------
       IF (IPRECON.gt.0)
      &IPRE_1  = KDIAG(9)      ! pointer to the preconditioner in KV()
       N_BS    = KDIAG(11)     ! # of big_springs (for presc. disps.)
+!**FIXED 16-4-15 next line was (11) !!  which =1 not a far location in kdiag
       IF (N_BS.gt.0) THEN
-        IBS_START = KDIAG(11)       !- start of the list of big spring freedoms
+        IBS_START = KDIAG(12)       !- start of the list of big spring freedoms
         BIG_SPRING = KV (KDIAG(13)) !- value of the BIG_SPRING
       ENDIF
 
@@ -1126,7 +1417,9 @@ c    &   ' setup=(',flops_setup/1000000.,')'
       endif
 
 c.. multiply the (EBE) matrix by X to give U.
+      write(*,'(a,10G12.3)')'before:x,u=',x(0:N),U(0:N)
       CALL CG_MATVEC_EBE (KV, X, U, N, KDIAG, 1,NEL)
+      write(*,'(a,(10G12.3))')'after:x,u=',x(0:N),u(0:N)
 
 c.. recieve the parts of U from other processors and sum them
 
@@ -1135,6 +1428,7 @@ c----- apply the BIG_SPRINGS ------
         K = KDIAG (IBS_START+I)
         U(K) = U(K) + BIG_SPRING * X(K)
       ENDDO
+!     write(*,'(a,10G12.3)')'after bs:x,u=',x(0:N),U(0:N)
 
 c---------- MPI: exchange U() across boundaries ------------
 c   send: the values of U() on the boundary
@@ -1149,16 +1443,20 @@ c calls our nodes, hence block the += our values.
 c (cf one-sided communication)
 
 c-----------------------------------------------
+!     write(*,'(a,(10G12.3))')'b=',b(0:N)
       DO I=1,N
         R(I) = B(I)  -U(I)               !- put 'loads' B into R=residual
       ENDDO                              ! (B is not used again)
+!     write(*,'(a,(10G12.3))')'r=',r(0:N)
 
       call apply_prceon(KV,R,N,D,iprecon,ipre_1)
+!     write(*,'(a,(10G12.3))')'d,r=',d(0:N),r(0:N)
 c----------- need 2 copies: (one gets bigger, the other smaller ?)
 c.. compute UP=R.D here too?
       DO I=1,N
         P(I) = D(I)
       ENDDO
+!     write(*,'(a,(10G12.3))')'p,d=',p(0:N),d(0:N)
 
 c------------------------ loop the iterations --------------------------
 c     TOL = 10.**(-4)              !- adjust as necessary
@@ -1178,8 +1476,7 @@ c     TOL = 10.**(-4)              !- adjust as necessary
 c       print*,'iters=',iters
       call get_secs(t0a)            !- time before matrix:vector
       CALL CG_MATVEC_EBE (KV, P, U, N, KDIAG, 1,NEL)  !U =KV * P
-
-      call get_secs(t1a)            !- time after matrix:vector
+!     write(*,'(a,(10G12.3))')'p,u=',p(0:N),U(0:N)
 
 c.. recieve the parts of U from other processors and sum them
 
@@ -1188,6 +1485,10 @@ c----- apply the BIG_SPRINGS ------
         K = KDIAG (IBS_START+I)
         U(K) = U(K) + BIG_SPRING * P(K)
       ENDDO
+!     write(*,'(a,(10G12.3))')'u,p=',u(0:N),p(0:N)
+
+      call get_secs(t1a)            !- time after matrix:vector
+
 c---------- MPI: exchange U() across boundaries ------------
 c     CALL MPI_REDUCE (U,U,N,MPI_REAL,MPI_SUM,0,MPI_COMM_WORLD)
 c-----------------------------------------------------------------------
@@ -1227,9 +1528,10 @@ c-- really it shouldn't be 1:n but rather ifrom:ito
 c$OMP PARALLEL DO
 cdir$ unroll 2
       DO I=1,N
-        XNEW(I) = X(I) + ALPHA * P(I)        !  X = X + à P
-        R(I)    = R(I) - ALPHA * U(I)        !  R = R - à U
+        XNEW(I) = X(I) + ALPHA * P(I)        !  X = X + Ã  P
+        R(I)    = R(I) - ALPHA * U(I)        !  R = R - Ã  U
       ENDDO
+!     write(*,'(a,(10G12.3))')'xnew,r=',xnew(0:N),r(0:N)
 #endif
 
 c------------------------- apply preconditioner ------------------------
@@ -1597,7 +1899,7 @@ c        Dan Kidger : abstracted from SOLVE_CG
 c
 c.. if a precon.. then up = dot(r,d)  < if no precon d==r >
 c     solve precon eqns. for D
-      real kv(*), r(*), D(*)
+      real kv(*), r(0:n), D(0:n)
       integer I,n
       IF (IPRECON.eq.0) THEN        !-- no preconditioner --
         DO I=1,N

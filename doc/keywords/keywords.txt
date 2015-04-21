@@ -1,0 +1,3757 @@
+
+.HR ---------------------------------------------------------------------------
+.TH *ANALYSE
+Runs a 'standard' analysis of the given loads and mesh
+.SH DATA
+(none)
+.SH DESCRIPTION
+This module analyses the effect of the previously given loads on the stucture.
+It is the core module of a DANFE run, and will usualy take the bulk of the total
+runtime.
+
+*ANALYSE will loop the muplitle load steps as given in *LOAD_STEPS or
+*TIME_STEPS, but a seperate *ANALYSE is needed for each Load case - for example
+after some element have been removed or a differnt set of loads applied.
+
+For each step a table of displacements is written out to the current output
+file. If the SPRINT or EPRINT tags have been given to materials in the
+*MAT_PROPS module, then tables of stresses and strains (respectively) will also
+be written out. These allow contouring of stresses subsequently in DANPLOT.
+
+For non-linear models, there will be an iterative process where the excess
+stresses are restributed until all are in the allowable range as given by the
+material model (eg. Mohr-Coulomb). The maximum number of these iterations and
+the criteria for convergence may be changed using *CONTROL.
+
+For each *ANALYSE module a summary table is written to stdout. This has one row
+per load step and gives a line of 9 values. The first is the load step number.
+The second is the number of iteration needed. This will equal 2 for linear
+behaviour and rise considerably after the onset of yield.
+
+The third is the total applied load. This is the unsigned sum of the reaction
+forces for all nodes that have had an applied load or prescribed displaement.
+Fourthly the 'average' displacement of the nodes used for the previous column is
+written. This again is unsigned so care must be taken in interpretation if there
+are multiple key points moving in differing directions.
+
+The fifth column gives the slope of the graph that would ensue from plotting
+column 2 against column 3. This is non-dimensionalised so that the first number
+is 100 (%). This number falls below 100 as the material begins to yield. On the
+yield plateau, this number should converge to a value of probably less than 5
+(%).
+
+The sixth and seventh numbers indicate the extent of yielding. The sixth number
+shows the stress stae of the point in the mesh closest or with the most
+yielding. For elastic response, this number is always less than 100%, and the
+amount of load needed to cause yielding can be seen by simple extrapolation. It
+should not rise above 100%, however values of 100%-103% are normaly acceptable.
+Higher values indicate that the algorithm is struggling to find convergence, and
+perhaps the job should be rerun with a smaller loadstep size. The Seventh number
+gives the number of 'Gauss' points in the mesh that are at yield - a simple
+indication of the extended of yielded material at this stage.
+
+The final column gives the time of day, useful perhaps to indicate how long the
+job has been running and so estimate how long it will take to complete. For
+Fortran implemntation that like a real time clock the dummy string "hh:mm:ss" is
+printed instead.
+
+.SH EXAMPLE
+*NODAL_LOADS
+  5. 10.    0.  -500.     !- 500kN vertical load at point (5.,10.)
+*FORM_KM
+*ANALYSE
+*EOF
+
+.SH ADVANCED
+.SH CAVEATS
+*ANALYSE requires that the 'stiffness matrix' has previously been formed with a
+call to *FORM_KM (or *FORM_KP, etc.). In a future release of DANFE, *ANALYSE
+will itself call *FORM_KM internaly if the current stiffness matrix is absent or
+invalid because the mesh has changed, for example when excavating a tunnel or
+performing Adaptive Mesh Refinement by the h-method or the p-method.
+
+.SH SEEALSO
+*FORM_KM
+*LOAD_STEPS
+*TIME_STEPS
+*MAT_PROPS
+*NODAL_LOADS
+*NODAL_DISPS
+*BC_BY_COORD
+*FB_RS
+.SH FLAGS
+'F'    4    4    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ANALYSE_DYNAMIC
+Runs a natural freq. analysis
+.SH DATA
+(none)
+.SH DESCRIPTION
+This module computes the natural frequencies and mode shapes for the structure.
+
+The eigenvalues are written out to screen as a table in ascending order.
+Consecutive eigenvalues of the same numerical value are written with a repeat
+count. This makes them much easier to spot, they usualy arise from symmetries in
+the structure.
+
+The results are written out to the Output file as an equivalent set of Load
+steps in *DISPLACEMENT modules. This is preceeded by an *EIGENVALUES table.
+
+.SH EXAMPLE
+<< previous modules ommited >>
+*FORM_KM
+*FORM_MM
+*ANALYSE_DYNAMIC
+*EOF
+
+.SH ADVANCED
+.SH CAVEATS
+This module currently uses a consistant lumped mass matrix, rather than the full
+mass matrix.
+
+Currently all eigenvalues are extracted, this can take a long time, even for
+moderately sized structures of a few thousand nodes. Iterative solvers such as
+Lanczos' will be implimented in the future for use with very large meshes.
+
+Also planned is a Modal analysis module, so resynthesise the movements due a
+given input frequency profile.
+
+.SH SEEALSO
+*FORM_KM
+*FORM_MM
+*ANALYSE_EIGEN
+.SH FLAGS
+'F'    5    5    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ANALYSE_EIGEN
+runs 'Eigenvalues of KM'
+.SH DATA
+.SH DESCRIPTION
+This is similar to *ANALYSE_DYNAMIC, but does not use the mass of the
+structure. This then gives the eigenspectrum of the stiffness matrix. This is
+used to detect buckling instabilities and to investigate the behaviour of
+individual Finite Elements under certain conditions, for example the degeneracy
+of 20-node brock elements when under integrated with only 8 Gauss points. Such
+meshes exhibit spurious zero-energy modes for single rows of elements and
+similar configurations.
+
+.SH EXAMPLE
+<< previous modules ommited >>
+*FORM_KM
+*FORM_MM
+*ANALYSE_DYNAMIC
+*EOF
+.SH ADVANCED
+The results should always show the first 3 eigenvalues as zero in 2D, and the
+first 6 as zero in 3D. If more than this appears, or if the next non-zero
+eigenvalue is very small, then the mesh is degenerate. If there are less than
+this number of zero modes, then the element will clearly fail the Patch test as
+it cannot move as a rigid body without generating strain.
+
+.SH CAVEATS
+.SH SEEALSO
+*ANALYSE_DYNAMIC
+.SH FLAGS
+ 'F'    6    6    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ANALYSE_EXPLICIT
+(Explicit dynamic solver)
+.SH DATA
+(none)
+.SH DESCRIPTION
+(This will analyse the movements of a structure over time, due to transient
+effects such as the impact of one object on another. Here the model will be re-
+cast explicitly rather than an implicit set of coupled equations. )
+
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+This module has not yet been implimented.
+.SH SEEALSO
+*ANALYSE
+*ANALYSE_DYNANIC
+.SH FLAGS
+'F'    7    7    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ANALYSE_FLOWLINES
+This computes Flownet lines for seepage.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'    8    8    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ANALYSE_POTENTIALS
+This Compute Equipotentials for seepage
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'    9    9    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *APPLY_CONSOL
+Forms initial pre-stress in the soil.
+.SH DATA
+(none - but see *MAT_PROPS)
+.SH DESCRIPTION
+This sets the initial stresses in all the elements based on the position of the
+point verticaly and the self-weight of the soil. Without this module all
+stresses would be zero at the beginning of an analysis. The vertical stresses is
+set to be the y-coordinate of the point muliplied by the the self-weight of that
+material plus CONS, where CONS is the uniform consolidation pressure. The
+horizontal stresses is set to by EpK0 times this. Epk0 can vary from 0.3-2.5
+typicaly. For a saturated soil in a total stress analysis, EpK0 would always be
+unity.
+
+For the simulation of Triaxial tests, then Cons is set to the confining
+pressure, Gy set to zero, and Epk0 probably set to one.
+
+.SH EXAMPLE
+*MAT_PROPS
+ mat=1 E=4.e3  v=0.49   C=40.  Cons=10. Gy=-20. EPK0=1.5
+*APPLY_CONSOL
+.SH ADVANCED
+.SH CAVEATS
+This module is convenient, but cannot give the correct initial stress state for
+sloping ground surafces, since the y-coordinate rather than the distance to the
+surface is used, and also in such cases there will be a shear-stress component
+as well. In such cases *APPLY_GRAVITY would need to be used to recover
+the complex initial stress state.
+
+Also *APPLY_CONSOL uses just the self-weight of the current material and so is
+not valid in layered ground where each layer has a very different self-weight
+(for example if the surface layers where completely unsaturated above the water
+table). Again *APPLY_GRAVITY would need to be used.
+
+.SH SEEALSO
+*MAT_PROPS
+*APPLY_GRAVITY
+.SH FLAGS
+'F'   10   10    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *APPLY_GRAVITY
+Applies gravity as a loadcase.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+    4.   0.   1.2   2.4   3.5
+
+.SH SEEALSO
+*APPLY_CONSOL
+.SH FLAGS
+'F'   11   11    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *AUTOPLOT
+This instructs DANMESH  to draw the mesh graphically after every keyword.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This sets a flag in DANMESH, such that from this point onwards in the file,
+the current state of the mesh is drawn on screen after each keyword step.
+This is equivalent to calling *PLOT_MESH after every keyword. The user needs to
+press the <enter> key, repeatedly as the mesh generation pauses after drawing
+each picture. The use of *AUTOPLOT is useful for understanding how the mesh
+generation is proceeding, particularly for debugging purposes.
+.SH EXAMPLE
+//
+*AUTOPLOT        ! lets watch what happens
+*MIRROR_MESH
+ 1 0.            ! reflect about the y-axis
+*MIRROR_MESH
+ 2 5.            ! reflect about the line y=5.
+//
+.SH ADVANCED
+.SH CAVEATS
+Currently this module is only available in the PC versions.
+There is no equivalent keyword to switch of plotting; however *DEBUG can be
+used to cancel *AUTOPLOT
+.SH SEEALSO
+*PLOT_MESH
+*DRAW_MESH
+*PLOT_MESH_BOUNDARY
+.SH FLAGS
+'MF'   12   12    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *AXISYMMETRIC
+Augments a model to an axisymmetric one.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This is used in conjunction with *TWO_DIMENSIONAL for models that represnt
+circular structures, with only symmetric loads; for example a circular
+footing, a single pile or a flywheel. The effect of *AXISYMMETRIC is to augment the strain-
+displacement matrix such that movements in 'x' (radial) will cause a strain
+in 'z'. Axisymmetry allows such symmertical structures to be analysed, without
+the overheads of a full three dimensional analysis.
+.SH EXAMPLE
+*TWO_DIMENSIONAL
+*AXISYMMETRIC
+*NODES
+//   !- etc for the rest of the model and analysis.
+.SH ADVANCED
+This can also be used with three dimensional models to specify that the
+z-coordinate is an angle about the vertical axis, rather than the usual
+cartesian coordiante. This is often useful when creating 3d meshes of models
+with cylindrical symmetry. This also allows *FB_RS to be used automaticaly to
+create suitable boundary conditions on the inner and outer circumferential
+surfaces and on the two radial cut-planes.
+
+The mesh is held in this format, unlike *WRAP_AROUND_Y, which converts a
+cylindrical geometry into a cartesion one.
+
+.SH CAVEATS
+ This module is not valid for cases where there is non-axisymmetric loading, such
+as a lateraly loaded pile.
+ Use of *AXISYMMETRIC for 3D problems, has been implimented, but never verified.
+.SH SEEALSO
+*TWO_DIMENSIONAL
+*THREE_DIMENSIONAL
+*PLANE_STRESS
+*WRAP_AROUND_Y
+.SH FLAGS
+'F'   13   13    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BARYCENTRIC
+This is used to smooth distorted elements in the mesh by moving the nodes.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This module is used to improve the 'quality' of meshes generated by other means.
+Such meshes may be have formed automaticaly by a Voronoi or Advancing front
+method, or converted from say triangles to quadrilaterials (see *BISECT_ELEMENTS
+and *UNBISECT_ELEMENTS), or nodes in the mesh might have been moved (eg.
+*MOVE_NODES) to model the shape around a pile say. The nodal spacing is adjusted
+by moving each node toward the centroid of all the nodes that it is directly
+connected to by an element edge. Nodes that lie on either the outer mesh
+boundary, or lie on the boundary between 2 different material types are not
+moved. Otherwise this would invalidate the geometry. The X and Y (and Z)
+components are handled seperately with an under-relaxation factor of 0.6. The
+method is iterated five times to ensure convergence.
+
+The result is a mesh where:
+ All mid-side nodes are moved to be equaly spaced on their respective element
+edges, large element internal angles are reduced, and small element internal
+angles are increased. This gives more 'equilateral' elements. This is not direct
+but a side-effect of the smoothing process. The smoothing operator is Laplacian,
+giving a 'flownet'-like quality to the mesh. Sharp bends in lines across the
+mesh are evened. The result is certainly more aestheticaly pleasing than before
+smoothing.
+
+.SH EXAMPLE
+!-- bore a 5m long tunnel 4m down in a 10m cube of soil.
+< previous mesh generation stages >
+*UNBISECT_ELEMENTS   !- convert a mesh of triangles into quadrilaterals.
+   7                 !- (option code)
+*STRIP_FACETS        !- identify the set of element faces
+*MARK_BOUNDARIES     !- lock those nodes on internal/external boundaies
+*BARYCENTRIC         !- smooth the mesh
+.SH ADVANCED
+A mesh can be deliberately severly distoted for using say *CIRCLE_A_SQUARE, such
+that parts of the mesh overlap other parts. *BARYCENTRIC will always suceed in
+bringing everything back on line.
+
+.SH CAVEATS
+The method of specifying the nodes that are not to be moved is currently
+slightly complex, requiring a call to *STRIP_FACETS beforehand. For 2d meshes
+there is also an internal call to STRIP_EDGES. As a result, this module is not
+available from within DANFE. The method always uses 5 iterations. This has found
+to be more than sufficient. After only two iterations there is little further
+change in nodal positiion. Even with under-relaxation, the sequence does no
+converge idefinitely because there seems to be  fine-grained 'push me-pull you'
+oscilations. For meshes with a fine localisation (eg. In Adaptive analyses)
+BARYCENTRIC might move the refined zone slightly off the target area. Some other
+codes (ref. P.L.George) use the target mesh density as a weighting factor. 3D
+brick elements and elements with internal nodes are not yet handled correctly
+(13-9-97) Since nodes on outer boundaries are not moved, this could leave
+midside nodes on boundaries unmoved and hence evenly space on their respective
+element edges. A better method might allow 'roller' boundaries to constrain
+movement, even to allow movement of nodes around an arc!
+
+.SH SEEALSO
+*CHECK_MESH_QUALITY
+.SH FLAGS
+'MFP'   14   14    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BASIC_BLOCK
+This creates a single rectangular element of a given size and position.
+.SH DATA
+    //
+    imat
+    xlow, xwidth
+    ylow, ywidth
+    << zlow, zwidth >>
+    //
+where:
+    imat is the material type to assign to the element
+    xlow, ylow, zlow is the coordinate of the lower left hand corner of
+this element
+    xwidth, ywidth, zwidth are the widths of this element in the x,y and
+z direction respectively.
+
+.SH DESCRIPTION
+    This module creates a single element: a 4-node quadrilateral in 2D,
+an 8-node brick in 3D, given its size and position. This provides a
+method for creating a 'starting' place for mesh-generation. This module
+is typically followed by *DANBLOCKS to fill in the block with more
+elements and/or change the material type, then futher module to shape
+and transform the mesh
+
+.SH EXAMPLE
+    *TWO_DIMENSIONAL
+    *BASIC_BLOCK
+    # This creates 2 elements :
+    # A long thin base layer with centered block (60m by 30m) above;
+    # The starting point for caisson footing model
+    3                   # soil is material type 3
+      0.  100.            # 100m by 20m deep
+      0.   20.
+    2                   # caisson is material type 2
+     20.   60.            # 60m wide by 40m high
+     20.   30.            # centered on the base-layer
+
+
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*SLOPE_MESH
+*REGULAR_MESH
+.SH FLAGS
+'MFP'   15   15    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BASIC_BLOCK_4NQ
+creates a simple nxn 2d(/3d) mesh
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   16   16    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BC_BY_BOX
+applies fixities to nodes within a cuboid
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   17   17    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BC_BY_COORD
+applies fixities based on position
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   18   18    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BC_BY_DIR
+applies fixities based on planes
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   19   19    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BC_BY_NODE
+applies fixities based on node numer
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   20   20    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BEGIN_ANALYSE
+Synonym for *NULL_ARRAYS
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   21   21    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BIOT
+(Adds freedom for Biot consolidation)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   22   22    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BISECT_ELEMENTS
+converts quad meshs to triangles
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   23   23    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BORE_MATERIALS
+This is used to define material groups, typicaly for tunneling with sequential excavation steps.
+.SH DATA
+//
+count, imat, idir, imat_delta
+//
+where:
+count = Number of steps to perform
+imat = The (starting) material number to build upon.
+idir = the direction to build (1..6), ie. Which of the six faces of a brick element to build on.
+imat_delta = the increment of material number. This is typicaly =1 to give the simple sequence: 5,6,7,8,9, ....
+.SH DESCRIPTION
+This module gives elements that are adjacent to elements of a given material
+number to be given their own unique material number. A typical use would to be
+to create a seuence of 'blocks' along the line of a tunnnel, then each can be
+removed in sequence to simulate the tunnel advancement.To mark such
+elementscould be done explictly using say *MATERIALS_BY_BOX but this module
+saves much repetative typing.
+
+To use this module, it is necessary to define a material region (that is
+different to the basic mesh), to act as the 'seed'. Then we can build any number
+of incrementaly numbered regions in the desired direction, starting from this
+seed. < a figure would be very useful here>
+
+.SH EXAMPLE
+!-- bore a 5m long tunnel 4m down in a 10m cube of soil.
+*THREE_DIMENSIONAL
+*SUPERBLOCK
+   1  3 20 1  ! a 10m x 10m x 10m cube of
+   20 0. 10.  ! 20x20x20=8000 elements
+   20 0. 10.  ! ie. All elements are 0.5m cubes.
+   20 0. 10.
+*MATERIALS_BY_BOX
+   5  0. 1.  4. 6.   0. 0.5   ! set the first tunnel elements.
+*STRIP_FACETS     ! build the facets data structure.
+*BORE_MATERIALS   ! add 9 more sections, from this IMAT=5 in
+        9   5  4  1     ! the positive z direction, and ++1 each
+.SH ADVANCED
+*BORE_MATERIALS was designed with tunneling in mind (bence the name), but this
+module is extremely powerful and has analogs with other mesh sweeping routines
+such as *GROUP_GREEDY (for domain decomposition q.v.).
+
+idir may be overloaded with the value 97. This will cause building on all six
+faces of each element simultaneosly. (Maybe even Conway's game of Life could be
+simulated this way) It is safe to give count a large number (eg. 999) to simply
+advance forever until we reach the edge of the mesh. Once you have defined a
+tunnel, it is possible to add a lining by making a single 'radial' step.
+(Advancing in all directions (IDIR=97) should also work here).
+
+If we define a single plane as the seed, then we can advance 'up' the mesh to a
+set of slabs. You could 'write your name in elements' by building a chain, but
+note that the 'turning points' will need there own unique material number.
+
+.SH CAVEATS
+Curently (12-9-97) only 3D elements are supported. This is because this module
+uses the FACETS data structure which records only 2d face:2d face contacts
+between adjacent elements.
+
+.SH SEEALSO
+*MATERIALS_BY_BOX
+*MATERIALS_BY_IEL
+*CHANGE_MATERIALS
+.SH FLAGS
+'M'   24    0    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *BUILD_LAYER
+For siumulating construction.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   25   24    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *CHANGE_MATERIALS
+This allows the material property numbers to be swapped with new values.
+.SH DATA
+   //
+   imat_old,  jmat_new
+   //
+
+   where
+   imat_old is the 'old' material type,
+   imat_new is the 'new' type to replace the old.
+.SH DESCRIPTION
+    This module allows the number associated with each element as its
+'material property number' to be changed.
+.SH EXAMPLE
+      *CHANGE_MATERIALS
+      3   0     # mark type 3 as 'zero' for possible deletion
+      5  99         # swap over
+      6   5         # material types
+      99  6         # 5 and 6
+.SH ADVANCED
+    By means of a temporary number, the numbers of two materials may be
+exchanged, for example to make sure that material 1, is the first to be
+placed in the case of build-up finite element models. Also the finite
+element code DANFE, automatically skips all elements with zero or
+negative material numbers. Thus blocks of elements can selectively be
+included/ excluded from certain load-stesps without altering the overall
+mesh.
+.SH CAVEATS
+.SH SEEALSO
+*DELETE_MATERIALS
+*MATERIALS_BY_BOX
+*ELEMENT_TYPES
+.SH FLAGS
+'MFP'   26   25    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *CHECK_DXF
+decodes a DXF mesh file to screen
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   27   26    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *CIRCLE_A_SQUARE
+This convert a square mesh into a circle or part thereof.
+.SH DATA
+    <none>
+.SH DESCRIPTION
+    This module will reduce to coordinates of all points so that they
+lie on concentric arcs to give a whole or part circular disc. For each
+point then the maximum of its x or y coordinate is taken to be the
+necessary radius for that point. The points position is then scaled
+linearly along a line between this point and the origin to give the
+desired radius.
+.SH EXAMPLE
+    #.... << define the mesh ? >>
+    *CIRCLE_A_SQUARE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*WRAP_SPHERE
+*WRAP_AROUND_Z
+.SH FLAGS
+'MFP'   28   27    3
+.SH REVISION
+ 23:02:01 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *CONTROL
+A method of setting program options
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   29   28    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *COPY_MESH
+duplicates the mesh n-times
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   30   29    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *COPY_MESH_ARC
+duplicates the mesh in polar coords
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   31   30    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DANBLOCKS
+This major module handles all cases where it is desired to change the fineness of a mesh or the type of elements used.
+.SH DATA
+    //
+    imat
+    ndime, nod, itype
+    nxe, (x_widths(1:nxe)
+    nye, (y_widths(1:nye)
+    << and in 3D: nze, (z_widths(1:nxe) >>
+    //
+
+    where:
+    imat : is the material type to change (may be a wildcard)
+    ndime: is the number of dimesnions for the new element
+    nod  : is the number of nodes per new element
+    itype: is the element type (almost always = 1)
+    nxe, nye, nze : are the number of sub-elements in each new direction
+    x_widths(:). y_widths(:), z_widths(:) are the relative widths of the
+newly created sub-elements.
+.SH DESCRIPTION
+    This module ..
+.SH EXAMPLE
+    ..
+    # Example No.1
+    # this replaces all elements that were (say) 4nq's with 8 node quads.
+    *DANBLOCKS
+     1              # Handle material type 1
+     2 8 1          # into 2D, 8-noded (type 1) elements
+     1 1.           #  - with no disection
+     1 1.           #  - ie. as 1 by 1 sub-elements
+    ..
+
+    ..
+    # Example No.2 (more advanced)
+    # this replaces all eleemnt in a 3D mesh with
+    # 4 elements in x (unequally spaced)
+    # and 2 equally spaced elements in each of the y and z directions
+    #
+    *DANBLOCKS
+     230964         # Handle ALL materials by wildcard
+     3 20 1         # into 3D, 20-noded brick elements
+     5   5. 2.5 1. 1. .5  # in the ratio 50% : 25% : 10 % : 10% : 5 %
+     3   1. 1. 1.   # three equally spaced in 'y'
+     3 3*1.         # three equally spaced in 'z' (note: repeat count)
+     ..
+
+    ..
+
+    # example No.3 (advanced)
+    # This projects a 2D mesh into 3D replacing each (quadrilateral)
+    # element with 2 15-node 'toblerone' wedge eleemnts.
+    #
+    ..
+    *DANBLOCKS
+    1             #
+    3 15 1        # 3D wedge element (create 2 per quadrilateral)
+    1 1.          # just one element
+    1 1.          # in x-y-z (no disection)
+    1 125.        # the new 'z' thickness is 125m.
+    ..
+.SH ADVANCED
+    In is possible to transform (say) an existing 2D mesh into 3D by
+specifying NDIME as 3, when the current number of dimensions is only 2.
+The new mesh contains nze elements in the z-direction (through the
+thickness) of widths directly as given in z_widths.
+    It is also possible to divide a quadrilateral mesh into pairs of
+triangles. In this case, if ndime,nod,itype = 2,15,1 then all
+qaudrilateral elements will be replaced by a pair of 15-node triangles;
+the shape functions of the parent element being used to interpolate the
+position of the new nodes. The new elements are split across a 'south
+west' to 'north east' dividing line. More specific disections are
+possible using other modules; for example *4NQ_TO_4_3NTS will take each
+4 node quadrilateral create a central node, then it split each element
+into four 3-node triangles each having a vertex at the central node.
+.SH CAVEATS
+.SH SEEALSO
+*4NQ_TO_4_3NTS
+.SH FLAGS
+'MFP'   32   31    3
+.SH REVISION
+ 23:03:01 pasted in
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DEBUG
+Sets options for monitoring output.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   33   32    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DELETE_INTERNAL_FACETS
+Leaves just the outer shell of a 3d mesh
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'M'   34   33    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DELETE_INVIS_MATERIALS
+completely removes all deselected elements
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   35   34    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DELETE_MATERIALS
+Completely removes specific elements
+.SH DATA
+    //
+    imat
+    //
+
+    where
+    imat : the material type of the elements to delete
+.SH DESCRIPTION
+    This module will remove from the element database all element that
+match the given material type. It does not directly remove the nodes
+however. to delete them, follow *DELETE_MATERIALS with a
+*DELETE_ORPHAN_NODES module.
+.SH EXAMPLE
+    *DELETE_MATERIALS
+    # delete all the air elements above the mesh
+    # and remove the berm at the toe of the dam
+    0      # 'Air' elements
+    5      # the berm material
+.SH ADVANCED
+    One reason why the nodes are not automatically deleted is so that we
+can re-mesh the area with other elements; for example Delauney
+triangularisation of the domain using the *TRIANGULARISE module.
+    To delete a given area of the mesh we can precede *DELETE_MATERIALS
+by either *MATERIALS_BY_BOX, or *ELEMENT_TYPES to give a set of elements
+an arbitary material tpye prior to deleting them.
+
+<< hmm nice to tell *TRIANGLE a sub-set of nodes so that we can do it by
+material type in stages >>
+.SH CAVEATS
+.SH SEEALSO
+*MATERIALS_BY_BOX
+*DELETE_ORPHAN_NODES
+*DELETE_ZERO_AREA_ELEMENTS
+*TRIANGULARISE
+*CHANGE_MATERIALS
+.SH FLAGS
+'MFP'   36   35    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DELETE_NUL_ELEMENTS
+(removes odd invalid elements)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   37   36    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DELETE_ORPHAN_NODES
+removes nodes that have no elements attached.
+.SH DATA
+    < none >
+.SH DESCRIPTION
+    Orphan nodes are those which have no element attached to them. These
+may arise when elements have been deleted, when a element is changed
+to one of a different number of nodes, or simply from points used in
+construction. These nodes may be left in the mesh but can break some FE
+programs that assume that all nodes present contribute to the stiffness
+matrix and so are assigned freedoms by default.
+    A side effect of this is that the nodes numbers are re-sequenced to
+close up the 'gaps'.
+.SH EXAMPLE
+    # delete all elements of material type 7
+    *DELETE_MATERIALS
+     7
+    # clean up the mesh by removing stray nodes
+    *DELETE_ORPHAN_NODES
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*COALESCE_COINCIDENT_NODES
+.SH FLAGS
+'MFP'   38   37    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DELETE_ZERO_AREA_ELEMENTS
+Removes elements that are reduced to points or lines.
+.SH DATA
+    < none >
+.SH DESCRIPTION
+    This will remove all elements form the mesh that enclose no area.
+These can arise deliberately (for example in *LAYERED_SLOPE) where a
+material layer such a coal-seam within the mesh peters out. Such
+elements do not really exist and can cause problems in analysis since
+they have zero area and hence zero stiffness  causing numerical
+problems.
+    All ÿthe elements of the mesh are examined. ÿFor the centre of ÿeach
+element, ÿÿthe Jacobian matrix is produced. ÿIf the determinant of ÿthis
+matrix is zero (using a small tolerance), then the element is considered
+degenerate ÿÿand ÿis ÿremoved. ÿÿThe ÿnodes ÿare ÿnot ÿremoved ÿand ÿÿso
+*DELETE_ZERO_AREA_ELEMENTS is normally followed by *DELETE_ORPHAN_NODES.
+    When we are removing an infinitely thin layer from the centre of a
+mesh then we normal which to connect the elements abobe and below this
+layer back to each other, and so *DELETE_ZERO_AREA_ELEMENTS is normally
+preceded by *COLLAPSE_COINCIDENT_NODES.
+.SH EXAMPLE
+    # Remove a vestiage coal-seam layer from a mesh
+    # first we join the two sides, then delete the row
+    # finally we remove any orphaned nodes
+    *COLLAPSE_COINCIDENT_NODES
+    *DELETE_ZERO_AREA_ELEMENTS
+    *DELETE_ORPHAN_NODES
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*DELETE_ORPHAN_NODES
+*COLLAPSE_COINCIDENT_NODES
+.SH FLAGS
+'MFP'   39   38    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DISECT_MESH
+See *BISECT_ELEMENTS
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+''   40   39    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DISPLACEMENTS
+For restart jobs or plotting.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'FP'   41   40    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *DUMMY
+does nothing!
+.SH DATA
+(none)
+.SH DESCRIPTION
+This module has no effect! It may be used to replace an existing module so that
+the total number of modules remains constant. All data lines that follow up
+until the next keyword are skipped.
+.SH EXAMPLE
+*DUMMY        !- do nothing
+ 1 2 3
+*PLOT_MESH
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*PAUSE
+.SH FLAGS
+'F'   42   41    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ECHO_TEXT
+echo text to the console - cf use of '!'
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   43   42    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *EIGENMODES
+The tables of eigenvalues and eigenmodes
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'P'   44   43    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ELEMENT_GROUP
+defines the group # for  ALL elements
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   45   44    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ELEMENT_SET
+defines the material # for  ALL elements
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   46   45    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ELEMENT_TYPES
+Material # based on its 'ijk' position
+.SH DATA
+   //           ( // indicates the repeatable portion )
+   ixl,ixh    iyl,iyh    << 3d: izl, izh >>,   imat
+   //
+
+    where:
+    ixl, ixh are the low and high element postioned numbered in the
+x-direction. iyl,iyh, izl,izh are the y and z equivalents.
+    imat is the material property type to assign to this block
+.SH DESCRIPTION
+    This routine provides a simple way to assign the material property
+number to a rectangular (a cube in 3D) block of elements. The desired
+elements are specified by the integer 'coordinate' within the mesh.
+By default all materials are of type 1, so only regions of other
+materials types need to be specified.
+.SH EXAMPLE
+    *ELEMENT_TYPES
+    # This takes a mesh of 9 by 10 elements and gives 2 layers with an
+    # embedded pile.
+    # material type 1 is the default and so could have been omitted
+    1    1 9    3  5     # The upper soft soil-layer
+    2    1 9    6 10     # The lower firm soil-layer
+    0    1 9    1  2     # The 'Air' above ground surface
+    3    5 5    1  7     # The Pile itself
+.SH ADVANCED
+    A Element's material type may be set and reset, several times For
+Example when producing a mesh of a pile within a soil of 3 layers, we
+first set the horizontal soil layers, then finaly the pile whose
+property number will replace that of the various soil layers that it
+passes through.
+    More complex geometries than that possible simply by using
+*SLOPE_MESH can be constructed. For example by setting the material type
+of a patch to (say) zero then following this module with
+*DELETE_MATERIALS to remove those elements, meshes with muliple cut-outs
+can be produced. For the above case of a piled foundation, this can be
+used to remove material either side of the pile above ground level to
+give a free-standing pile.
+.SH CAVEATS
+    This routine is only to be used where the mesh was created using the
+*SLOPE_MESH module.
+.SH SEEALSO
+*MATERIALS_BY_BOX
+*DELETE_MATERIALS
+.SH FLAGS
+'MFP'   47   46    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ELEMENTS
+The table of element connectivity
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   48   47    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ELEMENTS_2
+as *ELEMENTS but for meshes of all the same element type.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+''   49   48    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *EOF
+Marks the (premature) end of a data file
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   50   49    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *EXCAVATE_LAYER
+For simulating Excavations
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   51   50    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FACETS_TO_EDGES
+? see *STRIP_EDGES? ?
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'M'   52   51    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FACETS_TO_ELEMENTS
+Creates shell elems. on the mesh-surface
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'M'   53   52    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FB
+Make all nodes on the base encastre
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   54   53    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FB_RS
+The most common boundary condition!
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   55   54    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FLIP_OVER_ELEMENTS
+Fixes meshes where the nodes were defined anti-clockwise.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   56   55    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FORM_KM
+Forms the stiffness-matrix
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   57   56    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FORM_KP
+Forms the fluid-flow matrix
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   58   57    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FORM_KPI
+Forms the inverse fluid-flow matrix
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   59   58    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FORM_MM
+Forms the mass-matrix
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   60   59    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FOS
+Reads the factors for C and PHI
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   61   50    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FOUR_DIMENSIONAL
+defines a 4D world (!)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MF'   62   51    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FUDGE_TUNNEL_MATS
+old hack for a certain analysis
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   63   52    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *FUDGE_TUNNEL_ZPLANES
+old hack for a certain analysis
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   64   53    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_3DEDIT
+- from an old  shareware prog.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   65   54    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_CAROLUS
+- in C. Setjeningrat's style
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   66   55    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_DXF
+- in Autocad's style
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   67   56    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_MESH
+Read ANY mesh - based on its filetype
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   68   57    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_OFF
+This reads in a mesh in the 'Object File Format' (eg. raytracing)
+.SH DATA
+    NN, NEL, NEDGES
+    (x(i),y(i),z(i),i=1,nn)
+    (nod,(num(1:nod,i),i=1,nel)
+
+    where:
+    nn is the number of nodes (vertices) in the mesh
+    nel is the number of elements (polygons) in the mesh
+    nedges is the number of edges (unused in FE)
+.SH DESCRIPTION
+    This module allows the importing of pre-defined meshes produced in
+the 'Object File Format'.The 'Object File Format' (OFF) is a set of
+polygonal elements where each node has a geneal x,y,z coordinate. Such
+meshes can be either planar meshes, or more usually curved shells, for
+example the VW 'beetle' dataset. OFF is one of the de-facto standards
+for the interchange of mesh data.
+    The material property type of each element is set to be the same as
+the number of nodes in that element.
+    The '< filename' 'input redirection token is usually used to cause
+the actual mesh data to be read from a secondary file rather than from
+the main Keyword-based input file.
+    A side effect of this module is that the number of dimensions is set
+to 3.
+.SH EXAMPLE
+    *IMPORT_OFF
+    # This imports from a secondary file the classic
+    # Volkswagon beetle dataset (1232? shell elements)
+    < c:\OFF_FILES\VW.GEO
+.SH ADVANCED
+    OFF elements may in general have any number of nodes. Currently
+elements of 3 and 4 nodes are handled as 3-node triangles and 4-node
+quads. respectively. elements of 5 or more  sides/nodes are handled but
+since pentagons, hexagons do not currently exist as finite elements,
+these must be manually removed or modified if they exist in the mesh,
+before the *ANALYSE phase. Polygons of greater than 27 nodes are
+not supported. Since the material property is set to the same as the
+number of nodes per element, these can easily be seen and eliminated,
+before converting the remaining 3 and 4 noded elements to the same
+material type (say) before analysis.
+.SH CAVEATS
+    This implimentation just handles the '*.geom' file of geometries. The
+table of vertex coloues '*.pcol'? are not relevant. The '*.aoff' file of
+textual information is currently not supported, although in the future
+this will used to get the titles, etc.
+.SH SEEALSO
+*IMPORT_PL
+*IMPORT_NFF
+*IMPORT_SRF
+*IMPORT_3D
+*IMPORT_TECPLOT_MESH
+*WRITE_OFF
+*WRITE_RAYSHADE
+*WRITE_DANPLOT
+.SH FLAGS
+'MFP'   69   58    3
+.SH REVISION
+ 23:03:01 added
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_PHASES
+- from another commercial FE code.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   70   59    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_PL
+- from my simplified .PL format
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   71   60    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_SRF
+- from a shareware '3D shader'
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   72   61    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_TECPLOT
+This imports a mesh in format used by the TECPLOT (tm) FE Package.  - from a commercial FE postprocessor
+.SH DATA
+   A file containing a description of the mesh  and the coordinates of the elements
+    For full details refer to the TECPLOT user-guide.
+.SH DESCRIPTION
+    This module will parse a TECPLOT (tm) format datafile to abstract
+the geometric mesh data. ...
+.SH EXAMPLE
+     *IMPORT_TECPLOT_MESH
+     # read the tecplot demonstration space vehicle dataset
+     # as a mesh only (ignoring temperatures and pressures)
+     < c:\tecplot\data\space.dat
+.SH ADVANCED
+.SH CAVEATS
+    Currently, only a sub-set of all the possible forms of TECPLOT data are
+supported, for example the 'IJK' form for shells and surfaces. This
+module only handles the geoemtry held in the data files and ignores
+other information such as computed pressures.
+.SH SEEALSO
+*IMPORT_OFF
+*IMPORT_PL
+*IMPORT_NFF
+*IMPORT_SRF
+*IMPORT_3D
+*WRITE_OFF
+*WRITE_RAYSHADE
+*WRITE_DANPLOT
+.SH FLAGS
+'MFP'   73   62    3
+.SH REVISION
+ 23:03:01 pasted in
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_TIM_LIU
+- from Dr. Liu's format
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   74   63    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *IMPORT_UCD
+- from AVS's  unstructured format
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   75   64    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *JOB_TITLES
+- give your analysis an (optional)  title
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'FP'   76   65    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *JOIN_COINCIDENT_NODES
+This gives all nodes that at the same location the same node number.
+.SH DATA
+    < none >
+.SH DESCRIPTION
+    Sometimes several nodes can end up at the same point in space. This
+can occur when joining two seperate meshes together, or when a mesh is
+warped so that seperate edges are brought together. In order for the FE
+program to know that the two are connected, it is convenient to
+give them the same node number. This also reduces the number of nodal
+coordinates that need to be stored.
+    A ÿside ÿeffect ÿof this module is that the nodes ÿnumbers ÿare ÿre-
+sequenced to close up the 'gaps'.
+.SH EXAMPLE
+    *IMPORT_PL
+    < c:\pl_files\ground.dat     # The first mesh
+    *IMPORT_PL                   #    added
+    < c:\pl_files\building.dat   # to the second mesh
+    # Now remove the 'extra' nodes on the interface.
+    *COALESCE_COINCIDENT_NODES
+.SH ADVANCED
+.SH CAVEATS
+    This algorithm uses a simple search of order nn^2 where nn is the
+number of nodes and some can become slow when the mesh is very large.
+A faster method using octress is currently being developed.
+.SH SEEALSO
+*DELETE_ORPHAN_NODES
+.SH FLAGS
+'MFP'   77   66    3
+.SH REVISION
+ 23:03:01 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *JOIN_COINCIDENT_NODES_BY_BOX
+- coalesces nodes within a cuboid.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   78   67    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *LAYERED_SLOPE
+A method for creating meshes of muliple layers of ground of varying thicknesses.
+.SH DATA
+    nlayers
+    //
+    x, y(1:nlayers+1)
+    //
+
+    where:
+    nlayers is the number of soil layers to create.
+    x,y(:) are the x-coordinate and y-coordinates of each vertical 'stage-line'
+.SH DESCRIPTION
+    Ths module allows a direct way of producing meshes where the soil
+lies in bands of continously varying thickness. The mesh produced is in
+the form of 4-noded quadrilaterals with each layer given a different
+material property number. (the lowest layer is material type 1) One line
+of data is needed for each 'stage-line'. These are the vertical lines
+between each element, hence for nxe element in the x-direction, nxe+1
+lines of data are required.
+.SH EXAMPLE
+    *LAYERED_SLOPE
+    #  This is model of 3 layers of soil with 5 columns of elements
+    # the base is horizontal: the surface slopes downhill.
+    3
+    0.   0.   1.0   2.0   3.9
+    2.   0.   1.1   2.2   3.7
+    4.   0.   1.2   2.4   3.5
+    6.   0.   1.3   2.6   3.4
+    8.   0.   1.4   2.4   3.3
+   13.   0.   1.5   2.2   3.2
+.SH ADVANCED
+    Since the mesh produced is in the form of 4-node quadrilateral
+elements, with only one element per layer then we would normally this
+module with *DANBLOCKS to both increase the number of elements and
+change the element type to (say) 8-noded quadrilaterals. Simerlarly
+*DANBLOCKS may be used transform the mesh into 3D.
+    If one of the 'seams' peters out, then the intersection of the
+layers above and below will coincide in the data. The 'zero-area'
+elements produced in this collapsed layer may then be deleted with
+*DELETE_ZERO_AREA_ELEMETS and then the sides rejoined with
+*JOIN_COINCIDENT_NODES
+.SH CAVEATS
+.SH SEEALSO
+*SLOPE_MESH
+*DANBLOCKS
+.SH FLAGS
+'MFP'   79   68    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *LOAD_CASE_NUMBER
+reads the step number
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'P'   80   69    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *LOAD_CASE_TITLE
+reads the step title
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'P'   81   70    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *LOAD_STEP_NUMBER
+read the step number
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'P'   82   71    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *LOAD_STEPS
+defines the size of the analysis sub-steps
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   83   72    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *LOADS
+reads applied loads by their node number
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   84   73    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MARK_BOUNDARY
+Anchors nodes before a call to *BARYCENTRIC
+.SH DATA
+(none)
+.SH DESCRIPTION
+This module identifies those nodes in the mesh that are either On the outer
+boundary, or On internal boundaries between area of differing material types.
+These nodes are then marked, such that in a following call to *BARYCENTRIC only
+unmarked nodes are moved. This preserves the boundaries, otherwise the whole
+mesh would just contract towards a single point (the 'black hole'!). For 2D
+meshes the FACET-structure is decomposed into the EDGES structure by an internal
+call to *STRIP_EDGES, so that edges that have differing material types can be
+found. For 3D meshes, the FACET-structure is used directly, so that facets that
+have differing material types can be found.
+
+.SH EXAMPLE
+!-- Mark the boundary nodes as fixed then smooth the ointernal nodes.
+< previous mesh generation stages >
+*STRIP_FACETS   !- identify the set of element faces
+*MARK_BOUNDARIES    !- lock those nodes on internal/external boundaies
+*BARYCENTRIC    !- smooth the mesh
+.SH ADVANCED
+.SH CAVEATS
+One-dimensional and four-dimenstional meshes are not yet handled.
+
+It would maybe be useful to manualy define additional nodes that are not to be
+moved, for example the point of action of applied loads (usualy on the outer
+boundary so OK), or points where we particularly want to know the displacement
+at.
+
+.SH SEEALSO
+*BARYCENTRIC
+*STRIP_FACETS
+*STRIP_EDGES
+.SH FLAGS
+'M'   85    0    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MAT_PROPS
+Defines the stiffness, strength, etc.
+.SH DATA
+.SH DESCRIPTION
+This table defines the Material properties, and other attributes (such as printing options) for each of the materials used in the model.
+A typical lines might be:
+            MAT=5   E=200.E6   V=0.3   SPRINT=17.
+This indicates that Material type 5 has a constant Young's Modules of 200x 106. kN/m2, a Poisson's ratio of 0.3 and that we want to print out the stresses for this type (17 gives the raw stresses and the coordinates of the points - see Table 3 below). Note that in the absence of a MODEL= token or a C=, (etc.) then the material is considered purely elastic.
+
+1. The tokens may appear in either upper or lower case.
+2. Comments may be added after a final '!' symbol (as in Fortran 90)
+3. lines may be temporalirly 'commented out' by use a preceding '!' symbol (or other valid comment character)
+4. The token may appear in any order on the line.
+5. Normaly the first Token is MAT= , if ommitted then the default material of '1' is used.
+6. The affect is cummulative. For example the following 2 lines are equivalent to the above example:
+	MAT=5   E=150.E6   V=0.3
+	MAT=5   SPRINT=17  E=200.E6
+7. (advanced use) A set of consecutive materials can be defined on one line using  a decimal value for MAT, For example MAT=06.13 applies the rest of the line to materials 6,7,8,9,10,11,12 and 13.
+8. The Code column in the table below gives the internal code number for this token. This is only useful to advanced user who wish to build their own constitutive models.
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'FP'   86   74    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MATERIAL_PROPERTIES
+Older version of  *MAT_PROPS
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   87   75    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MATERIALS_BY_BOX
+This sets the material number of those elements that lie within a given box
+.SH DATA
+    //
+    imat, xlo, xhi, ylo, yhi, < zlo,zhi >
+    //
+
+    where:
+    imat : the desired material property number.
+    xlo  : is the lower value of x, and
+    xhi  : is the upper value of x that define the x-range
+    ylo, yhi, zlo, zhi simmilarly define the y and z ranges of the box.
+.SH DESCRIPTION
+    This module lets a certain material property code be associated with
+all elements whose centres lies within a certain box. The box is given
+by the lower and upper value of the x, y (and z) coordinates. These may
+lie outside the bounds of the mesh.
+.SH EXAMPLE
+    *MATERIALS_BY_BOX
+    3    0.   20.   -150. 200.       # type 3
+    2 -999.  999.     10.  15.       # type 4 (for ALL x-values)
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*ELEMENT_TYPES
+*DELETE_MATERIALS
+*CHANGE_MATERIALS
+.SH FLAGS
+'MFP'   88   76    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MATERIALS_BY_IEL
+Set mat.type for specific elements
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   89   77    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MIRROR_MESH
+Copies the mesh across plane of symmetry
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   90   78    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MOVE_NODES
+from one xyz position to another
+.SH DATA
+    //
+    x1, y1, [z1], x2, y2, [z2]
+    //
+    where:
+    x1,y1,z1 is the coordinate of the old node,
+    x2,y2,z2 is its new coordinate.
+.SH DESCRIPTION
+    This module simply moves nodes from one position to another. For
+example to move the position of the crest of a slope before filling the
+domain with elements. The coordinates of a point in space is read in,
+any point that is within a small tolerance of this point will have its
+coordinate changed to the new value. A warning is given if no nodes are
+found at the specified location.
+.SH EXAMPLE
+    # move the 4 corners of a square towards (5,5) by the same amount
+    *MOVE_NODES
+     0.  0.  1. 1.    # lower left
+     0. 10.  1. 9.    # top left
+    10. 10.  9. 9.    # top right
+    10.  0.  9. 1.    # lower right
+.SH ADVANCED
+    Often a whole set of nodes may need to be moved, for example to turn
+a pile square in section into a round one. Here all the nodes with a
+given x and z value but any y value need to be moved. In the input any
+of x1,y1 or z1 may be given the wildcard value of 230964, to indicate
+that it can take any value. In such cases the corresponding x2,y2,z2
+value is a dummy, since it will take the same value as the original.
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   91   79    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *MP_BY_TOKEN
+???
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+''   92   80    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NEWMESH
+Erases the current mesh
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'   93   81    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NF
+Explicit boundary fixities (cf *FB_RS)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   94   82    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NODAL_DISPS
+Applied tractions based on nodal position
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   95   83    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NODAL_DISPS_BY_BOX
+tractions for a given zone
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   96   84    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NODAL_DISPS_BY_NODE
+tractions based on node number
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   97   85    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NODAL_LOADS
+applied  forces based on nodal position
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   98   86    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NODAL_LOADS_BY_BOX
+Applied forces for a given zone
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'   99   87    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NODAL_LOADS_BY_NODE
+Applied forces based on node number
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  100   88    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NODES
+Define explicit position of nodes
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  101   89    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NORMALISE_EIGENMODES
+Such that each has a unit magnitude.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  102   90    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NULL_ARRAYS
+Initialises storage before an analysis can be done
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  103   91    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *NULL_NF
+Sets all nodes back to being unconstrained
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  104   92    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ONE_DIMENSIONAL
+Starts a one dimensional data set
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  105   93    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ONE_DOF
+needed for a flownet-type analysis (obsolete?)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  106   94    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *OUTPUT
+???
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+''  107   95    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *PAUSE
+Waits for a keypress - good for debugging.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This pauses the run, and prompts for the user to press <Enter> to continue.
+This is used to control the program run, for debugging the input data file, or
+for illustration purposes.
+
+.SH EXAMPLE
+
+.SH ADVANCED
+.SH CAVEATS
+This should not be used in Batch-run jobs for obvious reasons.
+.SH SEEALSO
+*DUMMY
+.SH FLAGS
+'MFP'  108   96    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *PLANE_STRESS
+Modifies job from the 'plane strain' default
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  109   97    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *PLOT
+Plots the mesh on screen
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  110   98    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *PLOT_MESH
+Plots the mesh on screen
+.SH DATA
+    < none >
+.SH DESCRIPTION
+    This module pauses until the <CR> ÿkey is pressed, ÿthen clears ÿthe
+screen ÿand ÿdraws ÿthe current mesh. ÿOn a PC with a VGA ÿscreen, ÿÿthe
+backgraound ÿis blue, ÿwith the nodes in red and the elements in ÿwhite.
+The view is held until the next press of <CR>.
+    For ÿmore advanced plotting options including full three-dimensional
+shading, the DANPLOT package should be used.
+.SH EXAMPLE
+    ..
+    *DELETE_MATERIAL
+     3        # deleet all elements of type 3
+    # now plot the mesh to check
+    *PLOT
+    ..
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  111   99    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *PLOT_MESH_BOUNDARY
+Plots just the mesh outline
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MP'  112  100    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *PRESSURE_LOADS
+Applies Pressure Loading
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  114  102    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *QUADRILATERALISE_MESH
+trisects triangles to form 3 quads. (obsolete)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  115  103    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *QUIET
+Inhibits all on-screen information.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  116  104    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *RADIAL_DISPLACEMENTS
+For expanding boreholes.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  117  105    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *READ_CAROLUS
+- in C. Setjeningrat's style
+.SH DATA
+  'data file name'
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  119  107    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *READ_DANPLOT
+- in .PL format
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  120  108    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *READ_FACETS
+??? as a set of surface polygons.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MP'  121  109    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *READ_TECPLOT
+- from a commercial FE postprocessor
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MP'  122  110    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *REMOVE_ELEMENTS
+???
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  123  111    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *ROTATE_MESH
+Moves the mesh around an axis.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  124  112    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *RS
+Makes all vertical  boundaries ´sliding´´
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  125  113    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SCALE_MESH
+This change the size or shape of the mesh.
+.SH DATA
+      sx  sy  (sz)
+      where:
+      sx= the x-scale factor
+      sy= the y-scale factor
+      sz= the z-scale factor (only for 3D meshes)
+
+.SH DESCRIPTION
+This module simply mulitplies the coordinates of all the nodes in the mesh by
+the given sx and sy scale factors. For 3d meshes, sz should also be given.
+Typicaly it is used to change the coordinate units, for example from milimetres
+to metres (sx=sy=.001), or inches to mm (sx=sy=25.4). If sx and sy are not equal
+then the mesh is stretched anisotropicaly.
+
+.SH EXAMPLE
+*IMPORT_PL
+< c:\pl_files\ground,dat
+# original data was in feet, so convert to metres.
+*SCALE_MESH
+         .3075 .3075
+
+
+.SH ADVANCED
+If any one of sx, sy (or sz) is negative, then the mesh is 'reflected' about
+that axis. This can be used to convert a mesh in which the positive y-direction
+was originaly downwards (use *SCALE_MESH with parameters -1. 1.). The side
+effect of doing this, is that the normal vectors (orientation) of all elements
+is reversed, causing 'negative Jacobian' warnings in DANFE. This can be fixed by
+calling *TURN_UP_ELEMENTS.
+
+    The xs, ys and zs factors do no have to be postive. Sometimes meshes
+are produced in a 'left-handed' Cartession sytem when we need a right-
+handed axes set for analysis or plotting. In which case an odd number of
+xs,ys,zs need to be -1 (usualy as xs,ys,zs = 1,1,-1). This can also
+occur in 2D when we have a y-axis than is number positive downwards
+instead of the usual case of it pointing upwards.
+We can also 'squash out' the depth of model by using xs,ys,zs= 1,1,0. or
+exagerate the vertical coordinates for clarity when plotting the mesh.
+
+.SH CAVEATS
+.SH SEEALSO
+*SHIFT_MESH
+*ROTATE_MESH
+*TURN_UP_ELEMENTS
+.SH FLAGS
+'MFP'  126  114    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SET_LEGO_ALLDIF
+- assumes all elements are different
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  127  115    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SET_LEGO_ALLSAME
+- assumes all elements are the same
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  128  116    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SET_LEGO_IMAT
+- assumes each material  is isomorphic
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  129  117    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SET_LEGO_MYTUNNEL
+- for a particular analysis!
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  130  118    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SHIFT_MESH
+- moves the mesh e.g. to change where y=0.
+.SH DATA
+   xd, yd, <zd>
+
+   where
+   xd, yd, zd are the amounts to move the mesh by in x, y and z.
+.SH DESCRIPTION
+    This module will add a given amount to all nodes in the mesh, for
+example to make the line of zero y-cordinate the ground surface, rather
+than some other datum, or when combining 2 meshes together.
+.SH EXAMPLE
+    *IMPORT_PL
+    < c:\pl_files\ground,dat
+    # now move the mesh so that the building
+    # will be in the righht position
+    *SHIFT_MESH
+      10. 0.
+    *IMPORT_PL
+    < c:\pl_files\building,dat
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*SCALE_MESH
+.SH FLAGS
+'MFP'  131  119    3
+.SH REVISION
+ 23:02:01 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SLOPE_MESH
+A direct method for creating regular meshes with an optional sloping face/ cut-out.
+.SH DATA
+    ndim, nod
+    nxe,nxs
+    top(1:nxe+1)
+    bottom(1:nxe+1)
+    nye,nys
+    depth(1:nye+1)
+and if ndim=3 :
+    [nze
+    width(1:nze+1) ]
+
+    where
+      ndim is either 2 or 3 (for 2D or 3D meshes)
+      nod is the number of nodes per element (8 in 2D, 8,14 or 20 in 3D)
+      nxe,nye,nze are the number of elements in each of the x,y and z
+directions respectively.
+      nxs and nys are the number of elements in the upper 'slope' part
+      top(:) are the x-coordinates across the top of the mesh
+      bottom(:) are the x-coordinates across the bottom of the mesh
+      depth(:) are the y-coordinates of all the rows
+      width(:) are the z-coordinates though the thickness of the model
+.SH DESCRIPTION
+    This ÿmodule allows the direct creatation of 'block'-style meshes of
+elements. In 2 dimensions, these are 8-node quadrilaterals (8nq's), in 3
+dimensions, ÿthese may be 8,14 or 20 node brick elements for example all
+meshes in Chapter 6 of the Manchester FE book [1]=[Smith and Griffiths].
+In ÿits simplest form, ÿnxs is set to be equal to nxe, ÿnys is set to be
+equal to nye and bottom(:) ÿis given the same values as top. ÿThis ÿwill
+produce a  regular 'block' ÿ(eg book60.dat). ÿIf top are given different
+values to bottom, then the 'vertical' mesh lines will slope, for example
+the slope stabilty mesh of 'book61.dat'. ÿIf ndim is set to 3 and so nze
+and ÿwidth(:) ÿÿsupplied, ÿthen the 3D equivalents of these ÿmeshes ÿare
+produced with nze elements into the plane of the 2D cross-section.
+.SH EXAMPLE
+    *SLOPE_MESH
+    #....... book61.dat from Smith and Griffiths.
+    #....... a 1m high slope of slope 1 in 2
+       2   8
+       5 5
+       0.   0.4   0.6   0.8   1.0   1.2
+       0.   1.0   1.8   2.4   2.8   3.2
+       5 5
+       0.  -0.2  -0.4  -0.6  -0.8  -1.0
+
+ << nice to have an example #2 for a 3D mesh of 14 node bricks >>
+.SH ADVANCED
+    If nxs and nys are set to less than nxe and nye respectively, then
+only nxs by nys elements in the top left hand corner of the mesh are
+inclined; all elements below are set to the constant breadth values as
+given in bottom(:). This allows meshes with a cut-out at the top-right
+to be built: for example an exacavated trench, or (if top(:) /=
+bottom(:)), a slope, resting a foundation layer.
+    Note, that values in top(:) and bottom(:) should increase, but vlues
+in depth(:) and width(:) should decrease (ie. the most-postive should
+come first).
+    These meshes all have parallel mesh-lines in the x and z directions.
+If a mesh with parallel vertical but inlined horizontal lines is
+desired, then this module may be used followed by *X_TO_Y to exchange
+the x- and y- coordinates over.
+.SH CAVEATS
+.SH SEEALSO
+*BASIC_BLOCK
+*DANBLOCKS
+.SH FLAGS
+'MFP'  132  120    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SORT_ELEMENTS_FROM_POINT
+Renumbers all the elements in order of distance from a given point.
+.SH DATA
+   Xp, Yp, < Zp >
+
+   where
+   xp,yp,zp is the coordinate in space of the sorting point.
+.SH DESCRIPTION
+    Given ÿa ÿpoint in space, ÿthis sorts the elements in order ÿof ÿthe
+distances ÿof ÿtheir ÿcentres from this point, ÿsuch ÿthat ÿthe ÿeleemnt
+nearest ÿto ÿthis point is becomes element number '1'. ÿAlthough, ÿÿthis
+routine ÿis ÿnot really necessary, ÿÿsome older FE programs ÿuse frontal
+matrix solvers. where ÿthe maximum instataneous front-width, is a
+function of the biggest difference in element number at a node.
+.SH EXAMPLE
+    *IMPORT_PL
+    < 'c:\pl_files\footing.pl'
+    # Now renumber the elements from left to right, bottom to top
+    *SORT_ELEMENTS_FROM_POINT
+      -999. 0.
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*SORT_NODES_FROM_POINT
+.SH FLAGS
+'MFP'  133  121    3
+.SH REVISION
+ 23:03:01 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SORT_ELEMENTS_IMAT
+Puts the elements in order of material no.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  134  122    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SORT_NODES_FROM_POINT
+Renumbers all the nodes in order of distance from a given point.
+.SH DATA
+   Xp, Yp, < Zp >
+
+   where
+   xp,yp,zp is the coordinate in space of the sorting point.
+.SH DESCRIPTION
+    Given ÿa ÿpoint ÿin space, ÿthis sorts the nodes in order ÿof ÿtheir
+distance ÿfrom ÿthis ÿpoint, ÿsuch that the node nearest to ÿthis ÿpoint
+becomes node number '1'. Although, this routine is not really necessary,
+some older FE programs use banded matrix solvers where ÿthe freedoms are
+numbered in the same order as the nodes. without sorting, ÿthis can lead
+to unacceptably large bandwidths.
+
+This sorts all the nodes
+.SH EXAMPLE
+    *IMPORT_PL
+    < 'c:\pl_files\footing.pl'
+    # Now renumber the nodes from left to right, top to bottom
+    *SORT_NODES_FROM_POINT
+      -999. 85.
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*SORT_ELEMENTS_FROM_POINT
+.SH FLAGS
+'MFP'  135  123    3
+.SH REVISION
+ 23:03:01 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *STRAINS
+The table of element stains
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'FP'  136  124    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *STRESSES
+The table of element stresses
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'FP'  137  125    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *STRIP_EDGES
+Abstracts the boundary polygon(s)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MP'  138  126    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *STRIP_FACETS
+Abstracts the list of external faces
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MP'  139  127    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *SUPERBLOCK
+Creates an arbitrary ´cube´ of elements
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  140  128    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+.HR ---------------------------------------------------------------------------
+.TH *SWAP_IMAT_IGRP
+This swaps the Material # and Group # for all elements.
+
+.SH DATA
+(none)
+.SH DESCRIPTION
+Every element has a certain material number and a certain group number. The
+material number is used in DANFE to indicate elements with the same material
+properties: Young's Modulus, Permeability, Undrained Strength, etc. The Group
+number is used internaly for housekeeping. It is also used to for the LEGO
+condensed storage method for the Preconditioned Conjugent Gradient (PCG) solver
+and for domain decomposition for parallel architectures.
+
+There are many modules used for setting material # (eg. *MATERIALS_BY_BOX,
+*BORE_MATERIALS,etc.). Only a few modules set the Group Number, currently:
+*GROUP_CONNECTIVITY for identifying disconnected objects in the mesh, and
+*GROUP_GREEDY which partions the mesh into a set of connected subsets that can
+be distributed onto separate processors.
+
+This module simply swaps these two indeces over.
+
+.SH EXAMPLE
+!-- partition a mesh into 16 regions and plots the result
+< previous mesh generation stages >
+*GROUP_GREEDY
+   16   3   !into 16 zones, option=3 uses a random seed element
+*SWAP_IMAT_IGRP ! so that the material numbers are these zones
+*PLOT_MESH    ! draw the mesh on screen
+
+.SH ADVANCED
+The group # can be used as a temporary buffer for the material numbers. This
+allows the material numbers to be swapped out, whilest a superset is marked and
+some action (eg. DANBLOCKS) is carried out on it. A further call to
+*SWAP_IMAT_IGRP will restore the original values.
+
+Note that the default value for both IMAT and IGRP is unity.
+
+.SH CAVEATS
+None of the current output file formats (eg. the *ELEMENTS module as output by
+*WRITE_DANPLOT_KEY), stores the group number (only the material # is saved).
+Thus setting group numbers must be done within the application that requires
+them. By callling *WRITE_DANPLOT_KEY after calling *SWAP_IMAT_IGRP allows them
+to be written, but of course at the expense of the material numbers.
+
+.SH SEEALSO
+*GROUP_GREEDY
+*MATERIALS_BY_BOX
+*GROUP_CONNECTIVITY
+*BORE_MATERIALS
+.SH FLAGS
+'MFP'  140  128    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *THREE_DIMENSIONAL
+Starts a three dimensional data set
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  141  129    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *TRIANGULARISE_MESH
+Splits elements to form triangles
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  142  130    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *TURN_DOWN_ELEMENTS
+Makes Normals point down into the page.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  143  131    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *TURN_UP_ELEMENTS
+Fixes ´negative Jacobian´problems.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  144  132    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *TWO_DIMENSIONAL
+Starts a two dimensional data set
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  145  133    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *UNBISECT_ELEMENTS
+Glues triangle-pairs to form quads :-)
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  146  134    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *VERBOSE
+Gives extended tracing information
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  147  135    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRAP_AROUND_X
+Converts a mesh into a cylinder
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  148  136    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRAP_AROUND_Y
+Converts a mesh into a cylinder
+.SH DATA
+   (none)
+.SH DESCRIPTION
+    This module procudes a cylinder from a reactangular 3D mesh. For
+each point; the x-coord is considered as a radius and the z-coord as the
+angle in polar coordinates. Thus to create a quarter circle, the z-coords
+should vary between 0. and 90. The x values should all be positive; the
+smallest value being the inner radius, the largest being the outer
+radius.
+.SH EXAMPLE
+    *SCALE_MESH
+     1. 1. 360.     # change a unit z-thickness to 360 degrees
+    # now wrap into a cylinder
+    *WRAP_AROUND_Y
+    # join the two coincident faces
+    *COALESCE_COINCIDENT_NODES
+.SH ADVANCED
+    The inner radius can be set to zero to give a solid cylinder,
+however this produce a line a singularities along the axis. This usualy
+causes no problems, but can cause degeneracies. If a complete cylinder
+is produced then *COALLESCE_COINCIDENT_NODES will join the two ends, but
+may have the side effect of increasing the bandwidth.
+.SH CAVEATS
+.SH SEEALSO
+*WRAP_TWIST_Y
+*WRAP_AROUND_Z
+.SH FLAGS
+'MFP'  149  137    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRAP_AROUND_Z
+This wraps a mesh around in the x-y plane for example to produce a quarter circle.
+.SH DATA
+    (none)
+.SH DESCRIPTION
+    This module will wrap a rectangular mesh into a cirular arc. In
+three dimensions, this procudes a cylinder around the z axis. For
+each point; the x-coord is considered as a radius and the y-coord as the
+angle in polar coordinates. Thus to create a quarter circle, the y-coords
+should vary between 0. and 90. The x values should all be positive; the
+smallest value being the inner radius, the largest being the outer
+radius.
+.SH EXAMPLE
+    *SHIFT_MESH
+    # move the inner radius to be 10m
+     10.  0.
+    # now wrap into a quater circle
+    *WRAP_AROUND_Z
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*WRAP_AROUND_Y
+*CIRCLE_A_SQUARE
+.SH FLAGS
+'MFP'  150  138    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRAP_CIRCLE_Y
+???
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  151  139    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRAP_SPHERE
+Inflates a cube into a ball shape
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  152  140    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRAP_SQUARE_Y
+???
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  153  141    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRAP_TWIST_Y
+This rotates successive x-z planes about the y-axis to produce a corkscrew effect.
+.SH DATA
+    (none)
+.SH DESCRIPTION
+    This module rotate x-z planes about the y-axis in proportion to the
+value of the y-coordinate at that point. This produces a spiraly twisted
+column from a straight one. If the column is not centered on the y-axis
+then this produces a 'corkscrew' or 'spiral-staircase' type mesh.
+    This ÿis an example of a special purpose module. Its ÿsource code is
+gven here as an example of how to structure ÿa user written ÿmodule ÿfor
+transforming the geometry.
+.SH EXAMPLE
+    #...
+    *WRAP_TWIST_Y
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+    *WRAP_AROUND_Y
+.SH FLAGS
+'MFP'  154  142    3
+.SH REVISION
+ 23:02:01 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_BOOK59
+Saves the mesh in the form that can be read by the program 'Book 5.9'.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This writes out the finite element mesh and the boundary fixities (NF array) in
+a file dalled 'p59.dat'. This file is in the form that can be read by Program
+6.8 from the book "Programming the Finite Element Method" I.M.Smith and
+D.V.Griffiths, 3rd edition (1997). Book 5.9 is a short Fotran 90 program for
+analysing the deflections of 2d and 3d elstic meshes.
+
+This provides a simple framework for users who wish to develop their own Finite
+Element codes based on the above book.
+
+.SH EXAMPLE
+< previous mesh generation stages >
+*PLOT_MESH
+*WRITE_BOOK59   ! draw the mesh on screen
+
+.SH ADVANCED
+.SH CAVEATS
+This file that is output will need manualy editing to add the applied loadings.
+
+.SH SEEALSO
+*WRITE_BOOK68
+*WRITE_DANPLOT
+*WRITE_DANPLOT_KEY
+.SH FLAGS
+'MFP'  155  143    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_BOOK68
+Saves the mesh in the form that can be read by the program 'Book 6.8'.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This writes out the finite element mesh and the boundary fixities (NF array) in
+a file dalled 'p68.dat'.
+This file is in the form that can be read by Program 6.8 from the book
+"Programming the Finite Element Method" I.M.Smith and D.V.Griffiths, 3rd edition
+(1997). Book 5.9 is a short Fotran 90 program for analysing the deflections of
+2d and 3d  meshes, with the Mohr-Coulomb yield criteria. The program is targeted
+towards the analysis of geotechnical probelms such as footings and earth
+retaining stuctures.
+
+This provides a simple framework for users who wish to develop their own Finite
+Element codes based on the above book.
+
+.SH EXAMPLE
+< previous mesh generation stages >
+*PLOT_MESH
+*WRITE_BOOK68   ! draw the mesh on screen
+
+.SH ADVANCED
+.SH CAVEATS
+This file that is output will need manualy editing to add the applied loadings,
+and to adjust the number of iterations, etc.
+
+.SH SEEALSO
+*WRITE_BOOK59
+*WRITE_DANPLOT
+*WRITE_DANPLOT_KEY
+.SH FLAGS
+'MFP'  155  143    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_ARENA
+- to a shareware 3d modeller
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  155  143    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_DANPLOT
+Writes the mesh into a '.PL' file: a simple numeric format.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This saves the nodal coordinates and the element connectivity to a file with the
+suffix '.PL'. This was the original file format of the DANPLOT package, and is
+compact and only contains numeric values. As such it is very simple to write
+a filter so that this format can be read into other packages.
+
+The file format is closely allied to that produced by *WRITE_DANPLOT_KEY; it
+consists of two tables, the first containing the node numbers and their x,y,z
+coordinates, and the second containing the element numbers, the no. of nodes in
+this element, followed by the list of nodes and finally by the material number.
+A full description of the format is given in the corresponding module:
+*IMPORT_PL.
+
+.SH EXAMPLE
+< previous mesh generation stages >
+*PLOT_MESH
+*WRITE_DANPLOT
+.SH ADVANCED
+It is sometimes convenient for complex mesh generation to save a partialy
+completed mesh to a .PL file, then invoke *NEW_MESH, then create a second part
+of the mesh, and finaly use IMPORT_PL to merge the two datasets together. The
+saved .PL mesh can of course be imported mutiple times to create a row of bridge
+piers say.
+
+.SH CAVEATS
+For each element, the .PL format can only store the material # and the list of
+nodes for each element. It does not store the number of dimensions of the
+elements or its type. Hence packages that read this file,  have to recognise
+that a 2-noded element has to be a rod, and a 6 noded element has to be a
+triangle with mid-side nodes. For 3D meshes, there is a potential for confusion
+between 8-noded brick elements and 8-noded quadrilateral elements, likewise
+between 4-noded quadrilaterals and tetrahedra.
+
+.SH SEEALSO
+*WRITE_DANPLOT_KEY
+*IMPORT_PL
+*IMPORT_MESH
+.SH FLAGS
+'MFP'  156  144    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_DANPLOT_KEY
+Writes the mesh ready for DANPLOT, DANFE etc.
+.SH DATA
+(none)
+.SH DESCRIPTION
+This saves the mesh as a set of Keywords. This files can then be read by any of
+the packages in the DANFE suite of programs. Normaly this keyword is used as the
+last stage of the mesh-generation phase of a DANFE datafile, just before the
+*NULL_ARRAYS keyword, that begins the analysis phase.
+
+The data is written to a file with the extension .KEY from DANMESH; from DANFE,
+this data is written to the default .OUT file.
+
+*WRITE_DANPLOT_KEY should be present in all DANFE data files so that the results
+may later be plotted in DANPLOT (However see below in the advanced usage notes).
+
+.SH EXAMPLE
+< previous mesh generation stages >
+*PLOT_MESH
+*WRITE_DANPLOT_KEY
+#---- end of mesh-generation, start of analysis ---
+*NULL_ARRAYS
+*FB_RS
+< following analysis related modules >
+
+.SH ADVANCED
+For very large structured meshes, it is worth remebering that it is not
+essential to explicitly save the whole mesh via *WRITE_DANPLOT_KEY. Instead
+the DANPLOT package can be fed the original mesh in whatever form was used to
+generate it. For example the set of *BASIC_BLOCKS and *DANBLOCKS commands of the
+mesh generation phase. If the mesh was imported from (say) a DIANA input file
+into DANFE, then of course it can be imported into DANPLOT likewise, without
+being duplicately stored in the .OUT file.
+
+.SH CAVEATS
+The element group numbers are not currently stored with each element, and so
+keywords such as *GROUP_GREEDY and *SET_LEGO_IMAT will not have their effect
+carried over into the saved copy of the mesh.
+
+.SH SEEALSO
+*WRITE_DANPLOT
+*WRITE_NF
+*NULL_ARRAYS
+.SH FLAGS
+'MFP'  157  145    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_DXF
+Save the mesh in AutoCAD's de-facto standard
+.SH DATA
+(none)
+.SH DESCRIPTION
+This saves the mesh in a file with the extension .DXF. This file can then be
+read into a wide variety of Computer aided Draughting (CAD) and Desktop
+Publishing (DTP) packages. The mesh is stored as a set of edged polygons using
+the POLYLINE operator. 3D elements are split into their component faces. Where
+these are simple triangles or quadrilaterals, then the DXF 3DFACE operator is
+used instead, to save of filesize.
+
+Note that DXF files are very verbose, and can easily be several megabytes in
+size.
+
+
+
+.SH EXAMPLE
+< previous mesh generation stages >
+*PLOT_MESH
+*WRITE_DXF
+.SH ADVANCED
+.SH CAVEATS
+All the polygons are written to the same default layer.
+
+Currently 1 dimensional elements are not handled.
+
+Only the ENTITIES section is written, and so the common DXF preamble that
+defines metrics and dimensioning styles etc. is not written. A few DXF-reading
+packages will fail if they do not find a preamble header section. In this case,
+it is simple to cut and paste such a section from any other DXF file to the
+beginning of the file produced here.
+
+.SH SEEALSO
+*IMPORT_DXF
+*CHECK_DXF
+*IMPORT_MESH
+.SH FLAGS
+'MFP'  158  146    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_FACETS
+Writes just the boundary faces.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MP'  160  148    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_FEMVIEW
+- to a commercial post-processor
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  161  149    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_LOADS
+Writes out the table of applied loads
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  162  150    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_MESH_UCD
+- to AVS's  unstructured format
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  163  151    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_NF
+Writes the nodal freedom table out
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'F'  164  152    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_NODES
+Writes just the nodal coordinates out
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MFP'  165  153    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_OFF
+This exports in a mesh in the 'Object File Format' <ref>
+.SH DATA
+    NN, NEL, NEDGES
+    (x(i),y(i),z(i),i=1,nn)
+    (nod,(num(1:nod,i),i=1,nel)
+
+    where:
+    nn is the number of nodes (vertices) in the mesh
+    nel is the number of elements (polygons) in the mesh
+    nedges is the number of edges (unused in FE)
+.SH DESCRIPTION
+    This module allows the exporting of polygonal meshes in
+the 'Object File Format'.The 'Object File Format' (OFF) is a set of
+polygonal elements where each node has a geneal x,y,z coordinate. Such
+meshes can be either planar meshes, or more usually curved shells, for
+example the VW 'beetle' dataset. OFF is one of the de-facto standards
+for the interchange of mesh data.
+    Most Ray-tracing packages and other scene-drawing programs can
+accept OFF geometry files. This module allows these to be used to
+produce high quality images of the mesh.
+.SH EXAMPLE
+    *IMPORT_PL
+    # read a standard DANPLOT style mesh
+    ..
+    *EXPORT_OFF
+    # write the mesh in Object File Format for raytracing
+    > c:\OFF_FILES\VW.GEO
+.SH ADVANCED
+.SH CAVEATS
+    This implimentation just handles the '*.geom' file of geometries. The
+table of vertex coloues '*.pcol'? are not relevant. The '*.aoff' file of
+textual information is currently not supported, although in the future
+this will used to get the titles, etc.
+.SH SEEALSO
+*IMPORT_PL
+*IMPORT_NFF
+*IMPORT_SRF
+*IMPORT_3D
+*IMPORT_TECPLOT_MESH
+*WRITE_RAYSHADE
+*WRITE_DANPLOT
+.SH FLAGS
+'MFP'  166  154    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_RAYSHADE
+Output a file of polygons suitable be raytracing
+.SH DATA
+  <none>
+.SH DESCRIPTION
+    This ÿexports the mesh as a set of polygons in RAYSHADE ÿformat, ÿÿa
+public-domain raytracing package. ..
+.SH EXAMPLE
+    *EXPORT_RAYSHADE
+   ...
+.SH ADVANCED
+    Since in general only the surface of a mesh is visible, it will
+greatly speed up the raytracing package if all internal and/or
+backfacing polygons faces are removed before writing the Rayshade file.
+This may be done within the DANPLOT package (q.v.).
+.SH CAVEATS
+    Rayshade files consist of a set of polygons in 3D space. Before
+writing this file, 3D elements such as 20-node bricks should first be
+decomposed into a set its six faces using *POLYGONISE_3D_ELEMENTS.
+.SH SEEALSO
+*IMPORT_PL
+*IMPORT_NFF
+*IMPORT_SRF
+*IMPORT_3D
+*IMPORT_TECPLOT_MESH
+*WRITE_RAYSHADE
+*WRITE_DANPLOT
+*POLYGONISE_3D_ELEMENTS
+.SH FLAGS
+'MFP'  167  155    3
+.SH REVISION
+ 23:03:01 pasted in
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *WRITE_RINGS
+Writes out the bounding polygons.
+.SH DATA
+.SH DESCRIPTION
+.SH EXAMPLE
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+.SH FLAGS
+'MP'  168  156    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *X_TO_Y
+Swaps the horizontal and vertical axes
+.SH DATA
+   <none>
+.SH DESCRIPTION
+    This module has the effect of rotating the mesh by 90 degrees anti-
+clockwise. The original x coordiante becomes the new y coordinate and
+the the original y coordinate becomes the new *negative* x coordinate.
+This may be done when performing an axisymmetric analysis of a flywheel
+so the radial direction becomes the local x-axis. This may be swapped
+back for plotting. Also some basic mesh generation modules such as
+*LAYERED_SLOPE and *SLOPE_MESH may be used then translated into a
+differnt orientation. For example, using *SLOPE_MESH to create a spud-
+can mesh, or *LAYERED_SLOPE to create the flywheel example.
+.SH EXAMPLE
+    *IMPORT_PL
+    < c:\pl_files\flywheel.dat
+    # now put the flywheel radius in the x-direction
+    *X_TO_Y
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*X_TO_Y_TO_Z
+.SH FLAGS
+'MFP'  169  157    3
+.SH REVISION
+ 23:03:01 created
+.SH END
+
+.HR ---------------------------------------------------------------------------
+.TH *X_TO_Y_TO_Z
+To put the y-axis up instead of z
+.SH DATA
+(none)
+.SH DESCRIPTION
+This rotates the whole mesh, such that the old x axis becomes the new y axis,
+y becomes z, and z becomes x.  This enables meshes that were defined with z
+being upward, to be transformed to the more usual y=upwards form. Technically,
+this module rotates the mesh by 120 degrees about the 'hydrostatic axis' (unit
+vector=1,1,1), and so two successive calls will put x upwards, and three calls
+will restore the original state. All three axes remain positive, unlike
+*ROTATE_MESH.
+
+.SH EXAMPLE
+    *IMPORT_PL
+    < c:\pl_files\z_is_up.dat
+    # now topple to put the z coordinate properly in the horiz. plane
+    *X_TO_Y_TO_Z
+.SH ADVANCED
+.SH CAVEATS
+.SH SEEALSO
+*SCALE_MESH
+*SHIFT_MESH
+*X_TO_Y
+*ROTATE_MESH
+.SH FLAGS
+'MFP'  170  158    3
+.SH REVISION
+ 23:08:98 created
+.SH END
+
+
