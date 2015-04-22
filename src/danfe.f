@@ -413,7 +413,7 @@ c    &        ,file_out*128       !-- an output file
       REAL TIME(20)               !-- Program run-timings
       CHARACTER DATE_STAMP*20     !-- current date function
       EXTERNAL  DATE_STAMP
-      integer :: stderr=0         ! for bar line like output
+      integer :: stderr=-1         ! for bar line like output
 
       DATA U0,u2,U3/ 40, 78,80/   !- file numbers
 
@@ -526,6 +526,8 @@ c      TITLES(2) ='         --- No Title specified ----'
           PRPTAB (I,J) = 0.       ! so use 0 to flag mat=elastic only
         ENDDO
       ENDDO
+      if (stderr==-1) call my_getstderr(stderr)   ! first pass
+
 
 C----------------------- 1: write titles -------------------------------
 c... Write the boxed header to both screen and .OUT file ?
