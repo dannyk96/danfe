@@ -1,12 +1,13 @@
  Running is serial on one processor
   the system clock has        1000  ticks/s
-   +----------------------------------------------------------------------------+
-   |                D A N F E  Finite Element Analysis Program                |
-   |                             Version 1.3.00                               |
-   |           . . .                                                          |
-   |            Author : Dr. Dan Kidger, (ex. University of Manchester)       |
-   |          daniel.kidger@quadrics.com                                      |
-   +----------------------------------------------------------------------------+
+  
+    +----------------------------------------------------------------------------+
+    |                D A N F E  Finite Element Analysis Program                |
+    |                             Version 1.3.00                               |
+    |           . . .                                                          |
+    |            Author : Dr. Dan Kidger, (ex. University of Manchester)       |
+    |          daniel.kidger@quadrics.com                                      |
+    +----------------------------------------------------------------------------+
 
     - Job started: 10:37:41 22/04/15        2000000  Nodes,       80000  Elements, IKV=    82000000
  #args=           2
