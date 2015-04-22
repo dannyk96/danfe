@@ -128,7 +128,10 @@ rem %FC_CPP% libsrc\danlib.f /BINARY danlib.obj
 %FC% src\danplot.f    /LINK danplot.exe  /LIBRARY bits.obj menu.obj %DANLIB% %DANLIBG% int_gen.obj %MPILIB%
 
 :: rem  %FC% src\danfront.f90 /MOD_PATH libsrc
-%FC% src\danfe.f  /IN libsrc  /LINK danfe.exe    /LIBRARY %DANLIB% %MPILIB%  int_gen.obj 
+%FC% src\danfe.f  /IN libsrc /BINARY danfe.obj
+slink danfe.obj      %DANLIB% %MPILIB%  int_gen.obj  /stack:1000000000 /3gb 
+
+
 :$changed 08/04/15
 ::
 :: clean-up
