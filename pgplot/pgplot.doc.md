@@ -6,7 +6,7 @@ Subroutine Library'' available from T. J. Pearson
 (tjp@astro.caltech.edu).
 
 INDEX OF ROUTINES
-
+~~~
 PGARRO -- draw an arrow
 PGASK -- control new page prompting
 PGAXIS -- draw an axis
@@ -134,7 +134,7 @@ PGVPORT -- non-standard alias for PGSVP
 PGVSIZE -- non-standard alias for PGVSIZ
 PGVSTAND -- non-standard alias for PGVSTD
 PGWINDOW -- non-standard alias for PGSWIN
-
+~~~
 
 ------------------------------------------------------------------------
 Module: PGARRO -- draw an arrow
