@@ -35,7 +35,8 @@ PROGRAM  auto_mesher
       character :: base_type*12='backward', &    ! which segement to build on
                    outfile_type*5='dp'           !  what sort of output file to write.
       character :: arg*80, arg1*1, arg2*1        ! command line parsing
-      integer :: nargs, danfe_argc
+      integer :: nargs
+!     integer :: danfe_argc
 
 !TODO make this a command line option
 ! = 'backward', 'shortest', 'random','random2','longest'
@@ -403,7 +404,7 @@ PROGRAM  auto_mesher
 !
       implicit none
       CHARACTER VERSION*(20)
-      LOGICAL ANSI
+!     LOGICAL ANSI
 
       character  esc,black*7,red*7,green*7,yellow*7,blue*7,magenta*7,cyan*7,white*7, fg*7, &
       reset*4

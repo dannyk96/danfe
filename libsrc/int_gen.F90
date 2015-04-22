@@ -18,7 +18,7 @@
 
 !-----------------------------------------------------------------------
       subroutine danfe_getarg(N,arg)
-      integer    :: i
+!     integer    :: i
       character  :: arg*(*)
       arg = ""
       call getarg (N,arg)     ! need to compile with -Vaxlib
@@ -45,7 +45,8 @@
       character envvar*(*), string*(*)
 
 #ifdef __FTN95
-      string=" "
+      string = getenv@(envvar)
+!     call dosparam@(envvar,string)
 #else
       CALL get_environment_variable(envvar, string)
 #endif

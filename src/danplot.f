@@ -283,8 +283,8 @@ c    &           ,C_T *6           !- == ANSI CODE for 'top-left screen'
      &        ,TITLE_LS*79         !- A load step title
      &        ,S_term*4            !- stress-term eg 'sx','txy','mss',..
 
-       CHARACTER
-     &         CMNAM *60          !- the command-line function
+!      CHARACTER
+!    &         CMNAM *60          !- the command-line function
 
 c     integer*4  free_space_available@
       real free_memory               ! function (int_*.f)
@@ -292,15 +292,15 @@ c     integer*4  free_space_available@
       external istr_beg, istr_end, free_memory, post_menus
 c     external cmnam@, free_memory   !, free_space_available@
 !--------  variables for parsing the command line ---------
-      CHARACTER :: filenames*1024=' ',    !- stack of input filenames
-     &                  FILENAME*60 =' ', !- input datfile name
-     &                  basename*60       !- base for output filenames
-      integer  :: nfilenames = 0              !- count of files (only for info)
+      CHARACTER :: filenames*1024=' '    !- stack of input filenames
+     &                 ,FILENAME*60 =' ' !- input datfile name
+!    &                 ,basename*60       !- base for output filenames
+!     integer  :: nfilenames = 0              !- count of files (only for info)
       integer :: iverb=2           !  verbosity  so can increment or decrement from here.
      &          ,igraph=0          !- 0=no graphics, 1= ..
       character :: arg*80, arg1*1, arg2*1
       integer :: ikeyword=0
-      integer :: nargs, danfe_argc
+      integer :: nargs   !, danfe_argc
       logical :: debug = .false.,     !- cf. iverb (maybe cpp this?)
      &           colorise=.true.       !- toggle if use ANSI colours
 
@@ -319,8 +319,8 @@ C... subroutine to avoid 'cluttering' up the main prog
      &         ,IMAGE (MIMAGES)    !- memory locs. of stored frames
 c    &         ,VSCREEN            !- memory loc. 
 
-      INTEGER
-     &         IFAIL_2            !- if a subroutine 'fails'
+!     INTEGER
+!    &         IFAIL_2            !- if a subroutine 'fails'
 c    &         ,WIN1               !- HANDLE of a text window
 
 c     &          IXM_S_2,IYM_S_2    !- mouse position 
@@ -448,7 +448,7 @@ c       hence it write hopper.o[8-23] if it wishes.:-)
       !nargs= danfe_argc()
       iskip=0
       if (nargs==0) then
-        call usage()
+        call danplot_usage()
         stop
       endif
       do i=1,nargs
@@ -467,9 +467,9 @@ c       hence it write hopper.o[8-23] if it wishes.:-)
         else                       !----- parse options begining with '-' or '--' -----
           if (arg2=='-') then           !--- '--' =Gnu style options----
             if (arg=='--usage') then
-              call usage() ; stop
+              call danplot_usage() ; stop
             elseif (arg=='--help') then
-               call help(); stop
+               call danplot_help(); stop
             else
             call error('unknown argument:'//arg); stop
             endif
@@ -480,7 +480,7 @@ c       hence it write hopper.o[8-23] if it wishes.:-)
               if (arg2 ==' ') then
                 call error ('option missing')   !(or = stdin ?)
               elseif (arg2=='h') then
-                call help(); stop
+                call danplot_help(); stop
               elseif (arg2=='v') then    !---- verbosity level ----
                  iverb = iverb+1
               elseif (arg2=='s') then      !silent
@@ -492,7 +492,7 @@ c       hence it write hopper.o[8-23] if it wishes.:-)
                  colorise = .not.colorise
               elseif (arg2=='t') then      !- output file type (default is no file!)
                  if (i==nargs) then
-                   call usage(); stop
+                   call danplot_usage(); stop
                  endif
                  call danfe_getarg(i+1,arg); iskip=1
 !                outfile_type=arg(1:len(outfile_type))
@@ -512,7 +512,7 @@ c.. or think about a contour-palatte name eg. '-pHOTIRON'
         if (debug) write(*,'(i8," :",a)') i,arg
       enddo
       if (filenames ==" ") then
-        call usage (); stop
+        call danplot_usage (); stop
       endif
       ipr=iverb          ! synonym
 
@@ -5212,40 +5212,15 @@ c but with ifc we have peekcharqq()
       KEY_WAITING=.FALSE.
       END
 
-c-----------------------------------------------------------------------
-      function cmnam ()
-c
-c  pretends to return command-line arguments
-c
-      character :: cmnam*60, arg*60
-      integer   :: ipass=0, nargs=0
-      integer, external :: danfe_argc
- 
-      ipass=ipass+1
-      if (ipass==1) then
-!       open (89,file='FILE')
-        nargs= danfe_argc()
-      endif
-      if (ipass<=nargs) then
-        call danfe_getarg(ipass,arg)
-!        read (89,'(a)',iostat=ios) arg
-!        if (ios.ne.0) arg=" "
-        cmnam=arg
-      else 
-        cmnam=" "
-      endif
-      end
-c-----------------------------------------------------------------------
-c-----------------------------------------------------------------------
 !----------------------------------------------------------------------------------------
-      subroutine usage()
+      subroutine danplot_usage()
 !
       write (*,'(a)')
      &"Usage:  danplot [-vh] [-g graphics] [input file(s)]"
 
       end
 !----------------------------------------------------------------------------------------
-      subroutine help()
+      subroutine danplot_help()
 !
       write (*,'(a)')
      & "Usage:  danplot [OPTIONS] file(s)" , 

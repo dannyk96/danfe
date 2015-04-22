@@ -313,7 +313,8 @@ C---------- find the 'chararistic model length' = major daigonal -------
       PARAMETER (ICOORD = M_NOD)
       REAL      COORD (ICOORD,M_NDIM)    !-- nodal coords
 
-      real  GC_MAX(5),GC_MIN(5), DIAG
+      real  GC_MAX(5),GC_MIN(5)
+!     real ::  DIAG                   ! characteristic length of mesh
       character string*8
 
       INTEGER I,J, NUM(32)

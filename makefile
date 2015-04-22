@@ -52,7 +52,12 @@ FFLAGS+=-g
 #
 # for  warnings of source code bugs
 #
-FFLAGS+=-fno-backslash -Wall -Wno-unused-dummy-argument -Wno-unused-variable
+# 
+FFLAGS+=-fno-backslash -Wall 
+# Next I need as many subroutines have a common interface even if not all args are used.
+FFLAGS+=-Wno-unused-dummy-argument
+# next can be removed as hopefully all are fixed
+#FFLAGS+= -Wno-unused-variable
 
 #
 # Default is to use gfortran
@@ -210,9 +215,9 @@ sierpinski: src/sierpinski.f90
 # Sources: Danfront's extras 
 # (note f90 module dependancies here)
 #
-afront.o: libsrc/afront.F90
+afront.o: libsrc/afront.f90
 	$(FC_CPP) -c  $<
-afrontg.o: libsrc/afront.F90
+afrontg.o: libsrc/afront.f90
 	$(FC_CPP) -c -DPGPLOT -o $@ $<
 
 #

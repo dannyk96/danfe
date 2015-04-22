@@ -2495,7 +2495,7 @@ C     Dan Kidger 16-7-97
 C
       CHARACTER VERSION*(20)
       LOGICAL colorise
-      LOGICAL DOS           !- can use DOS character set?
+!     LOGICAL DOS           !- can use DOS character set?
       character  esc,black*7,red*7,green*7,yellow*7,blue*7,magenta*7,
      &     cyan*7,white*7
 

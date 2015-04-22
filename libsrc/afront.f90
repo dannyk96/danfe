@@ -102,12 +102,17 @@ contains
 !     This creates a graphics windows (of the given size)
 !
       implicit none
-      real   :: Screen_width=1024.   !- width of image in pixels
 !         best if I can let the user choose
 !         A config file, or environmental variable is nicest                   
-      real*4 :: x,y, zero=0., one=1.
-      real*4 :: pgopen, x1,x2,y1,y2, x1i, x2i, width,aspect, xsep,ysep
-      real*4 :: VPX1, VPX2, VPY1, VPY2, D
+#ifdef PGPLOT
+      real   :: Screen_width=1024.   !- width of image in pixels
+      real*4 :: x,y,x1,x2,y1,x1i,x2i,zero=0.  !, one=1.
+      real*4 :: pgopen,y2, width,aspect
+#endif
+!     real*4 :: x,y,x1,y1,y2,x2,x1,xli,
+!     real*4 :: VPX1, VPX2, VPY1, VPY2, xsep,ysep
+!     real*4 :: D
+
       if (grstate==0) then
 #ifdef PGPLOT
       if (PGOPEN("/XWIN").le.0) then
@@ -171,7 +176,7 @@ contains
 !  for viewports PGQVP returns xyXY
 !       PGQVSZ retyns xyXY of the view surface - hence use PGPAP to change
 !
-      real*4 :: dx=2.;dy=2.; t=0.1*1000
+!     real*4 :: dx=2.;dy=2.; t=0.1*1000
       if (grstate /=0) then
 #ifdef PGPLOT
         do i=1,2000
@@ -217,10 +222,11 @@ contains
 !
       implicit none
       real,intent(in) :: x(3),y(3)
-      real :: t,t_lastupdate = -999.
+!     real :: t,t_lastupdate = -999.
       
-      integer i,icol_line,icol_fill, handle, ifail
-      integer :: icol_line2, icol_fill2
+      integer i,icol_line
+      integer :: icol_fill,icol_line2, icol_fill2
+!     integer :: handle, ifail
       real*4 :: xs(4),ys(4)
       if (grstate==0) return
 
@@ -271,8 +277,11 @@ contains
       integer, intent(in) :: front(:,:), nfront,ifb, icol
       integer i
       real*4 ::  xs(2),ys(2)
+#ifdef PGPLOT
       real*4 :: radius=1.
-      integer :: icol_line2, icol_fill2, icol_node2
+      integer :: icol_line2, icol_node2
+!     integer :: icol_fill2
+#endif
 
       if (grstate==0) return
 
@@ -2353,8 +2362,8 @@ end module plotlib
       INTEGER IXRES,IYRES
 
       INTEGER   IFAIL, ix,iy,icol2      !------ for SALFORD calls -----
-      INTEGER   HANDLE
-      CHARACTER PALETTE*17
+!     INTEGER   HANDLE
+!     CHARACTER PALETTE*17
 
       print*,' PCX file reading not currently supported -- skipping'
       return
@@ -2637,9 +2646,9 @@ end module plotlib
       integer :: bins (nbins)
       integer :: table(20,200)
 
-      integer :: p(nn)
+!     integer :: p(nn)
       integer num(3)
-      save tables
+      save table 
 !
 !      call get_nodal_valency (nn,NUM3,INUM3,nel, ifrom, ito, p)
 

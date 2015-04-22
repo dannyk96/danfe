@@ -6891,7 +6891,7 @@ c
 !     integer nf (3,100000)
       REAL GC_MIN(5),GC_MAX(5)       !
 
-      integer stats (20)
+!     integer stats (20)
       integer list (32)              ! points to use
       real weights(32)               ! ..and their weights
       real dx(5),dx_max(5)           !- a point's movement

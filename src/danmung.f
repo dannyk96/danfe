@@ -34,17 +34,18 @@
 
  
 !--------------- character strings -------------------------------------
-      CHARACTER LINE*255     ! the whole command line
-!    &         ,KEYWORD*70   ! data input keyword 'token'
-     &         ,FILE_IN*80   ! input data file name
+      CHARACTER
+     &          FILE_IN*80   ! input data file name
      &        ,FILE_OUT*80   ! output data file name
      &  ,EXT_IN*3, EXT_OUT*3 ! input /poutput file extensions
+!    &         ,LINE*255     ! the whole command line
+!    &         ,KEYWORD*70   ! data input keyword 'token'
 
       INTEGER U1             ! input mesh file
      &       ,U2             ! output mesh file
 
       INTEGER NN,NEL,NDIM,IPR, IOS, nargs
-      INTEGER IBEG,IEND,IC
+!     INTEGER IBEG,IEND,IC
       INTEGER IARGC           ! a function in int_gen.F to return command line args
 
 !------------------ DATA stataments ------------------------------------

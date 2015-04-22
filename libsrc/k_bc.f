@@ -859,7 +859,7 @@ c     11-3-01 removed the call the SORTNF - do from teh calling program instaed
 C
       INTEGER NUMS (INUMS,NEL)  !-- the topology of the elements
      &         ,NF (INF,NN)     !-- node freedom array
-     &        ,node_order(nn)   !- order to the freems
+!    &        ,node_order(nn)   !- order to the freems
      &        ,NUM (32)
 
 c------------ Mark all the freedoms as 'possible-freedoms --------------

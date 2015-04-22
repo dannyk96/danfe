@@ -1116,13 +1116,14 @@ c     KDIAG(10)=..            !- store PRECON length too?
       real    :: up,up2,down, alpha,beta
       REAL    :: BIG_SPRING
 
-      integer :: i,j,k, iel, ic, idof, ibase
+      integer :: i,k
       real    :: zero=0.
 
 ! converrgence checking
       real    :: tol,big,biggest
       integer :: ilevel,ireport, iters_old, max_iters
-      LOGICAL CONVERGED, report_flops
+      LOGICAL CONVERGED
+!     report_flops
 
 
 ! timers
@@ -1231,7 +1232,7 @@ c    & ' setup=(',flops_setup/1000000.,')'
 !     report Mflops and when we pass each convergence level.
 !
       if (ipr.ge.4.and. biggest.lt.tol_sofar) then   ! report flop rate
-        ireport=ireport+1
+        ireport=ireport+1     !ireport==ilevel
         ilevel = ilevel +1
         TOL_SOFAR = tol_sofar/10.    !- next one to check
         call get_secs (t1)           !- time the process
@@ -1353,7 +1354,7 @@ c     integer:: iworkspace=n
      &       ,D (0:IWORKSPACE)       !- [Precond]*R  (==R if no precon)
 c#endif
       LOGICAL CONVERGED, report_flops
-      INTEGER :: IDOF,I,K,IEL,IC,NEL,IPRECON,N_BS,IBS_START=0
+      INTEGER :: I,K,NEL,IPRECON,N_BS,IBS_START=0
      &      ,MAX_ITERS,IPRE_1, ISTORE,ISTART     !- locals
       REAL TOL,BIG,BIGGEST, ALPHA,BETA, UP,UP2,DOWN, BIG_SPRING
 
@@ -1771,8 +1772,8 @@ c     SAVE G1,T,I,J,lhs2,rhs2    !- force local storage of arrays
       INTEGER G(IDOF), G1
       common /pcg_sub_bit/lhs2,rhs2
       real lhs2(102),rhs2(102)
-      REAL T                               !- local variables
-      INTEGER I,J,me, ifail
+      REAL      :: T                               !- local variables
+      INTEGER   :: I,J
 
 c.. first store a copy of the left hand side: LHS(G(1:idof))   3-11-98
 c.. this is not nice for fast-cpu but slow-memory machines like the t3e (?)
@@ -2225,7 +2226,8 @@ c-----------------------------------------------------------------------
 !    12-3-01 (DJK) removed E2 as it is unused
 !    13-3-01 (DJK) added and fixed flops estimate.
 
-      INTEGER M, IW, N2, N, K, MAXR, IRR, IR, KR, J, JM, IUGL, J2,
+      INTEGER IW, N2, N, K, MAXR, IRR, IR, KR, J, JM, IUGL, J2,
+!     integer :: m
      + L, JL, MAXL, I, IA
       REAL B, S, C, C2, S2, CS, U, U1, A(IA,*), D(*), E(*)
       real flops
@@ -2364,7 +2366,8 @@ c      9-3-01 (DJK) added (from fe5lib) for Lamaload Eigenvalues.
 c     13-3-01 (DJK) added flops estimate - appears O(N^2) ?
 c        note that this can only be an estimate since it has internal iteration.
 c
-      INTEGER P01AAF, ISAVE, IFAIL, N, I, L, J, M, I1, M1, II   ! P01AAf unused!
+      INTEGER  IFAIL, N, I, L, J, M, I1, M1, II  
+!     integer ::  ISAVE,P01AAF                         ! P01AAf unused!
       REAL B, F, H, ACHEPS, G, P, R, C, S, D(*), E(*)
       real flops
 !      ISAVE = IFAIL  ! unused
@@ -2893,7 +2896,8 @@ c      double precision c,c2,c3,dl1,el1,f,g,h,p,r,s,tst1,tst2  !,pythag
       real d(n),e(n),z(iz,n)
       real c,c2,dl1,el1,f,g,h,p,r,s,tst1,tst2  !,pythag
       ! to avoid compile warning about uninitialised and type convertion
-      real:: zero=0. , one=1.  , two=2.
+      real:: one=1.  , two=2.
+!     real:: zero=0.
       real:: s2=0., c3=0.
 
 c ** 9-6-94 modified by Dan Kidger to pass 'iz' : the size of 'z'

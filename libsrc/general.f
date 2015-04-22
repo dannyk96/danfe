@@ -972,7 +972,7 @@ c
       REAL TABLE (5,-1:NMETH1)     !- 1=IR, 2=IKDIAG,  3=%IR,4=IKDIAG, 5=Mb
 
       CHARACTER NAMES (0:NMETH1)*8
-      CHARACTER LL*6
+!     CHARACTER LL*6
       DATA  NAMES/ 'Sparin  ','PCG     ','Full NxN'
      &            ,'Banred  ','Cholin  ','        ','PCG-tri '/
 
