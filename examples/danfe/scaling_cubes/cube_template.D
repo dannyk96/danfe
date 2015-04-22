@@ -2,10 +2,11 @@
 #     The common part of all the cubical data files
 #          Dan Kidger 12/04/15  (oroginal dated  29-3-96)
 #
+# note that lines that start with ! are simply copied to stdout
 
 *DEBUG
-! 1 2     ! some timings
-! 9 2     !- PCG counts
+c 1 2     ! some timings
+c 9 2     !- PCG counts
 
 *CONTROL
  2     -1    !- 0=elastic only, -1= no stress calcs either
@@ -20,7 +21,7 @@ c12     0    !- 0=no-preconditioner, 1=diagonal precon
 *THREE_DIMENSIONAL
 !
 ! A mesh of nxe^3 finit elements of 100m on each side
-! a uniform pressur eof 1mm is applied downwards to one quarter.
+! a uniform pressure of 1mm is applied downwards to one quarter.
 !
 *SUPERBLOCK
  1       3 _ELTYPE_ 1

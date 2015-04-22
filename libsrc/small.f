@@ -1629,11 +1629,11 @@
 !     .. inspired from B+G (1992)
 !         DJK  15-11-96
 !
-      PHIR = PHI*4.*ATAN(1.)/180.
-      SNPH = SIN (PHIR)
-      CSPH = COS (PHIR)
-      SNTH = SIN (THETA)
-      CSTH = COS (THETA)
+!      PHIR = PHI*4.*ATAN(1.)/180.
+!      SNPH = SIN (PHIR)
+!      CSPH = COS (PHIR)
+!      SNTH = SIN (THETA)
+!      CSTH = COS (THETA)
 !      A = DSBAR*(CSTH/SQRT(3.)-SNTH*SNPH/3.)
 !      B = -SNPH*SIGM +   C*CSPH
 !      F = A - B

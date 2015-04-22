@@ -413,6 +413,7 @@ c    &        ,file_out*128       !-- an output file
       REAL TIME(20)               !-- Program run-timings
       CHARACTER DATE_STAMP*20     !-- current date function
       EXTERNAL  DATE_STAMP
+      integer :: stderr=0         ! for bar line like output
 
       DATA U0,u2,U3/ 40, 78,80/   !- file numbers
 
@@ -443,6 +444,7 @@ c   9=verbose
 c
       DATA (IDBG(I),I=1,10) /
 
+! next is superceded by iverb
      &   2,  ! (1) KEYWORDS: 1=echo, 2=show effect (usu =1-5 lines, eg BCs)
 c                            3= --show NEL,NN every step etc. too.--
      &   1,  ! (2) TIMINGS : 1=job summary, 2=for every keyword
@@ -451,13 +453,16 @@ c                            3=for every iteration (CG solver, etc.)
 c                            2= contours too etc.. :-)
      &   0,  ! (4)
      &   0,  ! (5)
+! next can be superceded by iverb
      &   0,  ! (6) COUNTERS : 2 = Elements in FORM_KM, PLASTICITY, etc. :-(
-
+!TODO supercede by iverb ?
      &   1,  ! (7) ? LOADSTEP : 1 = show sum-loads, mean-disp
 C                              * The sum-loads, avg-disp table every loadstep
 c                              also end of *ANALYSE tables ..sigma-max, etc.?
 c                              (=1 for just a counter?)
+! iverb=3 ?
      &   0,  ! (8) PLATIC_ITERATION:  1=Show max error, 2=..?
+! iverb=3  or TIMINGS flag?
      &   0,  ! (9) CG_ITERATIONS   :  1=total, 2= max error every iteration
      &   0/  !(10)
 
@@ -536,7 +541,7 @@ c     CALL SET_PAGES_RESERVE@(5)           !- try this out ?
 ! Note here also the use of environment variables to set the size of KV
 !      CALL WRITE_DANFE_BANNER (version,colorise)
       CALL WRITE_DANFE_BANNER (version,.false.)
-      PRINT*, 'Job started: ',DATE_STAMP(),
+      PRINT*, '   - Job started: ',DATE_STAMP(),
      & MNN,' Nodes,',MEL,' Elements, IKV=',IKV
 
 c------------ 2: get the input file name and open output files ---------
@@ -590,6 +595,7 @@ c   6: report how many files we used
 !          endif
         else                       !----- parse options begining with '-' or '--' -----
           if (arg2=='-') then           !--- '--' =Gnu style options----
+!           if (arg(1:2)=='--') then
             if (arg=='--usage') then
               call usage() ; stop
             elseif (arg=='--help') then
@@ -597,18 +603,26 @@ c   6: report how many files we used
             else
             call error('unknown argument:'//arg); stop
             endif
+!           endif
           else                         !-- single '-'
 !           now loop if we have say '-vvv'
-            do j=2,len_trim(arg)
+!           do j=2,len_trim(arg)
+            do j=2,2          !- so -vvvv becomes -v3
               arg2=arg(j:j)
               if (arg2 ==' ') then
                 call error ('option missing')   !(or = stdin ?)
               elseif (arg2=='h') then
                 call help(); stop
               elseif (arg2=='v') then    !---- verbosity level ----
-                 iverb = iverb+1
+                 if (trim(arg(2:))=='v') iverb = iverb+1
+                 if (trim(arg(2:))=='v0') iverb = 0    ! silent: only header block and results table
+                 if (trim(arg(2:))=='v1') iverb = 1    ! echo keywords only
+                 if (trim(arg(2:))=='v2') iverb = 2    ! echo keywords and summary
+                 if (trim(arg(2:))=='v3') iverb = 3    ! echo keywords and mor esummary
+                 if (trim(arg(2:))=='v4') iverb = 4    ! echo keywords and long outout
+                 if (trim(arg(2:))=='v5') iverb = 5    ! +debug level output
               elseif (arg2=='s') then      !silent
-                 iverb = 0
+                 iverb = 0                            ! superceded by -v0
               elseif (arg2=='g') then    !---- graphics option
                  igraph = igraph+1          !or read option?
 
@@ -635,7 +649,7 @@ c   6: report how many files we used
       if (filenames ==" ") then
         call usage (); stop
       endif
-      ipr=iverb          ! synonym
+!     ipr=iverb          ! synonym
 
 !-----------------------------------------------------------------------------
 !    Loop input files
@@ -655,7 +669,7 @@ c   6: report how many files we used
           filenames=' '
         endif
        if (iverb >=1) 
-     &print*,"Processing '",filename(1:len_trim(filename)),"'"
+     &    print*,"Processing '",filename(1:len_trim(filename)),"'"
       file=filename
       if (file.eq.' ') then
         print*,'Usage :'
@@ -917,7 +931,7 @@ c---------------------- post-processing modules ------------------------
 C---------------------- Material Properties (E,v,c,phi...) -------------
 
       ELSEIF (KEYWORD.EQ.'*MATERIAL_PROPERTIES') THEN        !(obsolete)
-        CALL R_PRPTAB (U1,IDBG(1), PRPTAB,IPRPTAB, NTYPES,NMATS)
+        CALL R_PRPTAB (U1,iverb, PRPTAB,IPRPTAB, NTYPES,NMATS)
       ELSEIF (KEYWORD.EQ.'*MAT_PROPS') THEN
 c.. good to write them out again for
         CALL R_PROPS_TOKEN  (U1, PRPTAB,IPRPTAB,MMATS, NMATS, iverb)
@@ -997,7 +1011,7 @@ c
 ! 11-3-01 added next. I think that doing it here is best, altnernative is to
 !      do at teh top of teh program, or at least if and when NN changes.
         NODE_ORDER(1) = 0           !- flag as having No optimsied BW.
-        IF (iverb >=3)
+        IF (iverb >=4)
      &  write (*,'(A,12i3)') 'DRPTVAC=',(drptvac(i),i=1,7)
         IF (iverb >=4)
      &  print*,'nodof_=',nodof_, 'nodof=', nodof
@@ -1031,8 +1045,10 @@ c        o will have 3x3 stress direction vectors if large-strain (cf Mok)
      &  '   - Storage at Gauss points =', IH+IH,' *', NEL*NGP_MAX,' GP''s  ='
      &   ,STORE_GP*8. /1024./1024.,' Mb'
         ENDIF
+!TODO malloc stresses here?
 
 c     be careful about NODOF.. if BIOT then = NDIM+1
+!6 arrays worth
         STORE_NN = 6* NN  * (NODOF)            ! loads, disps (by freedom)
 c                                              ! inc. disps, tot disps,
 c                                              ! app forces, tot force, NF(int)
@@ -1053,7 +1069,9 @@ c.. note PCGs own 'local' storage too (4 vectors ?: Xnew,P,U,D)
 c.. I need a flag to not bother storing any streses (ie if just elastic)
 c   - Hence in PLASTICITY section too
        IF (IOPS(2).GE.0) THEN    !- ie. IEVSTRS, IPORE are pseudo
+! malloc here 
          CALL NULL2D (STRESSES,IEVSTRS, IH*NGP_MAX,NEL) !- total stresses
+! only if pore pressure s switched on?
          CALL NULL2D (PORE,IPORE,NGP_MAX,NEL)
        ENDIF
 
@@ -1168,7 +1186,7 @@ c.. will need to hold it until later for Eval extraction
 
       ELSEIF (KEYWORD.EQ.'*FORM_MM') THEN
       CALL FORM_MM_GLOBAL (GC,IGC,NN,NDIM,NUMS,INUMS,NEL,PRPTAB,IPRPTAB
-     &         ,NF,INF,NODOF,N,MB,IMB,IR_MB,IOPS, IDBG(1) )
+     &         ,NF,INF,NODOF,N,MB,IMB,IR_MB,IOPS, iverb )
       tot_mass=0.
       do i=1,n
         tot_mass= tot_mass+MB(i)
@@ -1205,7 +1223,7 @@ c    otherwise we have a usable list.
 
 c---- form KDIAG for SPARIN and print KV requirements -----
 c.. so can malloc
-        ipr = idbg(1)
+!       ipr = idbg(1)
         CALL GET_KV_STATS (NUMS,INUMS,NEL, NN,NODOF,NF,INF, N,iloads
      &   ,IKV, IR, KDIAG,IKDIAG, IRK
      &   ,GROUPS,IGROUPS   ,IOPS(3),IOPS(11),iverb)
@@ -1246,7 +1264,7 @@ c   BIOT will need DTIM and THETA too. (also note the use of NODOF)
          CALL FORM_KM_ANY_GLOBAL (GC,IGC,NN,NDIM,NUMS,INUMS,NEL
      &     ,PRPTAB,IPRPTAB, NF,INF,NODOF,N,ILOADS
      &     ,KV,IKV, IR, KDIAG,IKDIAG
-     &     ,GROUPS,IGROUPS ,IOPS, idbg(1), KM_CODE,DTIM )
+     &     ,GROUPS,IGROUPS ,IOPS, iverb, KM_CODE,DTIM )
 
         CALL GET_SECS (TIME(4))
         IF (IDBG(2).GE.2) WRITE (*,'(a,f9.2,a)')
@@ -1279,7 +1297,7 @@ c 11-3-01 how come it still works if I am doing Eigen analysis , say with NxN st
         IF (IOPS(20).eq.1) THEN  !- so can swicth off for eigenanalysis
           if (iverb>=2)
      &    print*,'   - Factorising the Stiffness Matrix...'
-          CALL FACTOR_KV (KV,IR,KDIAG,N,iops(3), idbg(1))
+          CALL FACTOR_KV (KV,IR,KDIAG,N,iops(3), iverb)
         ENDIF
 !TODO : I think FACTOR_KV should also calc and return the BIG_SPRING value
 !     which is equal to the largest number (say 1.e6) * a big number (saty 1.e15)
@@ -1315,7 +1333,7 @@ c 17-3-99 Should we be able to set xs pore pressure here too?
 
       ELSEIF (KEYWORD.EQ.'*APPLY_CONSOL') THEN
         CALL APPLY_CONSOL (GC,IGC,NN,NDIM,NUMS,INUMS,NEL,
-     &          PRPTAB,IPRPTAB,STRESSES,IEVSTRS,NODOF, 'xy',IDBG(1) )
+     &          PRPTAB,IPRPTAB,STRESSES,IEVSTRS,NODOF, 'xy',iverb )
 
       ELSEIF (KEYWORD.EQ.'*APPLY_CONSOL_XZ') THEN !- for horiz slice models
 c 25-8-98 note here that If I build a layer I would like to be able to
@@ -1323,12 +1341,12 @@ c     control its initial stress state, eg. prestress for anchor-rods,
 c     and stress for tunnel linings etc.
 
         CALL APPLY_CONSOL (GC,IGC,NN,NDIM,NUMS,INUMS,NEL,
-     &          PRPTAB,IPRPTAB,STRESSES,IEVSTRS,NODOF, 'xz',IDBG(1) )
+     &          PRPTAB,IPRPTAB,STRESSES,IEVSTRS,NODOF, 'xz',iverb )
 
 c------------------------- Gravity Loading -----------------------------
       ELSEIF (KEYWORD.EQ.'*APPLY_GRAVITY') THEN
         CALL APPLY_GRAVITY (GC,IGC,NN,NDIM,NUMS,INUMS,NEL
-     &  ,PRPTAB,IPRPTAB,FORCES_N,MDF,NODOF, 230964,1., IDBG(1),IOPS(14))
+     &  ,PRPTAB,IPRPTAB,FORCES_N,MDF,NODOF, 230964,1., iverb,IOPS(14))
 
 c=======================================================================
 c               EXCAVATION   and  CONSTRUCTION
@@ -1347,7 +1365,7 @@ C          2: should we ave control over the initial stress/pp ?
           goto 888
         endif
         CALL APPLY_GRAVITY (GC,IGC,NN,NDIM,NUMS,INUMS,NEL
-     &   ,PRPTAB,IPRPTAB,FORCES_N,MDF,NODOF, JMAT,1., IDBG(1),iops(14))
+     &   ,PRPTAB,IPRPTAB,FORCES_N,MDF,NODOF, JMAT,1., iverb,iops(14))
 c... with construction .. start afresh so need to reapply BCs  :-(
         CALL ON_FREEDOMS (NUMS,INUMS,NEL, NF,INF,NN,NODOF,IBIOT)
 
@@ -1376,9 +1394,9 @@ c  loop and parse, for each, mark elements in P, thence generic.
 !  (*CHANGE_MATERIALS  is tricky - cf. set_imat of an element list)
         CALL EXCAV_FORCES (GC,IGC,NN,NDIM,NUMS,INUMS,NEL
      &    ,STRESSES,IEVSTRS, PORE,IPORE
-     &    ,FORCES_N,MDF,NODOF, JMAT, IDBG(1),IOPS(14))
+     &    ,FORCES_N,MDF,NODOF, JMAT, iverb,IOPS(14))
         CALL APPLY_GRAVITY (GC,IGC,NN,NDIM,NUMS,INUMS,NEL
-     &   ,PRPTAB,IPRPTAB,FORCES_N,MDF,NODOF, JMAT,-1., IDBG(1),IOPS(14))
+     &   ,PRPTAB,IPRPTAB,FORCES_N,MDF,NODOF, JMAT,-1., iverb,IOPS(14))
 
         CALL CHANGE_MATS (NUMS,INUMS,NEL, JMAT, -JMAT,nchange)     !- 'off'
         WRITE (U3,'(a/2I4)') '*CHANGE_MATERIALS', JMAT,-JMAT   !- so plot chnges
@@ -1394,7 +1412,7 @@ c=======================================================================
 c by pore pressure too ?
       ELSEIF (KEYWORD.EQ.'*MATS_BY_STRESS') THEN
         CALL R_MATS_BY_STRESS (U1,GC,IGC,NN,NDIM,NUMS,INUMS,NEL, P,
-     &               PRPTAB,IPRPTAB,STRESSES,IEVSTRS,NODOF, IDBG(1) )
+     &               PRPTAB,IPRPTAB,STRESSES,IEVSTRS,NODOF, iverb )
 
 C-----------------------------------------------------------------------
 C-------------------- The Main Body of the Program ---------------------
@@ -1414,15 +1432,18 @@ c.... maybe do this as we go along  ?  (and do a summary at the end ?)
       N_CASES = N_CASES + 1     !-- run the rest of the program
 
 c----------------------- Data summary Output ---------------------------
+      if (iverb>=3) then
 c     WRITE(*,'(70(''-''))')
-c     IF (N_CASES.EQ.1) THEN      !-- only for the first pass ?
-c       WRITE(*,'(A,I6,'' /'',I6,'' ('',F5.1,'' % )'')')
-c     +  'Number of nodes     = ',NN   ,MELS    ,100.*NN/MELS,
-c     +  'Number of elements  = ',NEL  ,MELS-1  ,100.*NEL/(MELS-1),
-c     +  'Number of freedoms  = ',N    ,ILOADS  ,100.*N/ILOADS,
-c     +  'Size of KV          = ',IR   ,IKV     ,100.*IR/IKV,
-c     +  'Number of materials = ',NPROP,MPROPS  ,100.*NPROP/MPROPS
+      IF (N_CASES.EQ.1) THEN      !-- only for the first pass ?
+        WRITE(*,'(A,I12,'' /'',I12,'' ('',F12.1,'' % )'')')
+     &  'Number of nodes     = ',NN   ,MNN    ,100.*NN/MNN,
+     &   'Number of elements  = ',NEL  ,MEL  ,100.*NEL/MEL,
+     &   'Number of freedoms  = ',N    ,ILOADS  ,100.*N/ILOADS,
+     &   'Size of KV          = ',IR   ,IKV     ,100.*IR/IKV,
+     &   'Number of materials = ',NPROP,MMATS ,100.*NPROP/MMATS
+       endif
 c       WRITE(*,'(70(''-''))')
+       endif
 c.. maybe rewrite the job title/ datafilename here ?
 
 c---------------- Write Job Titles to the .OUT file --------------------
@@ -1492,7 +1513,7 @@ c...... first work out how much of the 'total' load to apply
       STEP = Q_PERCENT (IY1) /100.          !- (read in as a percentage)
       PTOT = PTOT + STEP                    !- total so far (unused)
 
-      IF (IDBG(1).ge.3)                     !- each load step
+      IF (iverb.ge.5)                     !- each load step
      &   write(*,'(A,i4,a,i4,a,g12.3,a,g12.3,a)')
      &   'Load Step',iy,' /',N_LOAD_STEPS
      &   ,' Step=',Q_PERCENT (IY1)
@@ -1576,10 +1597,10 @@ C-------------------- form the vector of applied loads -----------------
       DO IFREE=1,N
         TOTFORCE = TOTFORCE + LOADS(IFREE)
       ENDDO
-      ipr=idbg(1)
+!     ipr=idbg(1)
 !TODO  hmm dont want to do this for every plastic iteration
-!     if (iverb.ge.2)
-!    &WRITE(*,'(A,E20.6)') 'Total applied load=',TOTFORCE
+      if (iverb.ge.4)
+     &WRITE(*,'(A,E20.6)') 'Total applied load=',TOTFORCE
 
 C------- if BIOT then add the KP*PP loads.
 c.. cf. APPLY_GRAVITY
@@ -2069,7 +2090,7 @@ c and while we are at it find its magnitude SC = max movaemnt at a node.
 
 c--- scale eigenmode so max =1. at any node. -----
           SC= sqrt (SC)
-          if (ipr.ge.4) print*, 'scaling from a max disp=',sc,
+          if (iverb.ge.4) print*, 'scaling from a max disp=',sc,
      &  '(at node #',inode,')'
           sc = 1./sc
           DO I=1,NN
@@ -2078,7 +2099,7 @@ c--- scale eigenmode so max =1. at any node. -----
             ENDDO
           ENDDO
 
-          IF (IPR.ge.4) THEN
+          IF (iverb.ge.4) THEN
 c------  check scale of this eigenmode -----
           sc=0.
           inode=0
@@ -2093,7 +2114,7 @@ c------  check scale of this eigenmode -----
             endif
           ENDDO
           SC= sqrt (SC)
-          if (ipr.ge.4) print*, 'now max disp=',sc,
+          if (iverb.ge.4) print*, 'now max disp=',sc,
      &  '(at node #',inode,')'
           endif
 
@@ -2256,7 +2277,7 @@ c     IF (IDBG(3).eq.2) CALL PLOT_MESH_DISP
 C       (GC,IGC,NDIM,NN,NUMS,INUMS,NEL, DISPS_TOT,MDF)
 
 c--------- Ruler line ---------
-      IPR=IDBG(1)
+!     IPR=IDBG(1)
 c   verbosity (1-5):
 c    0 = off, 1= mini (just *KEYWORDS)
 c    2=normal    (maybe 2 lines output per Keyword)
@@ -2274,7 +2295,7 @@ c    5= everything!
            CALL NUM_TO_CODE (NDIME,NOD,ITYPE, ELCODE)
          endif
          CALL GET_SECS (TIME(12))
-         WRITE(*,'(A,i1,a, a, I7,a,I7,a, A, a,f7.3,a, A,  a,f8.2,A )')
+         WRITE(stderr,'(A,i1,a, a, I7,a,I7,a, A, a,f7.3,a, A,  a,f8.2,A )')
      &    char(27)//'[0;45m'//
      &    '---',ndim,'D--'
      &   , elcode,    NN,' n'  ,NEL,' e'
@@ -2314,12 +2335,12 @@ C같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같
 C-----------------------------------------------------------------------
 
 C-----------------------------------------------------------------------
-      SUBROUTINE WRITE_RUNTIMES (TIME,IPR)
+      SUBROUTINE WRITE_RUNTIMES (TIME,IVERB)
 C
 C     Writes a summary table of timings : total run-time
 C
       IMPLICIT NONE
-      INTEGER IPR
+      INTEGER IVERB
       REAL TIME(10), T1,T2
       CHARACTER UNIT*1
 c     WRITE(*,'(79(''-''))')
@@ -2335,11 +2356,11 @@ c     WRITE(*,'(79(''-''))')
           unit = 'h'
         ENDIF
       ENDIF
-      IF (IPR.GE.1)
+      IF (IVERB.GE.1)
      & WRITE(*,'(A, f5.2, a,a,f13.2,a)')
      & '   - Total Run Time =', t2,unit,' =', t1,'s'
 
-      IF (IPR.GE.2) then    !- extra timing info
+      IF (IVERB.GE.2) then    !- extra timing info
         WRITE(*,'(T5,3(A,F10.2,A))')
      &      'FORM_KV =', time(4) - time(3),' s '
      &     ,'Factor  =', time(6) - time(5),' s '
@@ -2544,9 +2565,9 @@ C
 
       ELSE   !=== uncolored version ===
       WRITE (*,
-     & '(    '' +'',   76(''-'')      ,''+'' /,       '//
-     & '   5('' |'',   T15,A      ,T79,''|''/),       '//
-     & '     '' +'',   76(''-'')      ,''+'' /       )'  )
+     & '(    ''   +'',   76(''-'')      ,''+'' /,       '//
+     & '   5(''   |'',   T15,A      ,T79,''|''/),       '//
+     & '     ''   +'',   76(''-'')      ,''+'' /       )'  )
      &   '      D A N F E  Finite Element Analysis Program'
      &  ,'                   '//VERSION
      &  ,' . . .             '

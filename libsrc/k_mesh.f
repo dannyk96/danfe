@@ -476,7 +476,7 @@ C------------------- then create the new elements -------------------
 
   999 CONTINUE
       IF (IPR.GE.2) WRITE (*,'(A,I7,A,I7,   a,2i7,a)') 
-     &    '>< NN=',NN, ' NEL=',NEL, '(Nlayers,NXE=', nlay,ix-1,' )'
+     &    '   - NN=',NN, ' NEL=',NEL, '(Nlayers,NXE=', nlay,ix-1,' )'
       RETURN
       END
 
@@ -522,7 +522,7 @@ c---------------------- store the element steering ---------------------
       ENDDO
 
   999 WRITE (*,'(A,I7,A,I7,   a,2i7,a)') 
-     +    '>< NN=',NN, ' NEL=',NEL
+     +    '   - NN=',NN, ' NEL=',NEL
       RETURN
       END
 
@@ -580,7 +580,7 @@ c---------------------- store the element steering ---------------------
       ENDDO
 
   999 WRITE (*,'(A,I7,A,I7,   a,2i7,a)') 
-     &    '>< NN=',NN, ' NEL=',NEL
+     &    '   - NN=',NN, ' NEL=',NEL
       RETURN
       END
 
@@ -642,10 +642,10 @@ C------ to the next 'box' ----
         CALL MYERROR(2, 'Invalid *BASIC_BLOCK format')
       ELSEIF (NBOXES.EQ.1) THEN
         if (ipr.ge.2)
-     &  WRITE (*,'(A,I7,A)')  '>< ', nboxes,' Box created' 
+     &  WRITE (*,'(A,I7,A)')  '   - ', nboxes,' Box created' 
       ELSE
         if (ipr.ge.2)
-     &  WRITE (*,'(A,I7,A)')  '>< ', nboxes,' Boxes created' 
+     &  WRITE (*,'(A,I7,A)')  '   - ', nboxes,' Boxes created' 
       ENDIF
       RETURN
       END
@@ -667,7 +667,7 @@ C
         CALL IN_TEST (IO,IOS,*1,*999)
         NN = MAX (NN,INODE+nn_old)             !- update max node number
       ENDDO
-  999 WRITE(*,'(A,I7,A)')  '>< ',NN_NEW-1,' nodes read'
+  999 WRITE(*,'(A,I7,A)')  '   - ',NN_NEW-1,' nodes read'
       END
 
 C-----------------------------------------------------------------------
@@ -724,7 +724,7 @@ c       NEL = MAX (NEL,IEL2)       ! 10-7-96 changed to respect existing
 c    &  (NUMS,INUMS,IEL2, NUM, NOD,NDIME,ITYPE, IMAT,iel,1,1)
      &  (NUMS,INUMS,NEL, NUM, NOD,NDIME,ITYPE, IMAT,iel,1,1)
       ENDDO
-  999 WRITE(*,'(A,I7,A)')  '>< ',iel2-1,' elements read'
+  999 WRITE(*,'(A,I7,A)')  '   - ',iel2-1,' elements read'
       END
                  
 C-----------------------------------------------------------------------
@@ -845,7 +845,7 @@ c.............. add the current element ...............
      &  (NUMS,INUMS,IEL, NUM, NEN,NDIME,ITYPE, IMAT,iel,1,1)
         NEL = MAX (NEL,IEL)
       ENDDO
-  999 WRITE(*,'(A,I7,A)')  '>< ',ii,' elements read'
+  999 WRITE(*,'(A,I7,A)')  '   - ',ii,' elements read'
 
       END
 
@@ -1052,7 +1052,7 @@ c....... hmm I could even have 1d elements !
       ENDDO           ! elements   -x
       NEL = IEL
       IF (IPR.GE.2) WRITE (*,'(3(A,I7))')   
-     &  '>< NN=',NN, ' NEL=',NEL,' NOD=',nod
+     &  '   - NN=',NN, ' NEL=',NEL,' NOD=',nod
       RETURN
       END
 C-----------------------------------------------------------------------
@@ -3334,7 +3334,7 @@ c         NOD  = NUMS (INUMS  ,IEL)
           ENDIF
         ENDDO
         NEL = IC
-        WRITE(*,'(A,I4,A,I7,A)')  '>< ',KK,':',
+        WRITE(*,'(A,I4,A,I7,A)')  '   - ',KK,':',
      +               NEL1-NEL,' elements deleted'
       ENDDO
   999 RETURN
@@ -3364,7 +3364,7 @@ C
       ENDDO
       NEL = IC
       KK = 0
-      WRITE(*,'(A,I4,A,I7,A)')  '>< ',KK,':',
+      WRITE(*,'(A,I4,A,I7,A)')  '   - ',KK,':',
      +               NEL1-NEL,' elements deleted'
       RETURN
       END
@@ -3393,7 +3393,7 @@ c        ENDIF
 c      ENDDO
 c      NEL = IC
 c      KK = 0
-c      WRITE(*,'(A,I4,A,I7,A)')  '>< ',KK,':',
+c      WRITE(*,'(A,I4,A,I7,A)')  '   - ',KK,':',
 c     +               NEL1-NEL,' elements deleted'
 c      RETURN
       END
@@ -3428,7 +3428,7 @@ c       IF (abs(DET).GE. 0.0001) THEN          !-- If a 'good' element ..
         ENDIF
        ENDDO
        NEL = IC
-       WRITE(*,'(A,I4,A,I7,A)')  '>< ',1,':',
+       WRITE(*,'(A,I4,A,I7,A)')  '   - ',1,':',
      +               NEL1-NEL,' elements deleted'
       RETURN
       END
@@ -3460,7 +3460,7 @@ c
       CALL UPDATE_GC   (GC,IGC,NDIM,NN, P)
       CALL UPDATE_NUMS (NUMS,INUMS,NEL, P)
 
-      WRITE(*,'(A,I7,A)')  '>< ',NN-NN_NEW,' nodes deleted'
+      WRITE(*,'(A,I7,A)')  '   - ',NN-NN_NEW,' nodes deleted'
       NN = NN_NEW
       END
 
@@ -4553,7 +4553,7 @@ C
          WRITE (IO,'(I6,5G14.6)') I,(GC(J,I),J=1,NDIM)
       ENDDO
       IF (IPR.GE.2)
-     &WRITE(*,'(A,I7,A)')  '>< ',NN,' nodes written'
+     &WRITE(*,'(A,I7,A)')  '   - ',NN,' nodes written'
       call wr_danplot_selements (io,nel)
       DO IEL=1,NEL
         CALL GET_ELEMENT
@@ -4562,7 +4562,7 @@ C
      &   IEL,NDIME,NOD,ITYPE, (NUM(I),I=1,NOD),IMAT
       ENDDO
       IF (IPR.GE.2)
-     &WRITE(*,'(A,I7,A)')  '>< ',NEL,' elements written'
+     &WRITE(*,'(A,I7,A)')  '   - ',NEL,' elements written'
 
       RETURN
       END  
@@ -4626,7 +4626,7 @@ C
           ENDIF
         ENDDO   !---- loop elements
         WRITE(*,'(A,I4,A,I7,A,I4)')
-     &  '>< ',KK,' :',IC,' Elements of type',MATYPE
+     &  '   - ',KK,' :',IC,' Elements of type',MATYPE
       ENDDO
   999 RETURN
       END
@@ -4796,7 +4796,7 @@ c---- should we flip it over ? ---
      &    ,IMAT,IUSER1,IUSER2,IUSER3)
         ENDIF
       ENDDO
-      WRITE(*,'(A,I7,A)')  '>< ',IC,' elements flipped over'
+      WRITE(*,'(A,I7,A)')  '   - ',IC,' elements flipped over'
       RETURN
       END
 
@@ -4818,7 +4818,7 @@ C
     1   READ (IO,*,IOSTAT=IOS) JMAT1, JMAT2
         CALL IN_TEST (IO,IOS,*1,*999)
         CALL CHANGE_MATS (NUMS,INUMS,NEL, JMAT1, JMAT2, nchange)
-      WRITE(*,'(A,I7,A,I4,A,i4)')  '>< ',nchange
+      WRITE(*,'(A,I7,A,I4,A,i4)')  '   - ',nchange
      &  ,' elements changed from' ,JMAT1,' to',JMAT2
       ENDDO
   999 RETURN
@@ -4873,7 +4873,7 @@ c     CALL IN_TEST (IO,IOS,*1,*999)
         CALL PUT_EL_IMAT (NUMS,INUMS,IEL, JMAT)
       ENDDO
       WRITE(*,'(A,I7,A,I4)')
-     &   '>< ', IC,' elements set to mat type', jmat
+     &   '   - ', IC,' elements set to mat type', jmat
 
   999 RETURN
       END
@@ -5086,7 +5086,7 @@ c     CALL IN_TEST (IO,IOS,*1,*999)
         CALL PUT_EL_IGRP (NUMS,INUMS,IEL, JGRP)
       ENDDO
       WRITE(*,'(A,I7,A,I4)')
-     &   '>< ', IC,' elements set to group type', jgrp
+     &   '   - ', IC,' elements set to group type', jgrp
 
   999 RETURN
       END
