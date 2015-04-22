@@ -15,7 +15,7 @@ rem #### Set compiler flags
 set FCOMP=
 :: Compiler option for performance
                ! add P>=Pentium Pro instructions
-rem set FOPT=%FCOMP% /P6
+set FOPT=%FCOMP% /P6
 ::
 :: compiler options for validating the source code
 ::
@@ -34,6 +34,12 @@ rem set FCOMP=%FCOMP% /UNDEF
 ::    ! so kind=8 not kind=2
 ::
 rem set FCOMP=%FCOMP% /ALT_KINDS
+
+::
+:: allow >72 columns in fixed format
+::
+set FCOMP=%FCOMP% /WIDE_SOURCE
+
 
 ::
 :: compiler options for Fotran syntax and style

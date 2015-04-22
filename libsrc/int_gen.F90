@@ -45,6 +45,7 @@
       character envvar*(*), string*(*)
 
 #ifdef __FTN95
+      character :: getenv@*(*)
       string = getenv@(envvar)
 !     call dosparam@(envvar,string)
 #else
