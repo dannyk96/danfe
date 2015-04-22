@@ -15,6 +15,9 @@
 #  we use this to generate the '.tab' and other files
 #  we also use this as 'sticky' and overrides any .d files we parse.
 
+# note next for controling where stderr goes
+#export GFORTRAN_STDERR_UNIT=10
+
 DANFE=danfe
 DANFE=../../../danfe
 
