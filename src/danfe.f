@@ -2412,7 +2412,7 @@ c------------- internal variables ---------------
 !  note some data is only relevant if using PCG
       IF (IY.EQ.-1) THEN
         PCG_MEAN =iters_pcg_tot/real(max(1,iters_tot))
-        WRITE (IO,'(A)')
+        WRITE (IO,'(4x,A)')
      &   '+-------+------+-------------+-------------'//
      &   '+--------+--------+-----+--------+'
         WRITE (IO,'(a, i6,a, i6,a, f8.1,a ,f5.2,a)')
@@ -2460,16 +2460,16 @@ c------------------- Headers on the first pass -------------------------
         K_elastic = K_tangent    !- 'initial stiffness'
         IF (abs(K_elastic).lt.1.e-20) K_elastic=1.e-20
 
-        WRITE(IO,'(A,i4,t53,i7,a)')
+        WRITE(IO,'(4x,A,i4,t53,i7,a)')
      &      'Table #', Ntable,
      &     IC,' loaded freedoms'
-        WRITE (IO,'(A)')
+        WRITE (IO,'(4x,A)')
      &   '+-------+------+-------------+-------------'//
      &   '+--------+--------+-----+--------+'
-        WRITE (IO,'(A)')
+        WRITE (IO,'(4x,A)')
      &   '| Step# | #Its | Tot.Force   |  Mean disp. '//
      &   '| %Elast |%Mob-SS |  ngp|  Time  |'
-        WRITE (IO,'(A)')
+        WRITE (IO,'(4x,A)')
      &   '+-------+------+-------------+-------------'//
      &   '+--------+--------+-----+--------+'
 
@@ -2493,7 +2493,7 @@ c      ENDIF
 c     VBAR='³'
       VBAR='|'
 
-      WRITE (IO,'(A,I6 ,A,I5  '//
+      WRITE (IO,'(4x,A,I6 ,A,I5  '//
      &         ',A,G13.4, G13.4, A,F7.2,A,f7.2, a,i5, A,A8,A)')
      &    VBAR, IY
      &  , '  ', Iter
@@ -2564,15 +2564,16 @@ C
      &                 '------------------------------------+'
 
       ELSE   !=== uncolored version ===
+      WRITE (*,*)
       WRITE (*,
-     & '(    ''   +'',   76(''-'')      ,''+'' /,       '//
-     & '   5(''   |'',   T15,A      ,T79,''|''/),       '//
-     & '     ''   +'',   76(''-'')      ,''+'' /       )'  )
+     & '(    ''    +'',   76(''-'')      ,''+'' /,       '//
+     & '   5(''    |'',   T15,A      ,T79,''|''/),       '//
+     & '     ''    +'',   76(''-'')      ,''+'' /       )'  )
      &   '      D A N F E  Finite Element Analysis Program'
      &  ,'                   '//VERSION
      &  ,' . . .             '
      &  ,'  Author : Dr. Dan Kidger, (ex. University of Manchester)'
-     &  ,'daniel.kidger@quadrics.com '
+     &  ,'daniel.kidger@gmail.com  http://github.com/dannyk96/danfe'
 
       ENDIF
       RETURN
