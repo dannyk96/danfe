@@ -698,8 +698,9 @@ C
 !     use, intrinsic :: iso_fortran_env, only : error_unit=>stderr
       IMPLICIT NONE
       CHARACTER WHAT*(*)
-      INTEGER I,N,IOP, stderr
-      stderr=0
+      INTEGER:: I,N,IOP, stderr=-1
+
+      if (stderr==-1) call my_getstderr(stderr)   ! first pass
 
 !     PRINT*,WHAT,I,' /',N,CHAR(27)//'[A'
 ! try stderr
@@ -1190,9 +1191,9 @@ C         Dan Kidger 10-3-97
 c.. hmm nicer to only write where the strings *change*
 c..  ie. only need to write the last *, then write the %number
 
-      INTEGER IPERCENT,IPERCENT_OLD, IWIDTH, stderr
+      INTEGER ::  IPERCENT,IPERCENT_OLD, IWIDTH, stderr=-1
       CHARACTER LINE*255
-      stderr=0
+      if (stderr==-1) call my_getstderr(stderr)   ! first pass
 
       IFRAC = NINT (IWIDTH * (IPERCENT/100.))
       DO I=1,IFRAC

@@ -53,6 +53,21 @@
 #endif
       end
 
+!-----------------------------------------------------------------------
+    subroutine my_getstderr(stderr)
+!
+!     returns the unit number for write() to stderr
+!
+!     use, intrinsic :: iso_fortran_env, only : error_unit=>stderr
+      implicit none
+      integer :: stderr
+#ifdef __FTN95
+      stderr=2   ! Salford FTN95 has 1,2,5,6 all going to the console
+#else
+      stderr=0   !- generic
+#endif
+    end
+
 
 !-----------------------------------------------------------------------
       SUBROUTINE GET_DATA_FILE_NAME (FILE)
