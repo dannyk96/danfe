@@ -551,7 +551,7 @@ c     If under Danplot, write to the screen in a pop-up
      &   ,CHAR(27)//'[1;32m  ',KEYWORD(1:ISTR_END(KEYWORD))
      &   ,CHAR(27)//'[0m.'
       else
-      WRITE (*,'(I3,1X,3A)') IKEYWORD,
+      WRITE (*,'(A,I3,1X,3A)') '####', IKEYWORD,
      &    '[',KEYWORD(2:ISTR_END(KEYWORD)),']'
       endif
 
@@ -695,11 +695,15 @@ c     -- also can skip a few if N>1000 (say)
 c     -- or show as a %
 C        DJK 4-4-95
 C
+!     use, intrinsic :: iso_fortran_env, only : error_unit=>stderr
       IMPLICIT NONE
       CHARACTER WHAT*(*)
-      INTEGER I,N,IOP
+      INTEGER I,N,IOP, stderr
+      stderr=0
 
-      PRINT*,WHAT,I,' /',N,CHAR(27)//'[A'
+!     PRINT*,WHAT,I,' /',N,CHAR(27)//'[A'
+! try stderr
+      write(stderr,'(a,i8,a,i8,a)') WHAT,I,' /',N,CHAR(27)//'[A'
       IF (I.EQ.N) PRINT*              !- (optional step over)
       RETURN
       END
@@ -1186,8 +1190,9 @@ C         Dan Kidger 10-3-97
 c.. hmm nicer to only write where the strings *change*
 c..  ie. only need to write the last *, then write the %number
 
-      INTEGER IPERCENT,IPERCENT_OLD, IWIDTH
+      INTEGER IPERCENT,IPERCENT_OLD, IWIDTH, stderr
       CHARACTER LINE*255
+      stderr=0
 
       IFRAC = NINT (IWIDTH * (IPERCENT/100.))
       DO I=1,IFRAC
@@ -1204,7 +1209,9 @@ c..  ie. only need to write the last *, then write the %number
         line(ip:ip) = char(ichar('0')+mod(ival,10) )
         ival = ival/10
       if (ival.ne.0) goto 12
-      WRITE (*,'(A,A)') LINE(1:IWIDTH), char(27)//'[A'
+!     WRITE (*,'(A,A)') LINE(1:IWIDTH), char(27)//'[A'
+      WRITE (stderr,'(A,A)') LINE(1:IWIDTH), char(27)//'[A'
+      if (ipercent.eq.100) write(stderr,*)
       IPERCENT_OLD= IPERCENT
       RETURN
       END

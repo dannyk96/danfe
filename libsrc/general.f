@@ -883,6 +883,7 @@ c .. nice to calc the min/max & mean_bw here (not from KDIAG!)
       DO IEL=1,NEL
         CALL GET_ELEMENT (NUMS,INUMS,IEL, NUM, NOD,NDIME,ITYPE
      &    ,IMAT,IUSER1,IUSER2,IUSER3)
+!TODO CYCLE
         IF (IMAT.GT.0) THEN                    !- skip 'missing' materials
           CALL GET_EL_IGRP (NUMS,INUMS,IEL,IGRP)
 
@@ -899,8 +900,10 @@ c         IF (BIOT) CALL EXTEND_G_BIOT (NF,INF,NOD,NUM, G,IDOF)
           TABLE(2,1) = TABLE(2,1) + 2 + IDOF         !- (+20 for basis)
           TABLE(2,6) = TABLE(2,6) + 2 + IDOF         !- (+20 for basis)
           IF (IOP_LEGO.eq.0.or.GROUPS(IGRP).eq.0) THEN
-            TABLE(1,1) = TABLE(1,1) + IDOF * IDOF         !- for CG
-            TABLE(1,6) = TABLE(1,6) +(IDOF * (IDOF+1))/2  !- for CG-upper-tri
+            IR_CG  = IR_CG  + idof*idof
+            IR_CGT = IR_CGT + (IDOF * (IDOF+1))/2 
+!           TABLE(1,1) = TABLE(1,1) + IDOF * IDOF         !- for CG
+!           TABLE(1,6) = TABLE(1,6) +(IDOF * (IDOF+1))/2  !- for CG-upper-tri
             IF (IOP_LEGO.ne.0) GROUPS(IGRP) = GROUPS(IGRP)+1  ! flag as done
           ENDIF
 
@@ -921,9 +924,13 @@ c.. dont like this ... do ibw_min myself!
 
       IR_BAN = N*(IBW_MAX+1)        !- +1 added 11-3-01
       TABLE(1,0) = IR_SP           ! SPARIN
+      TABLE(1,1) = IR_CG           ! PCG
       TABLE(1,2) = N*N             !- for a full NxN matrix
       TABLE(1,3) = IR_BAN          ! BANRED
       TABLE(1,4) = IR_BAN          ! CHOLIN
+
+      TABLE(1,6) = IR_CGT          ! PCG-tri
+
       TABLE(2,0) = N               ! ikdaig;SPARIN (rest are zero or PCG)
 
 c------ hence get the percent of total space and total Mb of storage
@@ -931,7 +938,7 @@ c... note that this assumes REAL*8 and INTEGER*4 !
       DO I=0,NMETH
         TABLE (3,I) = TABLE(1,I) / IKV           ! reals
         TABLE (4,I) = TABLE(2,I) / IKDIAG        ! integers
-        TABLE (5,I) = (8*TABLE(1,I) + 4*TABLE(2,I)) / 1024./1024.
+        TABLE (5,I) = (8*TABLE(1,I) + 4*TABLE(2,I)) / 1024./1024.  ! MB if DP.
       ENDDO
 
 c---------- write statistics table ------------
@@ -939,6 +946,9 @@ c---------- write statistics table ------------
      &     (N,ILOADS, TABLE, NMETH, IOP_PCG,
      &      IBW_MIN,IBW_MAX,IBW_MEAN, NEL,NGROUPS ,IPR )
 
+!TODO must allow extra space for any BIG_SPRINGS 
+!   this is in kdiag as <+n entries and 1 entry in KV
+! note PRECON which is N entries in KV
       IR  = nint(TABLE(1,iop_pcg))       !** return total storage required
       IRK = nint(TABLE(2,iop_pcg))       ! (oops was 1,.. 25-2-96
 

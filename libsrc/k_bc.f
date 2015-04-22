@@ -1300,7 +1300,7 @@ C
             IF (GC(K,J).LT.XMIN(K)-TOL) GOTO 2    !- skip to next node
             IF (GC(K,J).GT.XMAX(K)+TOL) GOTO 2    ! (cf CYCLE)
           ENDDO
-          if (ipr>=3) print*,j, (gc(kk,j),kk=1,ndim)
+          if (ipr>=4) print*,j, (gc(kk,j),kk=1,ndim)
           DO JJ=1,NODOF
             FORCES (JJ,J) = FORCES(JJ,J) + DATA(JJ)
           ENDDO

@@ -1374,8 +1374,8 @@ c       0: lots of titles
       INTEGER NUMS(INUMS,*), IO, P(*)
 c     INTEGER NUM(32), NUM2(32)
 c     character line*78   !, code*6
-      integer crisp_element
-      external crisp_element
+!     integer crisp_element
+!     external crisp_element
 
 c---- 1: look for headers
 
