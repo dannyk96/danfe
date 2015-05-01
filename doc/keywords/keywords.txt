@@ -744,7 +744,7 @@ necessary radius for that point. The points position is then scaled
 linearly along a line between this point and the origin to give the
 desired radius.
 .SH EXAMPLE
-    #.... << define the mesh ? >>
+    # << define the mesh ? >>
     *CIRCLE_A_SQUARE
 .SH ADVANCED
 .SH CAVEATS
@@ -1569,7 +1569,7 @@ to 3.
     *IMPORT_OFF
     # This imports from a secondary file the classic
     # Volkswagon beetle dataset (1232? shell elements)
-    < c:\OFF_FILES\VW.GEO
+    < off_files/vw.geo
 .SH ADVANCED
     OFF elements may in general have any number of nodes. Currently
 elements of 3 and 4 nodes are handled as 3-node triangles and 4-node
@@ -1659,7 +1659,7 @@ the geometric mesh data. ...
      *IMPORT_TECPLOT_MESH
      # read the tecplot demonstration space vehicle dataset
      # as a mesh only (ignoring temperatures and pressures)
-     < c:\tecplot\data\space.dat
+     < tecplot/data/space.dat
 .SH ADVANCED
 .SH CAVEATS
     Currently, only a sub-set of all the possible forms of TECPLOT data are
@@ -1742,11 +1742,11 @@ coordinates that need to be stored.
 sequenced to close up the 'gaps'.
 .SH EXAMPLE
     *IMPORT_PL
-    < c:\pl_files\ground.dat     # The first mesh
+    < pl_files/ground.dat     # The first mesh
     *IMPORT_PL                   #    added
-    < c:\pl_files\building.dat   # to the second mesh
+    < pl_files/building.dat   # to the second mesh
     # Now remove the 'extra' nodes on the interface.
-    *COALESCE_COINCIDENT_NODES
+    *JOIN_COINCIDENT_NODES
 .SH ADVANCED
 .SH CAVEATS
     This algorithm uses a simple search of order nn^2 where nn is the
@@ -3621,7 +3621,7 @@ produce high quality images of the mesh.
     ..
     *EXPORT_OFF
     # write the mesh in Object File Format for raytracing
-    > c:\OFF_FILES\VW.GEO
+    > off_files/vw.geom
 .SH ADVANCED
 .SH CAVEATS
     This implimentation just handles the '*.geom' file of geometries. The
