@@ -2443,7 +2443,9 @@ c    call calc_meanF_totD (S_D,S_F, FORCES_N,DISP_INC,BDYLDS_N,NN,NODOF)
      &        ABS(FORCES_N(J,I)).GT.1.E-20) THEN   !- if an applied force
             IC = IC + 1
             S_D1 = S_D1 + DISPS_INC (J,I) **2
-            S_F1 = S_F1 + BDYLDS_N  (J,I) **2
+            S_F1 = S_F1 + BDYLDS_N  (J,I) **2    
+!TODO  Woah! 20nb have corners with -ve reaction forces!
+!  should I be simple summing x,y,z then RMS to give 1 value ?
           ENDIF
         ENDDO
         S_D = S_D + SQRT(S_D1)
