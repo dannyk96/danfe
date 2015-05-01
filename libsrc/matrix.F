@@ -1190,6 +1190,31 @@ c     TOL = 10.**(-4)              !- adjust as necessary
      & 'CG solver', ':',n/1.e3, ' Kequations,', flops/1.e6,' mflops/itn'
 c    & ' setup=(',flops_setup/1000000.,')'
 
+!! from https://fs.hlrs.de/projects/eurompi2010/TALKS/MONDAY_INVITED/invited-eurompi10.pdf
+!! Pseudo-code 
+!    renaming: orig: me
+!     A  KV
+!     s  u
+!     r  b
+!     z  d
+!   gmma  up 
+!   
+!
+!• While (not converged)
+! niters += 1;
+! s = A * p;                          u = KV * P
+! t = p' *s;                          down = p.u
+! alpha = gmma / t;                   alpha= (b.d) /t
+!  x = x + alpha * p;                 *
+! r = r - alpha * s;                  b = b - alpha * s
+!  if rnorm2 < tol2;break;end
+! z = M * r;                          d = precon *  b
+! gmmaNew = r' * z;                   up2 =b.d
+! beta = gmmaNew / gmma;              *
+! gmma = gmmaNew;                     * (I recompute!)
+! p = z + beta * p;                   p = d  + beta*p
+!end
+
 !
 !------------------------ loop the iterations --------------------------
 !
@@ -1197,20 +1222,17 @@ c    & ' setup=(',flops_setup/1000000.,')'
 !       print*,'iters=',iters, ' /',max_iters
 
       call get_secs(t0a)            !- time before matrix:vector
-      u  =zero
+      u  =zero                      !FIXME : cg_matvec_ebe also does the null
       CALL CG_MATVEC_EBE (KV, P, U, N, KDIAG, 1,pcg%NEL)  !U =KV * P
 !----- apply the BIG_SPRINGS ------
       DO I=1,pcg%N_BS                   !(=0 if no Big springs)
         K = KDIAG (pcg%IBS_START+I)
         U(K) = U(K) + BIG_SPRING * P(K)
       ENDDO
-!     print*,'b=',b
-!     print*,'d=',d
-!     print*,'p=',p
-!     print*,'u=',u
-!     print*,'x=',x
 !     print*,'up,down,up2,alpha,beta=', up,down,up2,alpha,beta
 
+!  isnt the next exactly the same as up2 from the previous iteration?
+!  if so why recompute?
       up   = dot_product(b,d)
       down = dot_product(p,u)
       IF (ABS(DOWN).LT.1.E-30)
