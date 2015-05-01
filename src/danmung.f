@@ -41,22 +41,22 @@
 !    &         ,LINE*255     ! the whole command line
 !    &         ,KEYWORD*70   ! data input keyword 'token'
 
-      INTEGER U1             ! input mesh file
-     &       ,U2             ! output mesh file
+      INTEGER::    U1=40     ! input mesh file
+     &       ,     U2=50     ! output mesh file
 
-      INTEGER NN,NEL,NDIM,IPR, IOS, nargs
+      INTEGER::  NN=0,NEL=0,NDIM=0,IPR=2, IOS, nargs
 !     INTEGER IBEG,IEND,IC
       INTEGER IARGC           ! a function in int_gen.F to return command line args
 
 !------------------ DATA stataments ------------------------------------
-      DATA    U1/40/, U2/50/
-      DATA NEL,NN/2*0/            !-- initially NO elements etc.
-      DATA NDIM/0/                !-- default is 0-dimensions !
-      ipr = 2  !- 2 = moderate feedback
+!     DATA    U1/40/, U2/50/
+!     DATA NEL,NN/2*0/            !-- initially NO elements etc.
+!     DATA NDIM/0/                !-- default is 0-dimensions !
+!     ipr = 2  !- 2 = moderate feedback
 
 !======================================================================
       WRITE (*,'(A)') '-------- DANMUNG Mesh File translator -------'
-     &               ,'    by Dr. Dan.Kidger (d.kidger@quadrics,com)'
+     &               ,'    by Dr. Dan.Kidger (daniel.kidger@gmail.com)'
 
        nargs= iargc()     !- for IRIX etc.
 !     28-06-01 hmm can I use STDIN and STDOUT instead (and so use a flag for output format)?
@@ -90,8 +90,8 @@
 
 !---- recognise the file type by its extension (or other heurestic) ----
 
-      CALL GET_MESHFILE_TYPE (FILE_IN,  EXT_IN )
-      CALL GET_MESHFILE_TYPE (FILE_OUT, EXT_OUT)
+      CALL get_meshfile_type (FILE_IN,  EXT_IN )
+      CALL get_meshfile_type (FILE_OUT, EXT_OUT)
 !      print*,'-',ext_in,'-',ext_out,'-'
       open (u1,file=file_in,status='old',action='read',iostat=ios)
       if (ios.ne.0) then
@@ -99,6 +99,7 @@
        call myerror (2,'cannot open INPUT file')
       endif
 
+! note overload for say .png where we first create .ps then ghostscript it
       if (ext_out.eq.'pcx') then    !- we will open a binary file later.
       else
         open (u2,file=file_out,action='write',iostat=ios)   !- open for output
