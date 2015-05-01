@@ -503,8 +503,8 @@ C-----------------------------------------------------------------------
 C
 C     This is simply the common exit point for all threads in the package
 C
-      call MPI_FINALIZE(ifail)
-      if (ifail.ne.0) print*,'** problem with MPI_FINALIZE'
+!     call MPI_FINALIZE(ifail)
+!     if (ifail.ne.0) print*,'** problem with MPI_FINALIZE'
 
       STOP
       END !subroutine exit_prog
