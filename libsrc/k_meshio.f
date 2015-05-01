@@ -275,6 +275,8 @@ c     warning message
 
         if (file2.eq.' ') then
           INQUIRE (UNIT=IO,NAME=FILE)                !was missing 1-3-98
+!TODO call generate_filename()  
+!    maybe adds hostname, MPI_RANK, etc.
           file2 = FILE(1:INDEX(FILE,'.'))//'pl'
         endif
 
@@ -320,6 +322,7 @@ c.. hmm be careful as this will re-open and close DANFE's .OUT file :-(
         CALL WR_MESH_UCD (IO2,GC,IGC,NDIM,NN,NUMS,INUMS,NEL)
         CLOSE(IO2)
 
+!TODO add .x3d too
       ELSEIF (KEYWORD.EQ.'*WRITE_MESH_VRML') THEN  
         INQUIRE (UNIT=IO,NAME=FILE)
         OPEN (IO2,FILE=FILE(1:INDEX(FILE,'.'))//'wrl')
@@ -350,6 +353,7 @@ c        CALL R_ELEMENTS (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL)
 c--------------------------- Mesh Plots --------------------------------
 c      ELSEIF (KEYWORD.EQ.'*PLOT') THEN
 c         call myerror (1,'Please use *PLOT_MESH instead')
+!TODO why are PLOT_MESH and DRAW_MESH different?
       ELSEIF (KEYWORD.EQ.'*PLOT_MESH') THEN
         CALL PLOT_MESH (GC,IGC,NDIM,NN,NUMS,INUMS,NEL)
       ELSEIF (KEYWORD.EQ.'*DRAW_MESH') THEN
@@ -361,6 +365,7 @@ c        CALL PLOT_MESH_FILL (GC,IGC,NDIM,NN,NUMS,INUMS,NEL,1)
         CALL MYERROR (1,'"*PLOT_MESH_BOUNDARY" not yet available here')
 c       CALL PLOT_MESH_BOUNDARY (GC,IGC,NDIM,NN,RINGS)
 
+!TODO add .svg  for web based vector graphics
 
 C--------------------- End of all known keywords -----------------------
       ELSE
@@ -389,6 +394,7 @@ C
 
       ext=ext1
       call to_lower(ext)
+      if (ipr.ge.2) print*,'File type/extension = ',ext
 
       IF (EXT.EQ.'pl ') THEN                 !- Danplot (old) format
         CALL R_DANPLOT  (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL)
@@ -396,7 +402,12 @@ C
 c  .. we now need to call a proper parser 
 c   - it needs to be able to handle *2D, *NODES,*ELEMENTS only.
         CALL R_DANPLOT_KEY (IO,IPR,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)
+      ELSEIF (EXT.EQ.'out') THEN                 !- DANFE results file
+        CALL R_DANPLOT_KEY (IO,IPR,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)
 
+      ELSEIF (EXT.EQ.'off') THEN            !- OFF
+        read(io,'()')
+        CALL R_OFF      (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL)
       ELSEIF (EXT.EQ.'g  ') THEN            !- OFF
         CALL R_OFF      (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL)
       ELSEIF (EXT.EQ.'geo') THEN            !- OFF
