@@ -63,7 +63,8 @@ FFLAGS+=-Wno-unused-dummy-argument
 # Default is to use gfortran
 #
 FC=gfortran $(FFLAGS)
-FC_CPP=gfortran $(FFLAGS) -cpp
+FC_CPP=$(FC) -cpp
+MPIF90=gfortran $(FFLAGS) -I libsrc/
 LN=gfortran
 #
 #  MPI libraries: default os to use my dummy driver
@@ -155,7 +156,7 @@ all: $(APPS) docs examples
 # The DANFE Applications 
 #
 danfe: danfe.o $(DANLIB) $(MPILIB)
-	$(LN) -o $@ $^ $(BLASLIB)
+	$(MPIF90) -o $@ $^ $(BLASLIB)
 danmesh: danmesh.o $(DANLIB) $(MPILIB)
 	$(LN) -o $@ $^ $(BLASLIB)
 danslip: danslip.o $(DANLIB)
@@ -168,8 +169,9 @@ danfrontg: danfront.o afrontg.o  $(INT_GEN)
 
 danplot: danplot.o menu.o bits.o $(DANLIBG) $(DANLIB) $(MPILIB) real4.o
 	$(LN) -o $@ $^  $(BLASLIB) $(PLOTLIB)
-danmung: danmung.o $(DANLIB) $(MPILIB)
-	$(LN) $^ -o $@ $(BLASLIB)
+#  really we only need a small subnet of routines
+danmung: danmung.o $(DANLIB) 
+	$(LN) $^ -o $@
 
 #
 # screen based plotters
@@ -191,7 +193,7 @@ pl2ps_2win: pl2ps_2win.o
 # Source code  for the applications in src/
 #
 danfe.o: src/danfe.f
-	$(FC) -c -I libsrc $<
+	$(MPIF90) -c  $<
 danmesh.o: src/danmesh.f
 	$(FC) -c $<
 danslip.o: src/danslip.f
@@ -291,7 +293,7 @@ danplot_dll: danplot.o menu.o bits.o $(DANLIBG) $(DANLIB) $(MPILIB) real4.o
 libdanfe.a: $(DANLIB)  $(DANLIBG)
 	ar q  $@ $^
 libdanfe.so: $(DANLIB) $(DANLIBG)
-	$(LN) -shared $^ -o $@
+	$(LN) --shared $^ -o $@
 
 install:
 	-mkdir -p $(BINDIR)
@@ -302,7 +304,8 @@ install:
 #-----------------------------------------------------------
 docs:
 	@cd doc/keywords;  $(MAKE)
-
+ford:
+	ford ford_master.md -e f f90 F90
 #-----------------------------------------------------------
 #---------------------- examples----------------------------
 #-----------------------------------------------------------
