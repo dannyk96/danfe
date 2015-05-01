@@ -184,7 +184,7 @@ C
 C     This writes the filename and date (+ frame?) to the DXF output file
 C     (modelled on my PS driver)
       CHARACTER  TITLE*40, FILE2*40, VERSION*5
-     &        ,DATE_STAMP*20, BS*2, FS
+     &        ,DATE_STAMP*20, BS*1, FS
       EXTERNAL DATE_STAMP
       INTEGER RES(6)
       REAL X(5),Y(5)
