@@ -445,7 +445,7 @@ C
       INTEGER RES(6)
       REAL X(5),Y(5)
       external istr_end
-      BS='\'
+      BS='\\'             ! only used to sed a dos pathname into unix style
 
       FILE2 = TITLE
       DO I=1,istr_end(FILE2)     !- reverse backslashes for postscript output
