@@ -4,18 +4,13 @@
   'Simple Footing 32*8nq''s'
   'example 6.0 for Smith & Griffiths'
 
-c*VERBOSE
-c*QUIET
-c*DEBUG
-c  7  2       !- just the load-step tables
 c*CONTROL
 c 3     1    !- try PCG's !
 
 *CONTROL
  4   999    !- max # iterations
  5     3    !- tolerance (10**-val)
-c 6     2    !- use von Mise
- 6    -99    !- use von Mise
+c 7     2    !- use von Mise
 10     4    !- NGP=4 .. so R.I.
 #--------------------------- the mesh data ----------------------------
 *TWO_DIMENSIONAL
