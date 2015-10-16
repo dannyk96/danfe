@@ -29,7 +29,7 @@ $ danplot slope.out
 ## Contact details
 
 Dr. Dan Kidger
-danial.kidger@gmail.com
+daniel.kidger@gmail.com
 27/03/2015
 
 
