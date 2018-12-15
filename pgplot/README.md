@@ -1,7 +1,7 @@
 
 ### Notes of PGPLOT
 
-Danplot neeeds to be built using a low-level graphics libreary. Danplot was originally developed using the garphucs routines founnd in teh Salfrod FTN95 compiler on DOS and then later Windows.
+Danplot neeeds to be built using a low-level graphics library. Danplot was originally developed using the garphucs routines founnd in teh Salfrod FTN95 compiler on DOS and then later Windows.
 Around 1999 Danplot was ported to Unix / Linux and the graphics were converted to call routines from the PGPLOT library. The only graphic sdriver used was the /XWIN one. POstscript continued to nbe writen direct from the Danplot Fortran itself.
 
 
@@ -10,10 +10,10 @@ This includes a downlaod of an updated GIF driver
 
 #### Future
 
-It is hoped to port Danplot to a future graphics subsystem. This might be Qt ot raw X11 tbc.
+It is hoped to port Danplot to a future graphics subsystem. This might be Qt or raw X11 tbc.
 Also planned is to make more use of PGPLOT routines - eg to make the graphics window full screen and to allow animation on screen (as was done under Salford FTN95).
 
-The howto to build PGPLTO is taken from:
+The howto to build PGPLOT is taken from:
 http://pendientedemigracion.ucm.es/info/Astrof/software/howto/howto-pgplot.html
  
 ### Installation: method 1 - download prebuilt package
@@ -29,9 +29,9 @@ cd /tmp
 ~~~
 Also could to type ? to get a list of built in drivers and try both /GIF and /PNG 
 
-###Installation : method 2 - Compile from original source
+### Installation : method 2 - Compile from original source
 
-   1 download teh pgplot tarball from ftp://ftp.astro.caltech.edu/pub/pgplot/
+   1 download the pgplot tarball from ftp://ftp.astro.caltech.edu/pub/pgplot/
 I used the 5.2 version: ftp://ftp.astro.caltech.edu/pub/pgplot/pgplot5.2.tar.gz 
    2 Untar with tar xfz pgplot5.2.tar.gz
    3 rename the source directory: mv pgplot pgplot_src
