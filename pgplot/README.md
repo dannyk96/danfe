@@ -1,12 +1,12 @@
 
 ### Notes of PGPLOT
 
-Danplot neeeds to be built using a low-level graphics library. Danplot was originally developed using the garphucs routines founnd in teh Salfrod FTN95 compiler on DOS and then later Windows.
-Around 1999 Danplot was ported to Unix / Linux and the graphics were converted to call routines from the PGPLOT library. The only graphic sdriver used was the /XWIN one. POstscript continued to nbe writen direct from the Danplot Fortran itself.
+Danplot neeeds to be built using a low-level graphics library. Danplot was originally developed using the graphics routines founnd in the Salfrod FTN95 compiler on DOS and then later Windows.
+Around 1999 Danplot was ported to Unix / Linux and the graphics were converted to call routines from the PGPLOT library. The only graphics driver used was the /XWIN one. Postscript continued to be writen direct from the Danplot Fortran itself.
 
 
 One reference I used was http://www.star.le.ac.uk/~cgp/pgplot_Fortran95_WinXP.html
-This includes a downlaod of an updated GIF driver
+This includes a download of an updated GIF driver
 
 #### Future
 
@@ -64,7 +64,7 @@ $ grep -v ^! drivers.list
  PNDRIV 2 /TPNG      Portable Network Graphics file - transparent background C
  XWDRIV 1 /XWINDOW   Workstations running X Window System               C
 ~~~
-Unfortunately after teh makemake we need to edit the makefile to change where pgplot expect to find png.h et al.
+Unfortunately after the makemake we need to edit the makefile to change where pgplot expect to find png.h et al.
 ~~~
 t$ diff makefile ~/pgplot/makefile
 872c874
