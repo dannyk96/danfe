@@ -26,3 +26,12 @@ So
 - [x] Stick with PGPlot for a while until I am confident I understand all the features I need to port
 - [ ] Rewite in a language that is more modern, and so doesn't need features bolted on (legacy issues).
 - [ ] Look for alternative graphics libraries for MacOS (but I still need to support native Linux too!)
+
+<details>
+   <summary>Danplot porting issues</summary>
+   <p>This is where I descibed the issues found in porting Danplot ot other platforms</p>
+</details>
+
+## Some possible enhancement on a MacBook
+
+  1. Use <kbd>⌘↑</kbd> as a 'shift key' eg. when rotating/zooming the object (or the camera, or the light source)
