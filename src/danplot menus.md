@@ -15,8 +15,8 @@ no. | Name | Position | called from | Notes
 11 | Animation | L | Menu | #frames, destination, deltas of eye/COA/light/zoom, Go, bounce, save/load frames
 12 | Help    | casc. | Menu | *About* (=Danplot rainbow logo), 'sorry no help yet available'
 13 | About   | L | Help |Danplot Rainbow Logo, posted at startup, but covered by subsequent menus. 
-14 | Config | popup | File | Print setup, SVGA modes, menu color, font size. Some of thee would be better via a config file?
-15 | SVGA Modes | popup2 | Config | seems to be full of zeros, so cant change anything :sad:
+14 | Config | casc. | File | Print setup, SVGA modes, menu color, font size. Some of thee would be better via a config file?
+15 | SVGA Modes | casc2. | Config | seems to be full of zeros, so cant change anything :sad:
 16 | Colours  | L | menu | HotIron, Rainbow, matshade, interp colours, etc.
 17 | Faces+Edges | casc. | Mesh | Two columns for nodes/edges, material, facet#, node#, chess, matshade, z-depth 
 18 | Mirror | casc.| Edit | mirror in xyzXYZ, unmirror a 1/4, 
