@@ -34,4 +34,7 @@ daniel.kidger@gmail.com
 
 
 
-See here for emojis : https://www.webpagefx.com/tools/emoji-cheat-sheet/
+See here for emojis : https://www.webpagefx.com/tools/emoji-cheat-sheet/ such as :exclamation:  :bell: :book:
+
+/play horn
+
