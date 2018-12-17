@@ -34,3 +34,4 @@ daniel.kidger@gmail.com
 
 
 
+See here for emojis : https://www.webpagefx.com/tools/emoji-cheat-sheet/
