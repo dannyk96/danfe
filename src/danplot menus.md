@@ -10,11 +10,11 @@ no. | Name | Position | called from | Notes
 6 | File     | L | Menu | Open, Export, Print, Configure
 7 | Edit     | L | Menu | Select boxed, mirroring, scale/shift, nodes/elems, loads, mats, Misc.
 8 | View     | L | Menu | Zoom, dispscale, loadstep#, image rotation, light rotation, bg colour, 2x2 pics 
-9 | Contour  | L | *Value*, isosurface, shaded, rescale, #conts, line type, face type, *as menu*
+9 | Contour  | L | Menu | *Value*, isosurface, shaded, rescale, #conts, line type, face type, *as menu*
 10 | Mesh    | L | Menu | Faces+Edges, sub-edges, node#, #sub-facts, shrink 
 11 | Animation | L | Menu | #frames, destination, deltas of eye/COA/light/zoom, Go, bounce, save/load frames
 12 | Help    | casc. | Menu | *About* (=Danplot rainbow logo), 'sorry no help yet available'
-13 | About   | L | Danplot Rainbow Logo, posted at startup, but covered by subsequent menus. 
+13 | About   | L | Help |Danplot Rainbow Logo, posted at startup, but covered by subsequent menus. 
 14 | Config | popup | File | Print setup, SVGA modes, menu color, font size. Some of thee would be better via a config file?
 15 | SVGA Modes | popup2 | Config | seems to be full of zeros, so cant change anything :sad:
 16 | Colours  | L | menu | HotIron, Rainbow, matshade, interp colours, etc.
@@ -29,7 +29,7 @@ no. | Name | Position | called from | Notes
 25 | Export | casc | File | PL, OFF, NFF, Tecplot, DXF, GRD, Rayshade formats
 26 | Numbers | thin popup | various | A coloured vertical strip of 20 numbers
 27 | Vectors | L | Menu | Disp vectors, regrid lines, flownets, Stress tensors. This should really be about menu line 9 above, but was added much later?
-28 | Titles/Axes | L | Menu Title, subtutle, show axes, bounding box, window frame, conbtour legend  | | 
+28 | Titles/Axes | L | Menu | Title, subtutle, show axes, bounding box, window frame, conbtour legend  | | 
 29 | numbers | popop | misc | A big popup of 256 boxes. Used for loking at current shading, picking colours, etc. This is teh only menu where the button posiitions are all created on first pass rather than statically.
 30 | ContourVals | L | Contour | Table of everyything contourable, coords/disps/strain/stress/vonMise/FOS
 99 | Background | L | n/a  | I think that this is siomply a template used when writing new code for a new LH menu.
