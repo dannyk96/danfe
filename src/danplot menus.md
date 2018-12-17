@@ -6,7 +6,7 @@ no. | Name | Position | called from | Notes
 2 | Menu bar | top | Perm | File, Edit, Mesh, .. Help  
 3 | Image    | main | perm | only here so we can detect a mouse click here
 4 | Statusbar | Bot | Perm | shows #nodes, #elements, and last button press  
-5 | Countour  | RHS | Perm | (quick way of zooming,  not really used ) No! This is the Contouring menu
+5 | RHtool  | RHS | Perm | quick way of zooming,  not really used 
 6 | File     | L | Menu | Open, Export, Print, Configure
 7 | Edit     | L | Menu | Select boxed, mirroring, scale/shift, nodes/elems, loads, mats, Misc.
 8 | View     | L | Menu | Zoom, dispscale, loadstep#, image rotation, light rotation, bg colour, 2x2 pics 
