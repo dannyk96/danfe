@@ -55,7 +55,7 @@ Fortran implemntation that like a real time clock the dummy string "hh:mm:ss" is
 printed instead.
 
 ## EXAMPLE
-```javascript
+```c
 *NODAL_LOADS
   5. 10.    0.  -500.     !- 500kN vertical load at point (5.,10.)
 *FORM_KM
@@ -72,7 +72,7 @@ invalid because the mesh has changed, for example when excavating a tunnel or
 performing Adaptive Mesh Refinement by the h-method or the p-method.
 
 ## SEEALSO
-[*FORM_KM][form_km.md]
+[*FORM_KM](form_km.md)
 *LOAD_STEPS
 *TIME_STEPS
 *MAT_PROPS
