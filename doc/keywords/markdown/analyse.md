@@ -55,11 +55,13 @@ Fortran implemntation that like a real time clock the dummy string "hh:mm:ss" is
 printed instead.
 
 ## EXAMPLE
+```javascript
 *NODAL_LOADS
   5. 10.    0.  -500.     !- 500kN vertical load at point (5.,10.)
 *FORM_KM
 *ANALYSE
 *EOF
+````
 
 ## ADVANCED
 ## CAVEATS
