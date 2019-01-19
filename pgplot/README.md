@@ -8,6 +8,8 @@ Around 1999 Danplot was ported to Unix / Linux and the graphics were converted t
 One reference I used was http://www.star.le.ac.uk/~cgp/pgplot_Fortran95_WinXP.html
 This includes a download of an updated GIF driver
 
+see also https://github.com/bjweiner/PGPLOT-Mac-OSX-config
+
 #### Future
 
 It is hoped to port Danplot to a future graphics subsystem. This might be Qt or raw X11 tbc.
