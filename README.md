@@ -4,6 +4,8 @@ This is the source tree for DANFE - a suite of finite element software
 
 Contact:  daniel.kidger@alumni.manchester.ac.uk or daniel.kidger@gmail.com.
 
+Also see my original webpages from the year 2000 :  https://web.archive.org/web/20031029145550/http://people.man.ac.uk/~mbgasdk/
+
 The code is freely available for non-commerical use.
 
 ## List of applications
