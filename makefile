@@ -74,7 +74,8 @@ MPILIB=mpi_nul.o
 #  Graphics libarary
 #   cf  sudo apt-get install pgplot5
 #
-PLOTLIB= -L${HOME}/pgplot  -lpgplot -lX11
+# NO next gets overwritten by the include file
+PLOTLIB= -Lpgplot -lpgplot2 -lX11
 
 
 
@@ -299,6 +300,18 @@ install:
 	-mkdir -p $(BINDIR)
 	-mv $(APPS) $(BINDIR) 
 
+pgplot5.2.tar.gz:
+	wget ftp://ftp.astro.caltech.edu/pub/pgplot/pgplot5.2.tar.gz
+
+libpgplot: pgplot5.2.tar.gz
+	mkdir -p pgplot
+	tar xfz pgplot5.2.tar.gz --directory pgplot 
+	cd pgplot; cat pgplot/drivers.list | sed '/XWINDOW/s/! //' > drivers.list;
+	cd pgplot; pgplot/makemake pgplot linux g77_gcc_aout
+	cd pgplot; cat makefile | sed s'/g77/g95/'
+	#change g77 to g95
+	cd pgplot; FCOMPL=f95 make -e
+	cd pgplot; make clean
 #-----------------------------------------------------------
 #---------------------- doumentation ----------------------
 #-----------------------------------------------------------
