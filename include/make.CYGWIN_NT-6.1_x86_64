@@ -20,5 +20,6 @@
 #BLASLIB=
 
 PGPLOT_DIR=../../pgplot
+PGPLOT_DIR=pgplot
 PLOTLIB= -L${PGPLOT_DIR} -lpgplot -lX11
 
