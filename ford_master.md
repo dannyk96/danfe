@@ -6,7 +6,7 @@ project_github: https://github.com/dannyk96/danfe
 project_website: http://github.com
 summary:  A 3D finite Element Package
 author: Dr. Daniel Kidger
-author_description: An IBMer who writes Finite Element software in his spare time
+author_description: A former IBMer who writes Finite Element software in his spare time
 github: https://github.com/dannyk96
 email: daniel.kidger@gmail.com
 predocmark: >
