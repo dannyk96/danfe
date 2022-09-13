@@ -1,3 +1,4 @@
+---
 project_dir: ./src
 project_dir: ./libsrc
 output_dir: ./ford_doc
@@ -9,6 +10,7 @@ author_description: An IBMer who writes Finite Element software in his spare tim
 github: https://github.com/dannyk96
 email: daniel.kidger@gmail.com
 predocmark: >
+---
 
 @Note
 You can include any notes (or bugs, warnings, or todos) like so.
