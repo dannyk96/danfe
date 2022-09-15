@@ -19,7 +19,7 @@ You can include any notes (or bugs, warnings, or todos) like so.
 
 
 # DANFE 
-##A general putrpose 2d/3d finite elemnt analysis suite
+## A general putrpose 2d/3d finite elemnt analysis suite
 This is the source tree for DANFE - a suite of finite element software
 
 Contact:  daniel.kidger@alumni.manchester.ac.uk or daniel.kidger@gmail.com.
