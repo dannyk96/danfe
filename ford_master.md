@@ -2,6 +2,7 @@
 project_dir: ./src
 project_dir: ./libsrc
 output_dir: ./ford_doc
+graph: true
 project_github: https://github.com/dannyk96/danfe
 project_website: http://github.com
 summary:  A 3D finite Element Package
