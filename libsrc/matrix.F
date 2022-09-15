@@ -1419,7 +1419,7 @@ c-------------------- Abstract the storage info ------------------------
       IF (IPRECON.gt.0)
      &IPRE_1  = KDIAG(9)      ! pointer to the preconditioner in KV()
       N_BS    = KDIAG(11)     ! # of big_springs (for presc. disps.)
-!**FIXED 16-4-15 next line was (11) !!  which =1 not a far location in kdiag
+! **FIXED 16-4-15 next line was (11) !!  which =1 not a far location in kdiag
       IF (N_BS.gt.0) THEN
         IBS_START = KDIAG(12)       !- start of the list of big spring freedoms
         BIG_SPRING = KV (KDIAG(13)) !- value of the BIG_SPRING
@@ -3592,7 +3592,7 @@ C
 
         K = (L+IR)/2                ! midpoint of list
         ITEMP = INDX(K)
-        INDX(K) = INDX(L+1)         !> swap the 2 pointers
+        INDX(K) = INDX(L+1)         !  swap the 2 pointers
         INDX(L+1) = ITEMP
 
         IF (ARR(INDX(L+1)).GT.ARR(INDX(IR))) THEN   !- sort the triplet
@@ -3624,7 +3624,7 @@ C
 
         IF (J.LT.I) GOTO 5            !-- skip over
         ITEMP = INDX(I)
-        INDX(I) = INDX(J)             !> swap the 2 pointers over
+        INDX(I) = INDX(J)             !  swap the 2 pointers over
         INDX(J) = ITEMP
         goto 3
 c   5   CONTINUE
@@ -3690,7 +3690,7 @@ C
 
         K = (L+IR)/2                ! midpoint of list
         ITEMP = INDX(K)
-        INDX(K) = INDX(L+1)         !> swap the 2 pointers
+        INDX(K) = INDX(L+1)         !  swap the 2 pointers
         INDX(L+1) = ITEMP
 
         IF (IARR(INDX(L+1)).GT.IARR(INDX(IR))) THEN   !- sort the triplet
@@ -3722,7 +3722,7 @@ C
 
         IF (J.LT.I) GOTO 5            !-- skip over
         ITEMP = INDX(I)
-        INDX(I) = INDX(J)             !> swap the 2 pointers over
+        INDX(I) = INDX(J)             !  swap the 2 pointers over
         INDX(J) = ITEMP
         goto 3
 c   5   CONTINUE

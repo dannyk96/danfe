@@ -2966,7 +2966,7 @@ c         ... 1 implies that each triangle is independant. (?)
           WRITE (IO,'(A)')   '    )'            !- end of a 'FACE'
         ENDIF  !- only 3nt/4nq's elements
 
-        IF (IEL2.EQ.NEL2) THEN          !**** end of a block ****
+        IF (IEL2.EQ.NEL2) THEN          ! **** end of a block ****
           WRITE (IO,'(A)')
      &        '   )'             !- end of 'FACELIST' element steering section
      &      , '  )'             !- end of 'TRISET' - like ELEMENTLIST realy

@@ -1440,7 +1440,7 @@ c     ELSEIF (CKEY.EQ.'A') THEN
         IF (KEY2.eq.-99) THEN
           PRINT*,'Which Animation parameter?'
           PRINT*,'0=reset,1=GO,2=#frames,3=dest,4=filename'
-          PRINT*,'5=disp.code, 6=๋eye,7=๋coa'
+          PRINT*,'5=disp.code, 6=deye,7=dcoa'
           PRINT*,'8=store memory to PCX''s'
           READ*,KEY2
         ENDIF           
@@ -1541,7 +1541,7 @@ C------------- 'facet# to always/never draw' ---------------------------
 c.. again I can fill in a table off the menu  0,1,2 for each of the 6
 c.. must inform the user of which face is which
 c.. even show on the menu itself
-      ELSEIF (CKEY.EQ.'E')THEN           !-- was '|' , & then was แ  !!
+      ELSEIF (CKEY.EQ.'E')THEN           !-- was '|' , & then was xx  !!
         write(*,'(a,6i2)')'Facet codes(1..6)?=',(ID_FACE(i),i=1,6)
         write(*,*) '0 = selective(default), 1=never, 2=always'
         read*,(ID_FACE(i),i=1,6)
@@ -1986,7 +1986,8 @@ c-----------------------------------------------------------------------
 C --> menu-driven  eye-angle/eye-pan/light-source changing etc. ?
 C.. can make a subroutine .. nicer if we hold ALL these real numbers in
 C.. a 'viewing-array' :
-      ELSEIF (INDEX ('Vh€+t-<s>%',CKEY).ge.1) THEN
+      ELSEIF (INDEX ('Vh+t-<s>%',CKEY).ge.1) THEN 
+      !! removed non-ansi for Ford - I think these are the 4 cursor keys?
         CALL CHANGE_VIEW_PARAMS (CKEY,CODES, SSC,FACT, COA, DEYE, IROT
      &            ,XME,YME, XML,YML, CV)
 
@@ -2310,7 +2311,7 @@ C-----------------------------------------------------------------------
 C--------- turn the NUMS into a list of external facets 'FACETS' -------
 C-----------------------------------------------------------------------
         CALL POST_POP_UP ( 'Determining internal/External Facets')
-        CALL FSTRIP3 (NUMS,INUMS,NEL, NN,FACETS,IFCETS,NFCETS,PL2) !*very fast*
+        CALL FSTRIP3 (NUMS,INUMS,NEL, NN,FACETS,IFCETS,NFCETS,PL2) ! *very fast*
 c... the next should be OK .. but 3D will 'wire-frame'
 c     .. so need to BPC and depth-sort 
 C        (cf 'backplanes' and other image artifacts. )
@@ -3197,24 +3198,24 @@ C=======================================================================
 
 c-----------------------------------------------------------------------
 c  Note the 'layers'
-c     ษอออออออออออออออออออออออออออออออออออออออออออออออออออออออป
-c     บ                Layers in the Image                    บ
-c     ฬอออออออออออออออออออออออออออออออออออออออออออออออออออออออน
-c     บ   -0- screen background                               บ
-c     บ   -0- axes & 'backplanes'                             บ
-c     บ    1: material colour                                 บ
-c     บ    2:   light-shading (either/or do with material ?)  บ
-c     บ    3:   disp. contours (etc.)                         บ
-c     บ    4:   flow-net lines                                บ
-c     บ    5:   re-gridded surface lines                      บ
-c     บ    5a:  displacement vectors                          บ
-c     บ    6:   sub-facet edges                               บ
-c     บ    7: facet edges                                     บ
-c     บ    8: node symbols / numbers                          บ
-c     บ    9: element # / material #                          บ
-c     บ   -0- contour legend                                  บ
-c     บ   -0- Titles                                          บ
-c     ศอออออออออออออออออออออออออออออออออออออออออออออออออออออออผ
+c     
+c     |                Layers in the Image                    |
+c     
+c     |   -0- screen background                               |
+c     |   -0- axes & 'backplanes'                             |
+c     |    1: material colour                                 |
+c     |    2:   light-shading (either/or do with material ?)  |
+c     |    3:   disp. contours (etc.)                         |
+c     |    4:   flow-net lines                                |
+c     |    5:   re-gridded surface lines                      |
+c     |    5a:  displacement vectors                          |
+c     |    6:   sub-facet edges                               |
+c     |    7: facet edges                                     |
+c     |    8: node symbols / numbers                          |
+c     |    9: element # / material #                          |
+c     |   -0- contour legend                                  |
+c     |   -0- Titles                                          |
+c    |
 c-----------------------------------------------------------------------
 
 c.. really should call via my device driver
@@ -4072,7 +4073,7 @@ cc     &  ,CV(71),cv(72),cv(73),cv(74),cv(75),cv(76) )
 c.. if centered need to -= 1/2*vec(disps) ?
 c.. SAMPLE C_F to get global coords of point
 c.. and SAMPLE to get global disp, then *=FACT1             
-c.. do GPT1() and GPT2() as point๑ 0.5*VEC
+c.. do GPT1() and GPT2() as point  0.5*VEC
 c-----------------------------
 c.. I *could* get both coord and disps at once :-)
           DO J=1,3
@@ -4749,7 +4750,7 @@ c first 2 are direct, third prompts for filename, fourth picks its own name
      &, 50 ,'Anim - # frames     '! 54   cf. NLDS
      &,  0 ,'Anim - dest code    '! 55   0=no store, 1=Memory, 2=PCX 
      &,  0 ,'Anim - dx-eye       '! 56  
-     &,  0 ,'Anim - dy-eye       '! 57   .. ๋ COA for tunnels too
+     &,  0 ,'Anim - dy-eye       '! 57   .. d COA for tunnels too
      &,  0 ,'Anim - dx-light     '! 58   < load step from/to ?? >
      &,  0 ,'Anim - dy-light     '! 59  
      &,  1 ,'Anim - disp code    '! 60   0=off, 1=disps, 3 for SIN (eg.Eigen)
@@ -4774,8 +4775,8 @@ c first 2 are direct, third prompts for filename, fourth picks its own name
      &, -1 ,'sigma2              '! 72  & intermediate
      &, -1 ,'sigma3              '! 73 & most tensile  (iop for - or = ?)
      &, -1 ,'Tmax                '! 74 (max shear stain as 'X' (or / or bs)
-     &, -1 ,'Tensile zones       '! 75 show -ve ๅ3 as a dot /vector
-     &, -1 ,'Compr. zones        '! 76 show +ve ๅ1 as a dot /vector
+     &, -1 ,'Tensile zones       '! 75 show -ve s3 as a dot /vector
+     &, -1 ,'Compr. zones        '! 76 show +ve s1 as a dot /vector
 c                                      overrides 71,72,73 if tensile
      &, -1 ,'                    '! 77
      &, -1 ,'                    '! 78
@@ -5137,9 +5138,11 @@ c     CALL SELECT_SVGA_MODE (idev_x,idev_y,idev_ncols, IFAIL)
         print*,'failed to open PGPLOT''s X11 driver, exiting..'
         stop
       ENDIF
-      x1=0.;y1=0.;x2=1.;y2=1.
+      x1=-0.0;y1=0.;x2=1.0;y2=1.
+      !x1=-0.09;y1=-0.09;x2=1.09;y2=1.09
       call PGSVP (x1,x2,y1,y2)     !- set full viewport
       x1=0.;y1=0.;x2=640.;y2=480.
+      !x1=0.;y1=0.;x2=800.;y2=600.
       call PGSWIN (x1,x2,y1,y2)  !- and set internals to 800x600
 
       call SET_IDEST(1)     !- ie. on-screen graphics

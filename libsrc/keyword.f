@@ -791,7 +791,7 @@ C     Removes leading spaces from the given string =='Left Justify'
 !     USed eg when ploting node number next to nodes oin Danplot
 C     (be careful about STRING on both sides of the equation.)
 C     cf TRIM () in F90  but that only removes trailing not leading blanks
-!**OSBOLETE** as adjustl() in F90 does exactly the same
+! **OSBOLETE** as adjustl() in F90 does exactly the same
 C        DJK 6-9-95
 C
       IMPLICIT NONE

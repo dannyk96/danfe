@@ -184,7 +184,7 @@ PROGRAM  auto_mesher
 !.. NN_max should also be read in as a control
       igc = NN_max                     ! dummy array sizes
       inums = 10
-      ALLOCATE ( gc(2,NN_max) )        !*** the new nodal coords ***
+      ALLOCATE ( gc(2,NN_max) )        ! *** the new nodal coords ***
       ALLOCATE ( nums(inums,NEL_max))  !- the new element steering
       ALLOCATE ( ring(NN_MAX) )        !--- list of nodes in the front
 

@@ -1,5 +1,5 @@
 !
-!  One way of putting all teh danfe libraries into one compile 
+!  One way of putting all the danfe libraries into one compile 
 ! hence one .o file
 !
       include "keyword.f"

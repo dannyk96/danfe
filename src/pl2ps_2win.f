@@ -210,7 +210,7 @@ c      13-8-94 only do setrgbcolor if it has changed
       INTEGER N, ICOL,IOP, ICOL_OLD
       COMMON /PALETTE/PAL
       INTEGER PAL(3,0:255)
-      CHARACTER FORMAT*50, ACTION*5, TEXT*(*) !*80
+      CHARACTER FORMAT*50, ACTION*5, TEXT*(*) ! *80
       DATA ICOL_OLD/-1/     !- remember the 'last' colour
       DATA TXT_SIZE/-1./    !- remember the 'last' text size
  

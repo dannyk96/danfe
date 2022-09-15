@@ -155,12 +155,12 @@ c     &       (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)      !(IO is dummy)
 c        CALL R_TRIANGULARISE_MESH
 c     &       (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)
 
-      ELSEIF (KEYWORD.EQ.'*BISECT_ELEMENTS') THEN !*** general disection ***
+      ELSEIF (KEYWORD.EQ.'*BISECT_ELEMENTS') THEN ! `*** general disection ***
         CALL R_BISECT_ELEMENTS
      &       (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)
 
 
-      ELSEIF (KEYWORD.EQ.'*UNBISECT_ELEMENTS') THEN !*** glue together! ***
+      ELSEIF (KEYWORD.EQ.'*UNBISECT_ELEMENTS') THEN ! *** glue together! ***
         CALL R_UNBISECT_ELEMENTS
      &       (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)
 
@@ -389,16 +389,16 @@ c                       eg.  1.e-4, 100, 0.8, 'ISO', 0.65
 c-------------------------- obsolete modules ---------------------------
 
       ELSEIF (KEYWORD.EQ.'*TO_QUADS') THEN   !-- eg for 'teapot.g' 
-        CALL M_TO_QUADS  (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)  !*obs*
+        CALL M_TO_QUADS  (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)  ! *obs*
 
 c     ELSEIF (KEYWORD.EQ.'*4_3NTS_TO_4NQS') THEN   !-- eg for 'teapot.g' 
-c       CALL M_3NT_4NQ  (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)  !*obs*
+c       CALL M_3NT_4NQ  (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)  ! *obs*
 
 c     ELSEIF (KEYWORD.EQ.'*4NQS_TO_3NTS') THEN    !- slice each square '/'
-c       CALL M_4NQ_3NT  (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)    !*obs*
+c       CALL M_4NQ_3NT  (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)    ! `*obs*
 
 c      ELSEIF (KEYWORD.EQ.'*MIRROR_EVEN_ELEMENTS') THEN  ! eg for 'faces.2d'
-c        CALL MIRROR_EVENS (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)  !*obs*
+c        CALL MIRROR_EVENS (IO,GC,IGC,NDIM,NN,NUMS,INUMS,NEL,P)  ! *obs*
 
 C------------------------- else unknown --------------------------------
       ELSE
@@ -1691,7 +1691,7 @@ c
 c.. morph local to -1>+1 (only for direction in the parent that are  -1>1
 c.. > so sampling in a 6nw x,y are 0.>1, but 'z' in -1>+1.
             DO J=1,NDIME_NEW
-              SAMP(1,J) = SAMP(1,J)  * 2. - 1.     !*NOT* for triangle-parents
+              SAMP(1,J) = SAMP(1,J)  * 2. - 1.     ! *NOT* for triangle-parents
             ENDDO
 
 c-------------- Parent a triangle? Subdivision ------------------
@@ -2114,7 +2114,7 @@ c--- morph local to -1>+1 ----
 c  (only for direction in the parent that are  -1>1
 c    so sampling in a 6nw x,y are 0.>1, but 'z' in -1>+1.
         DO J=1,NDIME_NEW
-          SAMP(1,J) = SAMP(1,J)  * 2. - 1.     !*NOT* for triangle-parents
+          SAMP(1,J) = SAMP(1,J)  * 2. - 1.     ! *NOT* for triangle-parents
         ENDDO
 
       ENDIF  !- local coords for diffetn parent types: tris,quads,wedges,...
@@ -4509,7 +4509,7 @@ c.. note reverse order so bin #0 is always 100%
       nel_tot = 0
       area_tot = 0.
 
-      write (*,'(a)') 'ibin :  %, nel, area, änel, äarea'
+      write (*,'(a)') 'ibin :  %, nel, area, dnel, darea'
       do ibin=nbins,0,-1
         nel_tot=nel_tot+n_el_bin(ibin)
         area_tot=area_tot+area_bin(ibin)
@@ -4638,7 +4638,7 @@ c     &  wing,iwing,nedges,P)
      &  wing,iwing,nedges,P)
 C
 C     This converts an existing F.E. mesh into a edge-based database.
-c     This makes scanning the mesh much faster: O(N) rather than O(Ný) ?
+c     This makes scanning the mesh much faster: O(N) rather than O(N2) ?
 C      started: 6-5-97 D.Kidger
 c
 c     Format as 1: Winged edge - pointers to both elements, both nodes
@@ -7430,7 +7430,7 @@ c.. search for iend = the last element of the run that shares IGRP
 
       DO IEL3=IBEG, IEND
           CALL GET_EL_IGRP (NUMS,INUMS,P(IEL3), IGRP)
-          if (igrp.ne.igrp_base) goto 21     !*EXIT*
+          if (igrp.ne.igrp_base) goto 21     ! *EXIT*
           IEND = IEL3      !- this is OK so continue
       ENDDO
   21  CONTINUE

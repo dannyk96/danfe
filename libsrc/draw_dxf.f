@@ -122,7 +122,7 @@ c
       INTEGER N, ICOL,IOP, ICOL_OLD
       COMMON /PALETTE/PAL
       INTEGER PAL(3,0:255)
-      CHARACTER TEXT*(*) !*80
+      CHARACTER TEXT*(*) ! *80
       INTEGER I,II
       DATA ICOL_OLD/-1/     !- remember the 'last' colour
 c     DATA TXT_SIZE/-1./    !- remember the 'last' text size
@@ -162,7 +162,7 @@ c    &        0,'VERTEX',  8,1, 10,X(I), 20,0., 30,y(i)   ! y<->z flip
 
       ELSEIF (IOP.EQ. 3) THEN                      !/* draw-polyline */
             WRITE(IO,'(I3/A, 4(/I3/I5) )') 0,'POLYLINE'
-     &        ,66,1, 70,1, 8,1, 62,ICOL      !** check this = 'open-polyline'
+     &        ,66,1, 70,1, 8,1, 62,ICOL      ! ** check this = 'open-polyline'
             DO I=1,N
               WRITE(IO,'(I3/A, /I3/I5/, (I3/G14.5))')
      &        0,'VERTEX',  8,1, 10,X(I), 20,Y(I), 30,0.

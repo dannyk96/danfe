@@ -814,7 +814,7 @@ c          4  = a 'fat' cross ?
 c          5  = a standard mouse arrow (as a set of lines)
 c         10  = a rubber-band box (so store the 'anchor-point') eg. zoom
 c         11  = a resizable circle .. for fill ?
-c         20  = a dragged box frame (need xyXY of orig. & ëxy from 'anchor'
+c         20  = a dragged box frame (need xyXY of orig. & dxy from 'anchor'
 c                (eg. to move an element like the contour legend )
 c
 c     x1,y1,x2,y2 = the screen/window limits (eg 0,0,639.439)

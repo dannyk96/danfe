@@ -1,7 +1,8 @@
 ---
-project_dir: ./src
-project_dir: ./libsrc
+src_dir: ./src
+         ./libsrc
 output_dir: ./ford_doc
+exclude: qp_opengl.F
 graph: true
 project_github: https://github.com/dannyk96/danfe
 project_website: http://github.com

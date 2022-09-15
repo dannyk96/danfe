@@ -1000,12 +1000,12 @@ end module plotlib
 
 !- define the node at the head of the list as nodeN (often is nodeC)
 
-!**********************************************************************
+! **********************************************************************
 !  Test validity of this new element ABN
 !    A/ Is it a nice shape? (+ve area, not colinear)
 !    B/ Does it fit in? (doesn't cross the far segment boundary)
 ! (then we play with problems due to ring-splitting and corner-triangles..)
-!**********************************************************************
+! **********************************************************************
 !so
 !     call test_abn (xca,yca, xcb, ycb, xcn, ycn, ifail)
 !     if (ifail.ne.0) goto 30   !- try another of the 'close' points.
@@ -1285,7 +1285,7 @@ end module plotlib
       num3(2,nel) = nodeb    !- the three nodes. 
       num3(3,nel) = noden 
       num3(4,nel) = imat
-      area_remain = area_remain - area_element *(-1)!*(-iflip)
+      area_remain = area_remain - area_element *(-1)   ! *(-iflip)
       if (iverb>=3) &
       write(*,'(i7,a,g10.3,g10.3)') nel,':', area_remain, area_element
       if (area_remain/area_f < -0.02) then
@@ -2076,7 +2076,7 @@ end module plotlib
 !     xmag =     r * iresx * (xmax-2*xmin) / datax
       xmag =     r * iresx / datax
 !     xmag =       iresx * (fact+r*(xmax-xmin-xmin) / datax)
-      ymag =       xmag  !*(-1.)
+      ymag =       xmag  ! *(-1.)
       ixo =       iresx*(fact/2.-xmin/datax)
 !     iyo = iresy -iresx*(fact/2.-ymin/datax)
       iyo =        iresx*(fact/2.-ymin/datax)
@@ -2821,7 +2821,7 @@ end module plotlib
 
         K = (L+IR)/2                ! midpoint of list
         ITEMP = INDX(K)
-        INDX(K) = INDX(L+1)         !> swap the 2 pointers
+        INDX(K) = INDX(L+1)         !  swap the 2 pointers
         INDX(L+1) = ITEMP
 
         IF (ARR(INDX(L+1)).GT.ARR(INDX(IR))) THEN   !- sort the triplet
@@ -2853,7 +2853,7 @@ end module plotlib
 
         IF (J.LT.I) GOTO 5            !-- skip over
         ITEMP = INDX(I)
-        INDX(I) = INDX(J)             !> swap the 2 pointers over
+        INDX(I) = INDX(J)             !  swap the 2 pointers over
         INDX(J) = ITEMP
         goto 3
 

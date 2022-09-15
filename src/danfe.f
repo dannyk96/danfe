@@ -23,7 +23,7 @@ c      handle in order, then return. (cf file=FILE)
 c      - slaves get no file ?
 c      - slaves wait here until a master requests them - then they enter
 C        DANFE_MAIN (maybe with '-s' to flag slave status?)
-c      - 2ø DANFE_MAINs have PE/=0 but read their own files
+c      - 2  DANFE_MAINs have PE/=0 but read their own files
 
       include 'mpif.h'
 
@@ -658,7 +658,7 @@ c   6: report how many files we used
 !-----------------------------------------------------------------------------
 
 !do we reset everything here or carry on with current mesh,disps etc.?
-      files: do ifiles = 1, huge(ifiles)
+      files: do ifiles = 1, 9999
 !       print*,'filenames=', filenames, len_trim(filenames)
         if (filenames==' ') exit files     !- all done
         ipos = index(filenames,',')
@@ -2152,7 +2152,7 @@ c         < note Udiag is not time dependant so we can precalculate >
 c       F = Udiag(forced node)
 c       X1= eval(this node) - w^2
 c       X2=X1^2 + 4 w^2*Dr^2*Eval
-c       X4= F * 2 w *dr/X2 *ûeval
+c       X4= F * 2 w *dr/X2 * eval
 c       Xmod(mode) =  X3 coswt + x4 sinwt      <sinwt =dforce/dt cf vel.>
 
 c     loop freedoms
@@ -2331,9 +2331,9 @@ c       IF (IDBG(1).GE.1) CALL PRINT_FREE_MEMORY ()
       WRITE(*,'(A)') '   - DANFE analysis completed'
       END                         ! end of the main subroutine DANFE.
 C-----------------------------------------------------------------------
-C°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
-C°°°°°°°°°° End of the Main 'Event Handling' Program °°°°°°°°°°°°°°°°°°
-C°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+C
+C       End of the Main 'Event Handling' Program
+C
 C-----------------------------------------------------------------------
 
 C-----------------------------------------------------------------------
@@ -2368,7 +2368,7 @@ c     WRITE(*,'(79(''-''))')
      &     ,'Factor  =', time(6) - time(5),' s '
      &     ,'Bacsub  =', time(8) - time(7),' s '
      &     ,'all ANALYSE=', time(10)- time(9),' s '
-        WRITE(*,'(79(''Ä''))')
+        WRITE(*,'(79(''=''))')
       ENDIF
       RETURN
       END
@@ -2494,7 +2494,6 @@ c      ENDIF
      &slope = K_tangent / K_elastic *100.
       iters_tot = iters_tot + iter
 
-c     VBAR='³'
       VBAR='|'
 
       WRITE (IO,'(4x,A,I6 ,A,I5  '//

@@ -1423,7 +1423,7 @@ C
 C----------------------------------------------------------------------
       SUBROUTINE SET_COLOURS (IOP,ICOL2,ncol)
 C
-C     set the colour palette colour(s)  (ne‚ SET_PAL)
+C     set the colour palette colour(s)  (ne SET_PAL)
 C      0 = * reset to standard VGA *
 C      2 = reverses the sequence of colours (2-15)
 C      3 = inverts the RGB of all the colours

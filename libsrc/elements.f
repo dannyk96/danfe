@@ -390,7 +390,7 @@ c    hmm: maybe DANBLOCKS should use this concept for triangles
 C.... really the looping of the sub-facet nodes should be in the main
 c.... program.. a sub-routine could return them (eg. 4 node or 8 node
 C....                                             or even sub-triangles) 
-C.... ¨ or have 2 interfaces to SAMPLE .. one will do all nodes
+C....   or have 2 interfaces to SAMPLE .. one will do all nodes
 C....  the other just a given (by #?) point
 
       REAL LC_SF (ILC_SF,*)
@@ -482,7 +482,7 @@ c              . nice to have a 'get next free unit after IBASE' cf CBS)
       FOUND = .TRUE.
 
       IF (KEYWORD.EQ.'*STRIP_FACETS') THEN
-        CALL FSTRIP3 (NUMS,INUMS,NEL,NN,FACETS,IFCETS,NFCETS,P) !* super-fast *
+        CALL FSTRIP3 (NUMS,INUMS,NEL,NN,FACETS,IFCETS,NFCETS,P) ! * super-fast *
 
       ELSEIF (KEYWORD.EQ.'*QUERY_FACETS') THEN
         CALL Q_FACETS (NUMS,INUMS,NEL,NN,FACETS,IFCETS, NFCETS)
@@ -1311,7 +1311,7 @@ c----------------- 0: initiation ---------------------
 
 c------------- 1: Make sure we have got the facets stripped -------------
       IF (NFCETS.EQ.0) 
-     &CALL FSTRIP3 (NUMS,INUMS,NEL,NN,FACETS,IFCETS,NFCETS,P) !* super-fast *
+     &CALL FSTRIP3 (NUMS,INUMS,NEL,NN,FACETS,IFCETS,NFCETS,P) ! * super-fast *
 
 c------------------ 2: loop and identify each 'plane' -------------------
 c.. just do 1 for now (?)

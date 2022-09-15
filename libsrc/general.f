@@ -889,7 +889,7 @@ c .. nice to calc the min/max & mean_bw here (not from KDIAG!)
 
 c.. hmm for each 'freedom' I want to know how many nodes this element
 c is giving to it: hence IDOF =sum()
-C         IDOF = NOD * NODOF     !** hey! watch for BIOT **
+C         IDOF = NOD * NODOF     ! ** hey! watch for BIOT **
 c         call get_IDOF (NOD,NDIME,ITYPE, NODOF,IBIOT, IDOF)
           CALL FORM_G (NF,INF,NOD,NUM,NODOF, G,IDOF)
 
@@ -949,7 +949,7 @@ c---------- write statistics table ------------
 !TODO must allow extra space for any BIG_SPRINGS 
 !   this is in kdiag as <+n entries and 1 entry in KV
 ! note PRECON which is N entries in KV
-      IR  = nint(TABLE(1,iop_pcg))       !** return total storage required
+      IR  = nint(TABLE(1,iop_pcg))       ! ** return total storage required
       IRK = nint(TABLE(2,iop_pcg))       ! (oops was 1,.. 25-2-96
 
 c---------- check some errors here -----------
@@ -1100,7 +1100,7 @@ C-----------------------------------------------------------------------
      &        ,EVSTRS,IEVSTRS, PORE,IPORE
      &  ,EX_FORCES,IGF,NODOF, JMAT,IPR_EL, IAXES)
 C
-C   This forms the 'excavation' forces due   ie  F = B å
+C   This forms the 'excavation' forces due   ie  F = B d
 C   really these are the 'equlibrium' forces eg. for print-out
 C
 c   14-3-99 for effective stress analyses, we must add the PP here.
@@ -1153,7 +1153,7 @@ c Notes:
 c   1/ On first call set target_time to -1.0 - it will generate a .true.
 c      event and set a real time for the next event.
 c   2/ have a built-in value of DT (via *DEBUG?)
-c      if <0. use ÝDTÝ if <argument (so -999.= always use default)
+c      if <0. use  DT  if <argument (so -999.= always use default)
 c      if =0. then always return .true.  'cos
 c      if >0. use this value instead of passed argument (so 999. = never?)
 c   3/ What if we have no system clock?

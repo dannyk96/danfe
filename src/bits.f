@@ -212,17 +212,17 @@ C         21..  X-Coord in VAL (et seq. for 22 & 23)   (xy-coord??)
 c         29.. element area (from vector-products?)
 C       30-33   disp  in VEC  
 C         30    RMS Coord in VAL
-C         31..   X-Disp in VAL (et seq. for 32 & 33)   (éëxy etc. ??)
+C         31..   X-Disp in VAL (et seq. for 32 & 33)   (dexy etc. ??)
 C       40-49  Strain components  (plane-strain ?)
 C        40    = ?
-C        41    îx
-C        42    îy
-C        43    îxy
-C        44    îz
-C        45   ( îzx  )
-C        46   ( îzy ?) sigm
-C        47    îx      dsbar
-C        48    îx      theta
+C        41    ex
+C        42    ey
+C        43    exy
+C        44    ez
+C        45   ( ezx  )
+C        46   ( ezy ?) sigm
+C        47    ex      dsbar
+C        48    ex      theta
 C        49    DET itself :-)
 C       50-59  Elasstic Stress components (E=1.,v=.3) (cf strains
 C               .. really could pass E,v & do properly :-)
@@ -236,14 +236,14 @@ C          vectors  eg. coordinates, displacements
 C                  - x/y/z components (3), RMS xy,yz,zx,xyz (4)
 C                    thetas xy,yz,zx (3), also x-yz,(3) etc
 C          tensors  eg. stress, strain (either given or from disps?)
-C                   -x/y/z components & çxy etc. too (6)
-C                   -å1 etc. principal values (3) (also as vectors?)
-C                   - direction cosines of the å1 etc. (eigenmodes)
+C                   -x/y/z components & sxy etc. too (6)
+C                   -s1 etc. principal values (3) (also as vectors?)
+C                   - direction cosines of the s1 etc. (eigenmodes)
 C                   DSBAR,SIGM,THETA (3).. more.. ? (p/q?)
 C
 C.. so use 2 sub-subroutines :
 C      a) Vector (3 vals) and an opcode -> rms, thetas, etc.(13)
-C      b) Tensor (4/6 vals) + opcode -> å1, etc.  (14+)
+C      b) Tensor (4/6 vals) + opcode -> s1, etc.  (14+)
 C
 C    .. also concept of NODOF and if /= NDIM
 
@@ -881,7 +881,7 @@ C------------------------- image scaling -------------------------------
         READ*,SSC
 
 C---------------------- typed centre -of-attention ---------------------
-      ELSEIF (CKEY.EQ.'œ') THEN  
+      ELSEIF (CKEY.EQ.'zz') THEN     ! had for change for Ford
         WRITE(*,'(A,3F10.4)') 'Type Centre of View '
      +       ,COA(1), COA(2), COA(3)
         READ*,COA(1), COA(2), COA(3)

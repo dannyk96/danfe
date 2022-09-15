@@ -342,9 +342,9 @@ C
       INTEGER Q(4),P(4)
       CHARACTER TEXT*(*),TXT2*1
 
-      IF (TXT2.EQ.' ') THEN                                !* A title *!
+      IF (TXT2.EQ.' ') THEN                                ! * A title *!
         CALL POST_TEXT_WIDGET (Q,P, 2,0, 1,0, 0,text)
-      ELSE                                                 !* An option *!
+      ELSE                                                 ! * An option *!
         CALL POST_TEXT_WIDGET (Q,P, 2,1, 1,0, 1,text)
       ENDIF
       RETURN
@@ -1319,10 +1319,10 @@ c
 
 c     +  ,10, 40, 90,16,    'Disps:'            ,' '  ,0 
      +  ,10, 60, 90,16,    'reset'             ,'K'  ,-1
-c     +  ,10, 80, 90,16,    'ë-total'           ,'K'  ,30
-c     +  ,10,100, 25,16,    'ëx'                ,'K'  ,31
-c     +  ,40,100, 25,16,    'ëy'                ,'K'  ,32
-c     +  ,65,100, 25,16,    'ëz'                ,'K'  ,33
+c     +  ,10, 80, 90,16,    'd-total'           ,'K'  ,30
+c     +  ,10,100, 25,16,    'dx'                ,'K'  ,31
+c     +  ,40,100, 25,16,    'dy'                ,'K'  ,32
+c     +  ,65,100, 25,16,    'dz'                ,'K'  ,33
 
 c    +  ,10,120, 90,16,    'All Others-->'     ,' ' ,  0 
      +  ,10,100, 90,25,    'Value  -->'        ,'m' ,  30  !- to submenu
@@ -2874,8 +2874,8 @@ C
       YW = YW - 30 *2
       CALL MAKE_BOX (XS,YS,XW,YW,X,Y)
       CALL DR_PRIM (LINE,X,Y,4, 15, 2)     !----- 'box edge' ------
-      XS = XS + 3                     !>  nice to be able to do  <!
-      YS = YS + 3                     !>  rounded corners  :-)   <!
+      XS = XS + 3                     !   nice to be able to do  <!
+      YS = YS + 3                     !   rounded corners  :-)   <!
       XW = XW - 3 *2
       YW = YW - 3 *2
       CALL MAKE_BOX (XS,YS,XW,YW,X,Y)

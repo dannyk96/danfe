@@ -117,7 +117,7 @@
          CALL MAT_MULT (JAC,IJAC,DER,IDER,DERIV,IDERIV,NDIME,NDIME,NOD)
          CALL FORM_ANY_BEE (BEE,IBEE, DERIV,IDERIV, NOD,NDIME, 
      &     XY,FUN,IAXES,IH )
-         IF (IAXES.eq.2) DET = DET * XY(1) !*2.*3.14159265
+         IF (IAXES.eq.2) DET = DET * XY(1) ! *2.*3.14159265
          WEIGHT=  DET * WTS(IGP) *area
       
 !        IF (Erate .NE. 0) THEN     !- only do as required ?
@@ -402,7 +402,7 @@
           CALL MAT_MULT (DER,IDER,COORD,ICOORD,JAC,IJAC,NDIME,NOD,NDIME)
           CALL INVERT_JAC (JAC,IJAC,DET,NDIME)
           CALL MAT_MULT (JAC,IJAC,DER,IDER,DERIV,IDERIV,NDIME,NDIME,NOD)
-          IF (IAXES.eq.2) DET = DET * XY(1)  !*2.*3.14159265
+          IF (IAXES.eq.2) DET = DET * XY(1)  ! *2.*3.14159265
           WEIGHT=  DET * WTS(IGP) * area
           CALL FMBTDB (DERIV,IDERIV,KAY,IKAY,KP,IKP, WEIGHT, NDIME,IDOF)
         ENDDO   !--- loop GP's ---
@@ -479,7 +479,7 @@
 !.. just pass XY rather than FUN and COORD to next?
           CALL FORM_ANY_BEE (BEE,IBEE, DERIV,IDERIV, NOD,NDIME,
      &     XY,FUN,IAXES,IH )
-          IF (IAXES.eq.2) DET = DET * XY(1)  !*2.*3.14159265
+          IF (IAXES.eq.2) DET = DET * XY(1)  ! *2.*3.14159265
           CALL FORM_VOL (DERIV,IDERIV,VOL,NOD,NODOF)  ! ** note this **
           WEIGHT=  DET * WTS(IGP) *area
 !         IF (Erate .NE. 0) THEN     !- only do as required ?
@@ -729,7 +729,7 @@
         CALL MAT_MULT (DER,IDER,COORD,ICOORD,JAC,IJAC,NDIM,NOD,NDIM)
 !       CALL INVERT_JAC (JAC,IJAC,DET,NDIM)
         CALL INVERT_JAC (JAC,IJAC,DET,NDIME)          ! 25-2-98
-        IF (IAXES.eq.2) DET = DET *XY(1)  !*2.*3.14159265            ! 20-8-97
+        IF (IAXES.eq.2) DET = DET *XY(1)  ! *2.*3.14159265            ! 20-8-97
 
         WEIGHT= DET * WTS(IGP) * AREA  ! AREA<1. if a triangle 'axisym too?'
         DO J=1,NDIM           !- explicit VVMULT
@@ -801,7 +801,7 @@
         CALL MAT_MULT (JAC,IJAC,DER,IDER,DERIV,IDERIV,NDIM,NDIM,NOD)
         CALL FORM_ANY_BEE (BEE,IBEE, DERIV,IDERIV, NOD,NDIME,
      &     XY,FUN,IAXES,IH )
-        IF (IAXES.eq.2) DET = DET * XY(1) !*2.*3.14159265
+        IF (IAXES.eq.2) DET = DET * XY(1) ! *2.*3.14159265
         WEIGHT =  DET * WTS(IGP) *AREA
 
         DO K=1,IH                 
@@ -970,7 +970,7 @@
         CALL MAT_MULT (JAC,IJAC,DER,IDER,DERIV,IDERIV,NDIM,NDIM,NOD)
         CALL FORM_ANY_BEE (BEE,IBEE, DERIV,IDERIV, NOD,NDIME,
      &     XY,FUN,IAXES, IH )
-        IF (IAXES.eq.2) DET = DET * XY(1) !*2.*3.14159265
+        IF (IAXES.eq.2) DET = DET * XY(1) ! *2.*3.14159265
         WEIGHT =  DET * WTS(IGP) *AREA
 
         CALL MVMULT (BEE,IBEE,ELD,IH,IDOF,EPS_TOT) !- strain incrment
@@ -1781,7 +1781,7 @@
         ROW(4) = RPS+CPS*((1.-V)*DZ+V*(DX+DY))
         EE = E/((1.+V)*CC*(RPH*SNPS+2.*CPH*CPS*D2*D2*CC))
       ELSE                       !------ 'normal' state of affairs
-        ALP = ATAN(ABS((SX-SY)/(2.*TXY)))   ! so what is à? =p/q??
+        ALP = ATAN(ABS((SX-SY)/(2.*TXY)))   ! so what is ? =p/q??
         CA = COS(ALP)
         SA = SIN(ALP)
         DD = CC*SA
@@ -1914,8 +1914,8 @@
         DQ3 = 0.                                                      
 
 !  cf CRISP :  " MOHR COULOMB (NEAR A SINGULARITY)"
-!     dq2 = 0.25      *  (3ñsin(phi))  / DSBAR
-!      c2 = 0.5/root3 *  (3ñsin(phi))
+!     dq2 = 0.25      *  (3 sin(phi))  / DSBAR
+!      c2 = 0.5/root3 *  (3 sin(phi))
 !     so c2 is sort-of dq2 * DSBAR
 !c     S = SIN(PHI)
 !c     SRT3 = SQRT(3.)
@@ -1972,9 +1972,9 @@
 
 !.. note from CRISP...
 !    for VonMise DQ1..3  = 0., root3, 0.
-!    for Tresca  DQ1..3  = 0., 2cosé(1+tanétan3é), root3siní/(sbarýcosé)
-!    for DP(out) DQ1..3  = -6/root3*siní/(3-siní), 1. ,0.)      
-!    for DP(in)  DQ1..3  = -3*siní/û(9-3sinýí), 1. ,0.)      
+!    for Tresca  DQ1..3  = 0., 2cos (1+tan tan3 ), root3sin /(sbar cos )
+!    for DP(out) DQ1..3  = -6/root3*sin /(3-sin ), 1. ,0.)      
+!    for DP(in)  DQ1..3  = -3*sin / (9-3sin  ), 1. ,0.)      
 ! ie. these need muliplying by  1.,dsbar,sigm  or something like that.
 !--- outscribing circle ----
       DQ1 = 3. * 2 * snps / (sq3*(3.-snps))
