@@ -9,6 +9,8 @@ author: Dr. Daniel Kidger
 author_description: A former IBMer who writes Finite Element software in his spare time
 github: https://github.com/dannyk96
 email: daniel.kidger@gmail.com
+linkedin: https://www.linkedin.com/in/danielkidger/
+author_pic: https://avatars.githubusercontent.com/u/5859830?v=4
 predocmark: >
 ---
 
@@ -48,6 +50,6 @@ $ danplot slope.out
 
 Dr. Dan Kidger
 danial.kidger@gmail.com
-27/03/2015
+15/09/2022
 
 
