@@ -20,8 +20,11 @@ http://pendientedemigracion.ucm.es/info/Astrof/software/howto/howto-pgplot.html
  
 ### Installation: method 1 - download prebuilt package
    1  sudo apt-get install pgplot5
+   
    2  query where it was installed to :   dpkg -L pgplot5
+   
    3  try an example
+   
    4  Look at /usr/share/doc/pgplot5/README.Debian  for details about this implimentation. eg use of -fno-backslash and -lpng -lz -lm
 
 ~~~
@@ -50,10 +53,15 @@ $ grep -v ^! drivers.list
    9 build the custom makefile
 
    ../pgplot_src/makemake /home/dan/pgplot_src linux g77_gcc_aout
+   
    10 edit the makefile and change _g77_ to _gfortran_ on the FCOMP line
+   
    11 build with __make__
+   
    12 explot PGPLOT_DIR=~/pgplot
+   
    13 explot PGPLOT_DEV=/XWIN
+   
    13 test with ./pgdemo1
 
 #### Optional add PNG drivers - main reason is so we can create saved animations from Danplot. It also allows Danfe to create output with embedded displacement plots etc as html or .md
