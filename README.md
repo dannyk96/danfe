@@ -2,7 +2,7 @@
 ## A general purpose 2d/3d finite elemnt analysis suite
 This is the source tree for DANFE - a suite of finite element software
 
-Contact:  daniel.kidger@alumni.manchester.ac.uk or daniel.kidger@gmail.com.
+Contact:   daniel.kidger@gmail.com. (The former contacl email address of daniel.kidger@alumni.manchester.ac.uk appears to no longer work)
 
 Also see my original webpages from the year 2000 :  https://web.archive.org/web/20031029145550/http://people.man.ac.uk/~mbgasdk/
 
